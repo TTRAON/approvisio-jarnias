@@ -208,13 +208,6 @@ app.post('/api/invites', auth, adminOnly, async (req, res) => {
   } catch (e) { res.status(500).json({ error: 'Erreur' }); }
 });
 
-app.delete('/api/invites/:code', auth, adminOnly, async (req, res) => {
-  try {
-    await pool.query('DELETE FROM invite_codes WHERE code = $1 AND used_by IS NULL', [req.params.code]);
-    res.json({ ok: true });
-  } catch (e) { res.status(500).json({ error: 'Erreur' }); }
-});
-
 // ── USERS (admin) ─────────────────────────────────────────────
 app.get('/api/users', auth, adminOnly, async (req, res) => {
   try {
@@ -280,7 +273,7 @@ app.get('*', (req, res) => {
 
 // ── START ─────────────────────────────────────────────────────
 initDB().then(() => {
-  app.listen(PORT, () => {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`AppROVISIO démarré sur le port ${PORT}`);
     console.log(`Code admin de démarrage : ${BOOTSTRAP_ADMIN_CODE}`);
   });
