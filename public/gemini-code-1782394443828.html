@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Flotte Entreprise — JARNIAS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F1F5F9; color: #1E293B; font-size: 14px; display: flex; height: 100vh; overflow: hidden; }
+    
+    .app { display: flex; width: 100%; height: 100vh; overflow: hidden; }
+    .sidebar { width: 272px; min-width: 272px; background: #fff; border-right: 1px solid #E2E8F0; display: flex; flex-direction: column; overflow: hidden; }
+    .sb-brand { background: #0F172A; padding: 14px 16px; display: flex; align-items: center; gap: 10px; }
+    .sb-brand-name { font-size: 13px; font-weight: 700; color: #F1F5F9; text-transform: uppercase; letter-spacing: 0.5px; }
+    .sb-body { flex: 1; overflow-y: auto; padding: 12px 8px; }
+    
+    .sb-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; background: transparent; border: none; border-radius: 6px; color: #475569; font-size: 13px; font-weight: 500; text-align: left; cursor: pointer; margin-bottom: 2px; }
+    .sb-btn:hover { background: #F8FAFC; color: #0F172A; }
+    .sb-btn.active { background: #FFF7ED; color: #C2410C; font-weight: 600; }
+    
+    .main { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    .topbar { background: #fff; height: 53px; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; }
+    .content { flex: 1; overflow-y: auto; padding: 16px; }
+    
+    .card { background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 16px; }
+    .tbl-wrap { overflow-x: auto; }
+    .at { width: 100%; border-collapse: collapse; text-align: left; }
+    .at th { background: #F8FAFC; padding: 10px 12px; font-size: 11px; font-weight: 600; color: #64748B; text-transform: uppercase; border-bottom: 1px solid #E2E8F0; }
+    .at td { padding: 12px; border-bottom: 1px solid #E2E8F0; font-size: 13px; color: #334155; vertical-align: middle; }
+    .at tr:last-child td { border-bottom: none; }
+    
+    .plate { font-family: monospace; background: #E2E8F0; padding: 3px 6px; border-radius: 4px; font-weight: 700; color: #1E293B; letter-spacing: 0.5px; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; }
+    .btn-orange { background: #C2410C; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-orange:hover { background: #9A3412; }
+    .btn-del { background: transparent; border: none; color: #EF4444; cursor: pointer; padding: 4px; border-radius: 4px; }
+    .btn-del:hover { background: #FEF2F2; }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sb-brand">
+        <span class="sb-brand-name">🚚 JARNIAS — Gestion Flotte</span>
+      </div>
+      <div class="sb-body">
+        <button class="sb-btn active" id="btn-all" onclick="switchSection('all')"><i class="ti ti-layout-dashboard"></i> Tous les Véhicules</button>
+        <button class="sb-btn" id="btn-direction" onclick="switchSection('direction')"><i class="ti ti-briefcase"></i> Direction / Cadres</button>
+        <button class="sb-btn" id="btn-travaux" onclick="switchSection('travaux')"><i class="ti ti-building-bridge"></i> Équipes Travaux</button>
+        <button class="sb-btn" id="btn-atelier" onclick="switchSection('atelier')"><i class="ti ti-tools"></i> Atelier / Logistique</button>
+        
+        <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #E2E8F0;">
+          <a href="/" class="sb-btn" style="text-decoration: none;"><i class="ti ti-arrow-back-up"></i> Appli Approvisionnements</a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 style="font-size:14px; font-weight:700;" id="section-title">Flotte Globale de l'Entreprise</h2>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <input type="text" id="search" placeholder="Rechercher immat ou modèle..." style="padding: 6px 10px; border:1px solid #E2E8F0; border-radius:6px; outline:none; font-size:13px;" oninput="drawTable()">
+          <button class="btn-orange" onclick="addVehicle()"><i class="ti ti-plus"></i> Ajouter un véhicule</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="card">
+          <div class="tbl-wrap">
+            <table class="at">
+              <thead>
+                <tr>
+                  <th>Immatriculation</th>
+                  <th>Marque / Modèle</th>
+                  <th>Catégorie</th>
+                  <th>Attribué à</th>
+                  <th>Kilométrage</th>
+                  <th>Prochaine Révision</th>
+                  <th>Statut</th>
+                  <th style="width:40px;"></th>
+                </tr>
+              </thead>
+              <tbody id="rows">
+                </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let cars = [];
+    let currentFilter = 'all';
+    let token = localStorage.getItem("appro_token"); // Utilisation du token partagé de la session
+
+    if(!token) {
+      window.location.href = "/"; 
+    }
+
+    async function loadFleet() {
+      try {
+        let r = await fetch('/api/lists', { headers: { 'Authorization': 'Bearer ' + token } });
+        let d = await r.json();
+        cars = d.company_fleet || [];
+        drawTable();
+      } catch(e) { alert("Erreur de communication avec la base JARNIAS"); }
+    }
+
+    function drawTable() {
+      let tbody = document.getElementById('rows');
+      let searchQ = document.getElementById('search').value.toLowerCase();
+      
+      let filtered = cars.filter(c => {
+        let matchCat = currentFilter === 'all' || c.cat === currentFilter;
+        let matchSearch = c.plate.toLowerCase().includes(searchQ) || c.model.toLowerCase().includes(searchQ) || c.driver.toLowerCase().includes(searchQ);
+        return matchCat && matchSearch;
+      });
+
+      if(filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:24px; color:#64748B;">Aucun véhicule enregistré ou trouvé.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((c, i) => {
+        let isOverdue = new Date(c.nextCheck) < new Date();
+        return `
+          <tr>
+            <td><span class="plate">${c.plate}</span></td>
+            <td style="font-weight:600;">${c.model}</td>
+            <td><span class="badge" style="background:#F1F5F9; color:#475569;">${c.cat.toUpperCase()}</span></td>
+            <td><i class="ti ti-user" style="color:#94A3B8; font-size:14px; vertical-align:middle;"></i> ${c.driver}</td>
+            <td>${Number(c.kms).toLocaleString()} km</td>
+            <td style="color:${isOverdue?'#EF4444':'inherit'}; font-weight:${isOverdue?'700':'normal'};">
+              ${new Date(c.nextCheck).toLocaleDateString('fr-FR')} ${isOverdue?'⚠️ Dépassée':''}
+            </td>
+            <td><span class="badge" style="background:${c.status==='Disponible'?'#D1FAE5':'#FEE2E2'}; color:${c.status==='Disponible'?'#065F46':'#991B1B'};">${c.status}</span></td>
+            <td><button class="btn-del" onclick="deleteCar('${c.plate}')"><i class="ti ti-trash"></i></button></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function switchSection(sec) {
+      currentFilter = sec;
+      document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-'+sec).classList.add('active');
+      let titles = { all: "Flotte Globale de l'Entreprise", direction: "Parc Direction & Cadres", travaux: "Parc Utilitaires & Travaux", atelier: "Véhicules Logistique & Atelier" };
+      document.getElementById('section-title').innerText = titles[sec];
+      drawTable();
+    }
+
+    async function sync() {
+      try {
+        await fetch('/api/lists/company_fleet/seed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ data: cars })
+        });
+        loadFleet();
+      } catch(e) { alert("Erreur d'enregistrement"); }
+    }
+
+    function addVehicle() {
+      let plate = prompt("Plaque d'immatriculation (ex: AA-123-BB) :"); if(!plate) return;
+      if(cars.some(c => c.plate === plate.toUpperCase().trim())) { alert("Cette immatriculation existe déjà !"); return; }
+      
+      let model = prompt("Marque & Modèle (ex: Renault Master) :");
+      let cat = prompt("Catégorie (direction, travaux, atelier) :", "travaux");
+      let driver = prompt("Attribué à (Nom du collaborateur ou Service) :", "Disponible");
+      let kms = prompt("Kilométrage actuel :", "0");
+      let nextCheck = prompt("Date prochaine révision obligatoire (AAAA-MM-JJ) :", "2027-01-01");
+
+      cars.push({
+        plate: plate.toUpperCase().trim(),
+        model: model || "Inconnu",
+        cat: cat.toLowerCase().trim(),
+        driver: driver || "Non assigné",
+        kms: parseInt(kms) || 0,
+        nextCheck: nextCheck || "2027-01-01",
+        status: "Disponible"
+      });
+      sync();
+    }
+
+    function deleteCar(plate) {
+      if(confirm(`Supprimer définitivement le véhicule ${plate} de la flotte ?`)) {
+        cars = cars.filter(c => c.plate !== plate);
+        sync();
+      }
+    }
+
+    loadFleet();
+  </script>
+</body>
+</html>
