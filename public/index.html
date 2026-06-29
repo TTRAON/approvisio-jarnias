@@ -118,6 +118,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-pdf{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:7px 13px;font-size:13px;font-weight:600;color:#B91C1C;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit}
 .btn-pdf:hover{background:#FEE2E2}
 .btn-save{background:#10B981;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit}
+.tbi{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid #E2E8F0;background:#fff;cursor:pointer;transition:all .12s;color:#475569;padding:0}
+.tbi:hover{background:#F8FAFC;border-color:#CBD5E1;transform:translateY(-1px)}
+.tbi i{font-size:18px}
+.ui-sec{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:16px;margin-bottom:16px}
+.ui-sec-hd{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#0F172A;margin-bottom:14px}
+.ui-in{border:1px solid #E2E8F0;border-radius:8px;padding:9px 11px;font-size:13px;font-family:inherit;outline:none;background:#fff}
+.ui-in:focus{border-color:#6D28D9}
 .btn-save:hover:not(:disabled){background:#059669}
 .btn-save.saved{background:#D1FAE5;color:#065F46;cursor:default}
 .notice{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:9px 14px;font-size:13px;color:#1D4ED8;display:flex;align-items:center;gap:8px}
@@ -202,7 +209,15 @@ table.at td{padding:0}
 .cp-search{width:100%;border:1px solid #E2E8F0;border-radius:9px;padding:10px 12px 10px 36px;font-size:14px;font-family:inherit;outline:none;background:#F8FAFC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 12px center}
 .cp-search:focus{border-color:#6D28D9;background-color:#fff}
 .cp-empty{padding:30px 14px;text-align:center;color:#CBD5E1;font-size:13px}
-.type-ms{border:1px solid #E2E8F0;border-radius:9px;padding:10px;background:#F8FAFC}
+.type-ms{position:relative}
+.ms-dd{position:relative}
+.ms-trigger{display:flex;align-items:center;gap:8px;border:1px solid #E2E8F0;border-radius:9px;padding:9px 11px;background:#fff;cursor:pointer;min-height:42px}
+.ms-trigger:hover{border-color:#CBD5E1}
+.ms-trigger .ms-chips{margin-bottom:0;flex:1}
+.ms-chev{color:#94A3B8;font-size:16px;transition:transform .15s;flex-shrink:0}
+.ms-dd.open .ms-chev{transform:rotate(180deg)}
+.ms-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:50;background:#fff;border:1px solid #E2E8F0;border-radius:9px;padding:9px;box-shadow:0 10px 30px rgba(15,23,42,.14)}
+.ms-dd.open .ms-panel{display:block}
 .ms-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;min-height:24px}
 .ms-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid;border-radius:20px;padding:3px 9px;font-size:11px;font-weight:600}
 .ms-chip i{cursor:pointer;font-size:13px;opacity:.7}
@@ -231,7 +246,7 @@ table.at td{padding:0}
   #pz{display:block!important}
   .card{box-shadow:none!important;border:1px solid #ccc!important;break-inside:avoid;margin-bottom:8px}
   .fv{padding:0!important;max-width:100%!important;gap:8px!important}
-  .btn-save,.btn-ai,.btn-print,.btn-pdf,.btn-back,.btn-add,.btn-cat{display:none!important}
+  .btn-save,.btn-ai,.btn-print,.btn-pdf,.btn-back,.btn-add,.btn-cat,.tbi{display:none!important}
 }
 #pz{display:none}
 .pz-hd,.pz-ref,.pz-sec-t,.pz-info,.pz-dates,.pz-hd-flag>div{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
@@ -478,6 +493,9 @@ table.at td{padding:0}
       <button class="btn-new-sb" onclick="openNew()"><i class="ti ti-plus" style="font-size:16px"></i> Nouvelle appro</button>
       <button class="btn-admin" id="btn-admin" onclick="showAdmin()" style="display:none"><i class="ti ti-shield-lock" style="font-size:15px"></i> Administration</button>
       <button class="btn-admin" id="btn-dash" onclick="renderDashboard()" style="display:none;background:#EFF6FF;color:#1D4ED8"><i class="ti ti-chart-bar" style="font-size:15px"></i> Tableau de bord</button>
+      <button class="btn-admin" id="btn-ui" onclick="renderUISettings()" style="display:none;background:#F5F3FF;color:#6D28D9"><i class="ti ti-adjustments" style="font-size:15px"></i> Param&#233;trage interface</button>
+      <button class="btn-admin" id="btn-alo" onclick="renderAlobeesSettings()" style="display:none;background:#ECFEFF;color:#0E7490"><i class="ti ti-plug-connected" style="font-size:15px"></i> Gestion lien Alobees</button>
+      <button class="btn-admin" id="btn-trucks" onclick="renderTrucksSettings()" style="display:none;background:#FEFCE8;color:#A16207"><i class="ti ti-truck" style="font-size:15px"></i> Gestion des camions</button>
       <div id="sheets-list"></div>
     </div>
   </aside>
@@ -539,6 +557,7 @@ var AP=[
   {bg:"#FFF1F2",left:"#F43F5E",text:"#BE123C",label:"Rose"}
 ];
 var DEPOT_C={bg:"#E2E8F0",left:"#475569",text:"#334155",label:"D\u00e9p\u00f4t"};
+var TRUCKS=[];
 var CAT_ITEMS=[
   // SÉCURITÉ / EPI
   {cat:"S\u00e9curit\u00e9 / EPI",sec:"outillage",n:"Harnais cordiste",q:"1"},
@@ -955,7 +974,7 @@ function findServerId(localId){
 function mig(s){
   if(s.typeChantier==="Multi-corps d&#39;\u00e9tat")s.typeChantier="Multi-corps d\u2019\u00e9tat";
   if(s.typeChantiers===undefined)s.typeChantiers=s.typeChantier?[s.typeChantier]:[];
-  if(!s.dateAppro)s.dateAppro="";if(!s.conducteur)s.conducteur="";if(!s.coordClient)s.coordClient="";if(s.clientSite===undefined)s.clientSite="";if(!s.priorite)s.priorite="normale";if(!s.notes)s.notes=[];if(!s.statut)s.statut="en_attente";if(s.preparedAt===undefined)s.preparedAt=null;if(s.modifPrep===undefined)s.modifPrep=false;
+  if(!s.dateAppro)s.dateAppro="";if(!s.conducteur)s.conducteur="";if(!s.coordClient)s.coordClient="";if(s.clientSite===undefined)s.clientSite="";if(s.adresseChantier===undefined)s.adresseChantier="";if(!s.priorite)s.priorite="normale";if(!s.notes)s.notes=[];if(!s.statut)s.statut="en_attente";if(s.preparedAt===undefined)s.preparedAt=null;if(s.modifPrep===undefined)s.modifPrep=false;if(s.addToPrepare===undefined)s.addToPrepare=false;if(s.tlName===undefined)s.tlName="";if(s.tlCamion===undefined)s.tlCamion="";if(s.truckApplied===undefined)s.truckApplied=false;
   if(!s.dateChantier)s.dateChantier="";
   if(!s.additionDates)s.additionDates=[];
   ["consommables","fournitures","outillage"].forEach(function(k){
@@ -969,8 +988,8 @@ function mkR(n,q){return{id:uid(),designation:n||"",quantite:q||"",disponibilite
 function mkS(){
   return{id:uid(),
     reference:(function(){var n=new Date();return"REFJA"+n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0");})(),
-    noAffaire:"",nomChantier:"",chargeAffaires:"",conducteur:"",coordClient:"",clientSite:"",dateAppro:"",dateChantier:"",
-    typeChantiers:[],typeConfirmed:false,priorite:"normale",notes:[],statut:"en_attente",preparedAt:null,modifPrep:false,additionDates:[],
+    noAffaire:"",nomChantier:"",chargeAffaires:"",conducteur:"",coordClient:"",clientSite:"",adresseChantier:"",dateAppro:"",dateChantier:"",
+    typeChantiers:[],typeConfirmed:false,priorite:"normale",notes:[],statut:"en_attente",preparedAt:null,modifPrep:false,addToPrepare:false,tlName:"",tlCamion:"",truckApplied:false,additionDates:[],
     consommables:[mkR(),mkR(),mkR()],fournitures:[mkR(),mkR(),mkR()],outillage:[mkR(),mkR(),mkR()],
     observation:"",
     dateCreation:new Date().toLocaleDateString("fr-FR"),
@@ -1072,7 +1091,7 @@ function insertCp(){
     if(cur[sec].length&&!cur[sec][cur[sec].length-1].designation)cur[sec].splice(cur[sec].length-1,1);
     cur[sec].push(row);cnt++;
   });
-  if(cur.statut==="prete")cur.modifPrep=true;
+  if(cur.statut==="prete")cur.modifPrep=true;else if(cur.statut==="sur_chantier")cur.addToPrepare=true;
   saved=false;hideCp();renderForm();
   toast(cnt+" article"+(cnt>1?"s":"")+" ins&#233;r&#233;"+(cnt>1?"s":""),"ti-circle-check");
 }
@@ -1117,7 +1136,7 @@ function renderDepot(){
   if(typeof renderDeadlineBanner==="function")renderDeadlineBanner();
   cur=null;currentTab="depot";
   // List 1: a preparer (en_attente) + celles d\u00e9j\u00e0 pr\u00eates mais modifi\u00e9es (modifPrep)
-  var aPreparer=sheets.filter(function(s){return s.statut==="en_attente"||(s.statut==="prete"&&s.modifPrep);});
+  var aPreparer=sheets.filter(function(s){return s.statut==="en_attente"||(s.statut==="prete"&&s.modifPrep)||(s.statut==="sur_chantier"&&s.addToPrepare);});
   aPreparer.sort(function(a,b){
     // Les "d\u00e9j\u00e0 pr\u00eates \u00e0 compl\u00e9ter" remontent tout en haut
     var ma=(a.statut==="prete"&&a.modifPrep)?1:0;
@@ -1145,17 +1164,20 @@ function renderDepot(){
       var pr=PRIO[s.priorite]||PRIO.normale;
       var isUrgent=(s.priorite&&s.priorite!=="normale");
       var isModif=(s.statut==="prete"&&s.modifPrep);
-      var blCol=isModif?"#7C3AED":(isUrgent?pr.color:"");
-      h+="<div class=\"depot-card\""+((isModif||isUrgent)?" style=\"border-left:4px solid "+blCol+";padding-left:9px\"":"")+">";
-      if(isModif){
+      var isAddCh=(s.statut==="sur_chantier"&&s.addToPrepare);
+      var blCol=isAddCh?"#1D4ED8":(isModif?"#7C3AED":(isUrgent?pr.color:""));
+      h+="<div class=\"depot-card\""+((isModif||isUrgent||isAddCh)?" style=\"border-left:4px solid "+blCol+";padding-left:9px\"":"")+">";
+      if(isAddCh){
+        h+="<div style=\"display:flex;align-items:center;gap:6px;background:#DBEAFE;color:#1E40AF;border:1px solid #93C5FD;border-radius:7px;padding:5px 9px;font-size:11px;font-weight:700;margin-bottom:8px\"><i class=\"ti ti-tool\" style=\"font-size:13px\"></i> D\u00e9j\u00e0 sur chantier \u2014 seul l'ajout est \u00e0 pr\u00e9parer</div>";
+      } else if(isModif){
         h+="<div style=\"display:flex;align-items:center;gap:6px;background:#F3E8FF;color:#6B21A8;border:1px solid #D8B4FE;border-radius:7px;padding:5px 9px;font-size:11px;font-weight:700;margin-bottom:8px\"><i class=\"ti ti-alert-triangle\" style=\"font-size:13px\"></i> D\u00e9j\u00e0 pr\u00e9par\u00e9e \u2014 ajout/modif \u00e0 compl\u00e9ter</div>";
       }
       h+="<div onclick=\"openFromDepot('"+s.id+"')\">";
       h+="<div style=\"display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px\"><div class=\"depot-card-name\">"+esc(s.nomChantier||"Sans titre")+"</div>"+(isUrgent?prioBadge(s.priorite):"")+"</div>";
-      h+="<div class=\"depot-card-sub\">"+esc(s.conducteur||s.chargeAffaires||"Conducteur ?")+(s.dateAppro?" \u00b7 limite "+fd(s.dateAppro):"")+(isModif&&s.preparedAt?" \u00b7 1\u02b3\u1d49 pr\u00e9pa "+s.preparedAt:"")+"</div>";
+      h+="<div class=\"depot-card-sub\">"+(isAddCh&&s.tlName?"<i class=\"ti ti-user\" style=\"font-size:11px\"></i> "+esc(s.tlName):esc(s.conducteur||s.chargeAffaires||"Conducteur ?"))+(s.dateAppro&&!isAddCh?" \u00b7 limite "+fd(s.dateAppro):"")+(isModif&&s.preparedAt?" \u00b7 1\u02b3\u1d49 pr\u00e9pa "+s.preparedAt:"")+(isAddCh&&s.surChantierAt?" \u00b7 sur chantier depuis "+s.surChantierAt:"")+"</div>";
       h+="<div class=\"depot-card-items\">"+depotItemsPreview(s)+"</div>";
       h+="</div>";
-      h+="<button class=\"depot-btn depot-btn-prep\" onclick=\"depotMarkPrete('"+s.id+"')\"><i class=\"ti ti-package-import\" style=\"font-size:15px\"></i> "+(isModif?"Compl\u00e9ment pr\u00eat":"Appro pr\u00e9par\u00e9e")+"</button>";
+      h+="<button class=\"depot-btn depot-btn-prep\" onclick=\"depotMarkPrete('"+s.id+"')\"><i class=\"ti ti-package-import\" style=\"font-size:15px\"></i> "+(isAddCh?"Ajout pr\u00eat (\u00e0 r\u00e9cup\u00e9rer)":(isModif?"Compl\u00e9ment pr\u00eat":"Appro pr\u00e9par\u00e9e"))+"</button>";
       h+="</div>";
     });
   }
@@ -1192,7 +1214,7 @@ function renderDepot(){
     surChantier.forEach(function(s){
       h+="<div class=\"depot-card\" style=\"border-left:4px solid #1D4ED8;padding-left:9px\" onclick=\"openFromDepot('"+s.id+"')\">";
       h+="<div class=\"depot-card-name\">"+esc(s.nomChantier||"Sans titre")+"</div>";
-      h+="<div class=\"depot-card-sub\">"+esc(s.conducteur||s.chargeAffaires||"Conducteur ?")+(s.surChantierAt?" \u00b7 pris le "+s.surChantierAt:"")+"</div>";
+      h+="<div class=\"depot-card-sub\">"+(s.tlName?"<i class=\"ti ti-user\" style=\"font-size:11px\"></i> "+esc(s.tlName)+" (TL)":esc(s.conducteur||s.chargeAffaires||"Conducteur ?"))+(s.surChantierAt?" \u00b7 pris le "+s.surChantierAt:"")+"</div>";
       h+="<div class=\"depot-card-items\">"+depotItemsPreview(s)+"</div>";
       h+="<div style=\"display:flex;align-items:center;gap:5px;font-size:11px;color:#1D4ED8;font-weight:600\"><i class=\"ti ti-clock\" style=\"font-size:13px\"></i> En cours chez le Team Leader</div>";
       h+="</div>";
@@ -1211,7 +1233,7 @@ function renderDepot(){
       h+="<div class=\"depot-card\" style=\"border-left:4px solid #EA580C;padding-left:9px\">";
       h+="<div onclick=\"openFromDepot('"+s.id+"')\">";
       h+="<div class=\"depot-card-name\">"+esc(s.nomChantier||"Sans titre")+"</div>";
-      h+="<div class=\"depot-card-sub\">"+esc(s.conducteur||s.chargeAffaires||"Conducteur ?")+(s.renduAt?" \u00b7 rendu le "+s.renduAt:"")+"</div>";
+      h+="<div class=\"depot-card-sub\">"+(s.tlName?"<i class=\"ti ti-user\" style=\"font-size:11px\"></i> Rendu par "+esc(s.tlName)+" (TL)":esc(s.conducteur||s.chargeAffaires||"Conducteur ?"))+(s.renduAt?" \u00b7 rendu le "+s.renduAt:"")+"</div>";
       h+="<div class=\"depot-card-items\">"+depotItemsPreview(s)+"</div>";
       h+="</div>";
       h+="<button class=\"depot-btn depot-btn-rendu\" onclick=\"depotMarkRendu('"+s.id+"')\"><i class=\"ti ti-checks\" style=\"font-size:15px\"></i> Valider le rendu (chantier fini)</button>";
@@ -1255,6 +1277,14 @@ function openFromDepot(id){
 function depotMarkPrete(id){
   var s=null;sheets.forEach(function(x){if(x.id===id)s=x;});
   if(!s||!s._id)return;
+  if(s.statut==="sur_chantier"&&s.addToPrepare){
+    // L'ajout est pr\u00eat : l'appro reste SUR CHANTIER (les gars viennent r\u00e9cup\u00e9rer l'ajout)
+    s.addToPrepare=false;
+    apiCall("PUT","/appros/"+s._id,s).then(function(){
+      renderDepot();toast("Ajout pr\u00eat \u2014 \u00e0 r\u00e9cup\u00e9rer sur place","ti-package-import");
+    }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+    return;
+  }
   s.statut="prete";s.preparedAt=new Date().toLocaleDateString("fr-FR");s.modifPrep=false;
   apiCall("PUT","/appros/"+s._id,s).then(function(){
     renderDepot();toast("Appro pr\u00eate au d\u00e9p\u00f4t","ti-package-import");
@@ -1475,6 +1505,48 @@ function renderWelcome(){
 }
 
 // TABLE
+function _qtyNum(q){var n=parseInt((""+(q||"")).replace(/[^0-9]/g,""),10);return isNaN(n)?0:n;}
+function _normEq(s){return (""+(s||"")).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"");}
+function truckSelectorHTML(){
+  if(!TRUCKS.length)return "";
+  var opts="<option value=\"\">\u2014 Aucun camion \u2014</option>";
+  TRUCKS.forEach(function(t){opts+="<option value=\""+esc(t.tl)+"\""+(cur.tlCamion===t.tl?" selected":"")+">"+esc(t.tl)+"</option>";});
+  var h="<div class=\"fg fg-full\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-truck\" style=\"font-size:12px;color:#A16207\"></i> Team Leader / Camion</label><select class=\"fin\" onchange=\"setTlCamion(this.value)\">"+opts+"</select></div>";
+  var t=truckByTL(cur.tlCamion);
+  if(t){
+    h+="<div class=\"fg fg-full\" style=\"background:#FEFCE8;border:1px solid #FEF08A;border-radius:10px;padding:12px\">";
+    h+="<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px\"><span style=\"font-size:13px;font-weight:700;color:#854D0E\"><i class=\"ti ti-truck\"></i> \u00c9quipement du camion de "+esc(t.tl)+"</span>";
+    h+=cur.truckApplied?"<button onclick=\"clearTruckDeduction()\" style=\"background:#fff;border:1px solid #E2E8F0;color:#475569;border-radius:7px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-x\"></i> Annuler la d\u00e9duction</button>":"<button onclick=\"applyTruckDeduction()\" style=\"background:#A16207;color:#fff;border:none;border-radius:7px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-arrow-down\"></i> D\u00e9duire de l'appro</button>";
+    h+="</div><div style=\"display:flex;flex-wrap:wrap;gap:6px\">";
+    (t.items||[]).forEach(function(it){h+="<span style=\"font-size:11px;background:#fff;border:1px solid #FDE68A;color:#854D0E;border-radius:14px;padding:3px 9px\">"+esc(it.n)+" <b>x"+it.q+"</b></span>";});
+    if(!t.items||!t.items.length)h+="<span style=\"font-size:12px;color:#A16207\">Camion sans \u00e9quipement saisi</span>";
+    h+="</div></div>";
+  }
+  return h;
+}
+function setTlCamion(v){if(!cur)return;cur.tlCamion=v;cur.truckApplied=false;["consommables","fournitures","outillage"].forEach(function(k){(cur[k]||[]).forEach(function(r){delete r.truckQ;});});saved=false;renderForm();}
+function applyTruckDeduction(){
+  if(!cur)return;
+  var t=truckByTL(cur.tlCamion);
+  if(!t){toast("S\u00e9lectionnez un camion","ti-alert-circle");return;}
+  var map={};(t.items||[]).forEach(function(it){map[_normEq(it.n)]=it.q;});
+  var count=0;
+  ["consommables","fournitures","outillage"].forEach(function(k){
+    (cur[k]||[]).forEach(function(r){
+      if(!r.designation)return;
+      var q=map[_normEq(r.designation)];
+      if(q!=null){r.truckQ=q;count++;}
+    });
+  });
+  cur.truckApplied=true;saved=false;renderForm();
+  toast(count?count+" article(s) couvert(s) par le camion":"Aucune correspondance avec ce camion",count?"ti-truck":"ti-info-circle");
+}
+function clearTruckDeduction(){
+  if(!cur)return;
+  ["consommables","fournitures","outillage"].forEach(function(k){(cur[k]||[]).forEach(function(r){delete r.truckQ;});});
+  cur.truckApplied=false;saved=false;renderForm();
+  toast("D\u00e9duction annul\u00e9e","ti-rotate");
+}
 function tblH(sec,secColor){
   secColor=secColor||"#E2E8F0";
   var rows=cur[sec], html="";
@@ -1499,7 +1571,7 @@ function tblH(sec,secColor){
     row+="<input class=\"cin cin-d\" value=\""+esc(r.designation)+"\"";
     row+=" placeholder=\"D&#233;signation...\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'designation',this.value)\"";
-    row+=" style=\""+st+"\"/></td>";
+    row+=" style=\""+st+"\"/>"+(r.truckQ?"<div style=\"font-size:10px;color:#A16207;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px\"><i class=\"ti ti-truck\" style=\"font-size:11px\"></i> "+r.truckQ+" d\u00e9j\u00e0 dans le camion"+(_qtyNum(r.quantite)>r.truckQ?" \u00b7 "+(_qtyNum(r.quantite)-r.truckQ)+" \u00e0 pr\u00e9parer":" \u00b7 rien \u00e0 pr\u00e9parer")+"</div>":"")+"</td>";
     row+="<td data-label=\"Qt&#233;\" class=\"td-q\"><input class=\"cin\" value=\""+esc(r.quantite)+"\"";
     row+=" placeholder=\"0\" style=\"text-align:center;"+st+"\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'quantite',this.value)\"/></td>";
@@ -1571,8 +1643,8 @@ function renderForm(){
   var ai=(cur.additionDates||[]).indexOf(addDate);
   var ac=ai>=0?AP[ai%AP.length]:AP[0];
   var addBtn=addMode
-    ?"<button class=\"btn-add active\" style=\"background:"+ac.left+";border-color:"+ac.left+"\" onclick=\"togAdd()\"><i class=\"ti ti-pencil\" style=\"font-size:13px\"></i> Fin d&#39;ajout</button>"
-    :"<button class=\"btn-add\" onclick=\"togAdd()\"><i class=\"ti ti-circle-plus\" style=\"font-size:13px\"></i> Mode Ajout</button>";
+    ?"<button class=\"tbi\" style=\"background:"+ac.left+";border-color:"+ac.left+";color:#fff\" title=\"Terminer le mode ajout\" onclick=\"togAdd()\"><i class=\"ti ti-pencil\"></i></button>"
+    :"<button class=\"tbi\" style=\"color:#15803D\" title=\"Mode Ajout (lignes dat\u00e9es)\" onclick=\"togAdd()\"><i class=\"ti ti-circle-plus\"></i></button>";
   var addBanner=addMode
     ?"<div class=\"add-banner\" style=\"background:"+ac.bg+";border-color:"+ac.left+"\"><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"width:10px;height:10px;border-radius:50%;background:"+ac.left+";flex-shrink:0;display:inline-block\"></span><div><strong style=\"font-size:13px;color:"+ac.text+"\">Mode Ajout actif</strong><div style=\"font-size:11px;color:"+ac.text+";opacity:.8\">Nouvelles lignes en "+ac.label+" &#8212; "+fdB(addDate)+"</div></div></div><button style=\"background:rgba(0,0,0,.12);border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:"+ac.text+"\" onclick=\"togAdd()\">Terminer</button></div>"
     :"";
@@ -1580,7 +1652,7 @@ function renderForm(){
   var saveBtn=saved
     ?"<button class=\"btn-save saved\" disabled><i class=\"ti ti-check\"></i> Enregistr&#233;</button>"
     :"<button class=\"btn-save\" onclick=\"doSave()\">Enregistrer</button>";
-  var shareBtn=(cur&&cur._id)?"<button class=\"btn-print\" onclick=\"showShare()\" style=\"background:#FFF7ED;border-color:#FED7AA;color:#9A3412\"><i class=\"ti ti-qrcode\" style=\"font-size:13px\"></i> Partager</button>":"";
+  var shareBtn=(cur&&cur._id)?"<button class=\"tbi\" style=\"color:#9A3412\" title=\"Partager (lien + QR code)\" onclick=\"showShare()\"><i class=\"ti ti-qrcode\"></i></button>":"";
   var aiBanner=aiSug&&!cur.typeConfirmed
     ?"<div class=\"ai-banner\"><div class=\"ai-l\"><span style=\"font-size:22px\">&#129302;</span><div><div class=\"ai-lbl\">Suggestion IA</div><div class=\"ai-type\">"+esc(aiSug.typeChantier)+"</div><div class=\"ai-conf\">Confiance : "+Math.round(aiSug.confidence*100)+"%</div><div class=\"ai-just\">"+esc(aiSug.justification)+"</div></div></div><div class=\"ai-r\"><button class=\"btn-ok\" onclick=\"confAI()\"><i class=\"ti ti-check\"></i> Confirmer</button><button class=\"btn-no\" onclick=\"dismissAI()\">&#10005;</button></div></div>"
     :"";
@@ -1594,7 +1666,7 @@ function renderForm(){
   }).join("");
 
   var h="<div class=\"fv\">";
-  h+="<div class=\"topbar\"><button class=\"btn-back\" onclick=\"goBack()\"><i class=\"ti ti-arrow-left\" style=\"font-size:13px\"></i> Retour</button><div class=\"tb-right\"><button class=\"btn-cat\" onclick=\"showCp()\"><i class=\"ti ti-package\" style=\"font-size:13px\"></i> Catalogue</button><button class=\"btn-ai\" id=\"btn-ai\" onclick=\"classify()\"><i class=\"ti ti-sparkles\" style=\"font-size:13px\"></i> Classifier IA</button>"+addBtn+"<button class=\"btn-print\" onclick=\"doPrint()\"><i class=\"ti ti-printer\" style=\"font-size:13px\"></i> Imprimer</button><button class=\"btn-pdf\" onclick=\"doPDF()\"><i class=\"ti ti-file-type-pdf\" style=\"font-size:13px\"></i> PDF</button>"+shareBtn+saveBtn+"</div></div>";
+  h+="<div class=\"topbar\"><button class=\"btn-back\" onclick=\"goBack()\"><i class=\"ti ti-arrow-left\" style=\"font-size:13px\"></i> Retour</button><div class=\"tb-right\"><button class=\"tbi\" style=\"color:#6D28D9\" title=\"Catalogue\" onclick=\"showCp()\"><i class=\"ti ti-package\"></i></button><button class=\"tbi\" id=\"btn-ai\" style=\"color:#92400E\" title=\"Classifier avec l'IA\" onclick=\"classify()\"><i class=\"ti ti-sparkles\"></i></button>"+addBtn+"<button class=\"tbi\" style=\"color:#475569\" title=\"Imprimer\" onclick=\"doPrint()\"><i class=\"ti ti-printer\"></i></button><button class=\"tbi\" style=\"color:#B91C1C\" title=\"Exporter en PDF\" onclick=\"doPDF()\"><i class=\"ti ti-file-type-pdf\"></i></button>"+shareBtn+saveBtn+"</div></div>";
   h+=tplNotice+addBanner;
   h+="<div class=\"card\" id=\"info-card\"><div class=\"doc-band\"><img src=\"data:image/png;base64,"+LB64+"\" alt=\"JARNIAS\"/><div class=\"doc-band-r\"><div class=\"doc-band-title\">Feuille d&#39;approvisionnement</div><div class=\"doc-band-sub\">Les experts de la hauteur</div><div style=\"margin-top:6px\" id=\"pz-pill\">"+pill(cur,cur.typeConfirmed)+"</div><div style=\"margin-top:6px;display:flex;gap:6px;justify-content:flex-end;align-items:center\">"+prioBadge(cur.priorite)+"</div></div></div>";
   h+="<div class=\"doc-meta\"><div class=\"dm\"><label>R&#233;f&#233;rence</label><input class=\"dm-in\" value=\""+esc(cur.reference)+"\" oninput=\"upF('reference',this.value)\" placeholder=\"REF-001\"/></div><div class=\"dm\"><label>Cr&#233;&#233; le</label><div class=\"dm-val\">"+cur.dateCreation+"</div></div><div class=\"dm\"><label>Mis &#224; jour</label><div class=\"dm-val\" id=\"datemaj\">"+cur.dateMiseAJour+"</div></div></div>";
@@ -1608,12 +1680,14 @@ function renderForm(){
   var clientOpts=CLIENTS.map(function(c){return "<option value=\""+esc(c)+"\"></option>";}).join("");
   h+="<div class=\"fg\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-building\" style=\"font-size:12px;vertical-align:-1px\"></i> Client / Site <button type=\"button\" onclick=\"addNewClient()\" title=\"Ajouter un client\" style=\"background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:5px;padding:1px 6px;font-size:11px;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i></button>"+(isAdmin()?"<button type=\"button\" onclick=\"manageClients()\" title=\"G\u00e9rer les clients\" style=\"background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;border-radius:5px;padding:1px 6px;font-size:11px;cursor:pointer;font-family:inherit\"><i class=\"ti ti-settings\"></i></button>":"")+"</label><input class=\"fin\" list=\"clients-list\" value=\""+esc(cur.clientSite||"")+"\" placeholder=\"Rechercher ou saisir...\" oninput=\"upF('clientSite',this.value)\"/><datalist id=\"clients-list\">"+clientOpts+"</datalist></div>";
   h+="<div class=\"fg fg-full\"><label>Types de travaux (plusieurs possibles)</label><div class=\"type-ms\" id=\"type-ms\">"+typeSelectorHTML()+"</div></div>";
+  h+=truckSelectorHTML();
   h+="<div class=\"fg\"><label><i class=\"ti ti-calendar-due\" style=\"font-size:12px;vertical-align:-1px\"></i> Date limite d&#39;appro</label><input class=\"fin\" type=\"date\" value=\""+esc(cur.dateAppro)+"\" oninput=\"upF('dateAppro',this.value)\"/></div>";
   h+="<div class=\"fg\"><label><i class=\"ti ti-calendar-event\" style=\"font-size:12px;vertical-align:-1px\"></i> Date d&#233;but de chantier</label><input class=\"fin\" type=\"date\" value=\""+esc(cur.dateChantier)+"\" oninput=\"upF('dateChantier',this.value)\"/></div>";
 h+="<div class=\"fg\"><label>&#9889; Priorit\u00e9</label><select class=\"fin\" style=\"cursor:pointer\" onchange=\"upF('priorite',this.value)\"><option value=\"normale\""+(cur.priorite==="normale"?" selected":"")+">Normale</option><option value=\"urgente\""+(cur.priorite==="urgente"?" selected":"")+">Urgente</option><option value=\"tres_urgente\""+(cur.priorite==="tres_urgente"?" selected":"")+">Tr\u00e8s urgente</option></select></div>";
   var condOpts=(typeof serverConductors!=="undefined"?serverConductors:[]).map(function(c){return "<option value=\""+esc(c.name)+"\"></option>";}).join("");
   h+="<div class=\"fg fg-full\"><label>Conducteur de travaux responsable</label><input class=\"fin\" list=\"conducteurs-list\" value=\""+esc(cur.conducteur||"")+"\" placeholder=\"Nom Pr\u00e9nom\" oninput=\"upF('conducteur',this.value)\"/><datalist id=\"conducteurs-list\">"+condOpts+"</datalist></div>";
-  h+="<div class=\"fg fg-full\"><label>Coordonn\u00e9es client</label><textarea class=\"fin\" rows=\"2\" style=\"resize:vertical\" placeholder=\"Nom, adresse, t\u00e9l...\" oninput=\"upF('coordClient',this.value)\">"+esc(cur.coordClient||"")+"</textarea></div>";
+  h+="<div class=\"fg fg-full\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-map-pin\" style=\"font-size:12px;color:#DC2626\"></i> Adresse du chantier</label><textarea class=\"fin\" rows=\"2\" style=\"resize:vertical\" placeholder=\"Adresse compl&#232;te du chantier (rue, code postal, ville)...\" oninput=\"upF('adresseChantier',this.value)\">"+esc(cur.adresseChantier||"")+"</textarea></div>";
+  h+="<div class=\"fg fg-full\"><label>Coordonn\u00e9es client</label><textarea class=\"fin\" rows=\"2\" style=\"resize:vertical\" placeholder=\"Nom, t\u00e9l, contact...\" oninput=\"upF('coordClient',this.value)\">"+esc(cur.coordClient||"")+"</textarea></div>";
   h+="</div></div>";
   h+="<div class=\"card\" style=\"border-left:4px solid \"+((STATUT[cur.statut]||STATUT.en_attente).color)+\"\"><div style=\"padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap\"><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:12px;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.5px\">Statut :</span>"+statutBadge(cur.statut)+(cur.preparedAt?"<span style=\"font-size:11px;color:#94A3B8\">pr\u00e9par\u00e9e le "+cur.preparedAt+"</span>":"")+"</div><div style=\"display:flex;gap:6px\">"+statutButtons()+"</div></div></div>";
   h+=aiBanner+aiErr+legH()+secH;
@@ -1706,7 +1780,7 @@ function upR(sec,i,f,v){
   }
   cur.dateMiseAJour=new Date().toLocaleDateString("fr-FR");saved=false;
   // Si l'appro \u00e9tait d\u00e9j\u00e0 pr\u00eate et qu'on modifie son contenu, signaler au d\u00e9p\u00f4t
-  if(f==="designation"&&cur.statut==="prete")cur.modifPrep=true;
+  if(f==="designation"&&cur.statut==="prete")cur.modifPrep=true;else if(f==="designation"&&cur.statut==="sur_chantier")cur.addToPrepare=true;
   // R\u00e9activer le bouton Enregistrer (utile notamment pour le chef d\u00e9p\u00f4t)
   var sbtn=document.querySelector(".btn-save");
   if(sbtn&&sbtn.classList.contains("saved")){sbtn.innerHTML="Enregistrer";sbtn.classList.remove("saved");sbtn.disabled=false;sbtn.onclick=doSave;}
@@ -1719,7 +1793,7 @@ function addR(sec){
   if(!cur)return;var r=mkR();
   if(currentRole==="depot"){r.depotAdded=true;}
   if(addMode&&addDate){r.addBatch=addDate;if(!cur.additionDates)cur.additionDates=[];if(cur.additionDates.indexOf(addDate)<0)cur.additionDates.push(addDate);}
-  if(cur.statut==="prete")cur.modifPrep=true;
+  if(cur.statut==="prete")cur.modifPrep=true;else if(cur.statut==="sur_chantier")cur.addToPrepare=true;
   cur[sec].push(r);renderForm();
 }
 function delR(sec,i){if(!cur)return;cur[sec].splice(i,1);if(!cur[sec].length)cur[sec].push(mkR());renderForm();}
@@ -1746,8 +1820,10 @@ function typeListHTML(q){
   return h;
 }
 function typeSelectorHTML(){
-  return "<div class=\"ms-chips\" id=\"ms-chips\">"+msChipsHTML()+"</div><input type=\"text\" class=\"ms-search\" id=\"ms-search\" placeholder=\"Rechercher un type...\" oninput=\"filterTypes(this.value)\"/><div class=\"ms-list\" id=\"ms-list\">"+typeListHTML("")+"</div><button type=\"button\" onclick=\"addNewType()\" style=\"width:100%;margin-top:7px;background:#F0FDF4;border:1px dashed #86EFAC;color:#15803D;border-radius:7px;padding:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> Nouveau type</button>";
+  return "<div class=\"ms-dd\" id=\"ms-dd\"><div class=\"ms-trigger\" onclick=\"toggleTypeDD(event)\"><div class=\"ms-chips\" id=\"ms-chips\">"+msChipsHTML()+"</div><i class=\"ti ti-chevron-down ms-chev\"></i></div><div class=\"ms-panel\" id=\"ms-panel\"><input type=\"text\" class=\"ms-search\" id=\"ms-search\" placeholder=\"Rechercher un type...\" oninput=\"filterTypes(this.value)\" onclick=\"event.stopPropagation()\"/><div class=\"ms-list\" id=\"ms-list\">"+typeListHTML("")+"</div><button type=\"button\" onclick=\"event.stopPropagation();addNewType()\" style=\"width:100%;margin-top:7px;background:#F0FDF4;border:1px dashed #86EFAC;color:#15803D;border-radius:7px;padding:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> Nouveau type</button></div></div>";
 }
+function toggleTypeDD(e){if(e)e.stopPropagation();var dd=document.getElementById("ms-dd");if(dd)dd.classList.toggle("open");}
+document.addEventListener("click",function(e){var dd=document.getElementById("ms-dd");if(dd&&dd.classList.contains("open")&&!dd.contains(e.target))dd.classList.remove("open");});
 function filterTypes(q){var l=document.getElementById("ms-list");if(l)l.innerHTML=typeListHTML(q);}
 function toggleTypeI(i){
   if(!cur)return;
@@ -1766,7 +1842,7 @@ async function classify(){
   var btn=document.getElementById("btn-ai");if(!btn||!cur)return;
   var items=[].concat(cur.consommables,cur.fournitures,cur.outillage).map(function(r){return r.designation;}).filter(Boolean);
   if(!items.length){window._err="Ajoutez des articles avant de classifier.";renderForm();return;}
-  btn.disabled=true;btn.innerHTML="<i class=\"ti ti-loader-2\" style=\"font-size:13px\"></i> Analyse...";window._err=null;
+  btn.disabled=true;btn.innerHTML="<i class=\"ti ti-loader-2\"></i>";btn.style.opacity=".6";window._err=null;
   try{
     var res=await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
@@ -1860,6 +1936,7 @@ function statutButtons(){
 function setStatut(st){
   if(!cur)return;
   cur.statut=st;
+  if(currentUser&&currentUser.role==="team_leader"&&(st==="sur_chantier"||st==="rendu")&&currentUser.name)cur.tlName=currentUser.name;
   if(st==="prete"&&!cur.preparedAt)cur.preparedAt=new Date().toLocaleDateString("fr-FR");
   if(st==="en_attente")cur.preparedAt=null;
   if(st==="sur_chantier")cur.surChantierAt=new Date().toLocaleDateString("fr-FR");
@@ -1942,7 +2019,7 @@ function buildPZ(s){
   var pTag=prioBadge(s.priorite||"normale");var _pr=PRIO[s.priorite||"normale"];var prioFlag="<div style=\"background:"+_pr.color+";color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 2px 6px "+_pr.color+"55\"><span style=\"font-size:15px\">&#9873;</span>"+_pr.label+"</div>";var dRow=(s.dateAppro||s.dateChantier)?"<div class=\"pz-dates\"><div class=\"pz-fi\"><label>&#128197; Date limite d&#39;appro</label><span style=\"color:#C2410C\">"+(s.dateAppro?fd(s.dateAppro):"Non d&#233;finie")+"</span></div><div class=\"pz-fi\"><label>&#127959; D&#233;but de chantier</label><span style=\"color:#1D4ED8\">"+(s.dateChantier?fd(s.dateChantier):"Non d&#233;fini")+"</span></div></div>":"";
   var legH=dates.length?"<div style=\"margin-bottom:8px;padding:6px 10px;border:1px solid #E2E8F0;border-radius:6px;font-size:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap\"><strong>L&#233;gende :</strong>"+dates.map(function(d,i){var c=AP[i%AP.length];return"<span style=\"display:inline-flex;align-items:center;gap:4px\"><span style=\"display:inline-block;width:10px;height:10px;background:"+c.bg+";border:1px solid "+c.left+";border-radius:2px\"></span> Ajout "+fdB(d)+" ("+c.label+")</span>";}).join("")+"<span style=\"display:inline-flex;align-items:center;gap:4px\"><span style=\"display:inline-block;width:10px;height:10px;background:#FEE2E2;border:1px solid #FECACA;border-radius:2px\"></span> Retourn&#233; d&#233;p&#244;t</span></div>":"";
   var obsH=s.observation?"<div class=\"pz-sec\"><div class=\"pz-sec-t\">Observation</div><div class=\"pz-obs\">"+esc(s.observation)+"</div></div>":"";
-  var _qr=s._id?qrDataURL(window.location.origin+"/?appro="+s._id):"";var _qrB=_qr?"<img src=\""+_qr+"\" style=\"width:82px;height:82px;background:#fff;border-radius:8px;padding:3px\" alt=\"QR\"/>":"";return "<div class=\"pz-hd\"><div class=\"pz-hd-l\"><img src=\"data:image/png;base64,"+LB64+"\" alt=\"JARNIAS\"/>"+_qrB+"</div><div class=\"pz-hd-c\"><div class=\"pz-hd-title\">Feuille d&#39;approvisionnement</div><div class=\"pz-hd-sub\">Les experts de la hauteur</div><div style=\"margin-top:5px;display:flex;gap:5px;justify-content:center;flex-wrap:wrap\">"+tTag+"</div></div><div class=\"pz-hd-flag\">"+prioFlag+"</div></div><div class=\"pz-ref\"><div class=\"pz-ri\"><div class=\"pz-rl\">R&#233;f&#233;rence</div><div class=\"pz-rv\">"+esc(s.reference)+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Cr&#233;&#233; le</div><div class=\"pz-rv\">"+s.dateCreation+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Mis &#224; jour</div><div class=\"pz-rv\">"+s.dateMiseAJour+"</div></div></div><div class=\"pz-info\"><div class=\"pz-fi\"><label>N&#176; Affaire</label><span>"+(esc(s.noAffaire)||"—")+"</span></div><div class=\"pz-fi\"><label>Charg&#233; d&#39;affaires</label><span>"+(esc(s.chargeAffaires)||"—")+"</span></div><div class=\"pz-fi\" style=\"grid-column:1/-1\"><label>Nom du chantier</label><span>"+(esc(s.nomChantier)||"—")+"</span></div>"+(s.conducteur?"<div class=\"pz-fi\"><label>Conducteur de travaux</label><span>"+esc(s.conducteur)+"</span></div>":"")+(s.clientSite?"<div class=\"pz-fi\"><label>Client / Site</label><span>"+esc(s.clientSite)+"</span></div>":"")+(s.coordClient?"<div class=\"pz-fi\"><label>Coordonn&#233;es client</label><span style=\"white-space:pre-wrap\">"+esc(s.coordClient)+"</span></div>":"")+"</div>"+dRow+legH+secH+obsH+"<div class=\"pz-foot\"><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Charg&#233; d&#39;affaires</label></div><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Visa client</label></div></div>";
+  var _qr=s._id?qrDataURL(window.location.origin+"/?appro="+s._id):"";var _qrB=_qr?"<img src=\""+_qr+"\" style=\"width:82px;height:82px;background:#fff;border-radius:8px;padding:3px\" alt=\"QR\"/>":"";return "<div class=\"pz-hd\"><div class=\"pz-hd-l\"><img src=\"data:image/png;base64,"+LB64+"\" alt=\"JARNIAS\"/>"+_qrB+"</div><div class=\"pz-hd-c\"><div class=\"pz-hd-title\">Feuille d&#39;approvisionnement</div><div class=\"pz-hd-sub\">Les experts de la hauteur</div><div style=\"margin-top:5px;display:flex;gap:5px;justify-content:center;flex-wrap:wrap\">"+tTag+"</div></div><div class=\"pz-hd-flag\">"+prioFlag+"</div></div><div class=\"pz-ref\"><div class=\"pz-ri\"><div class=\"pz-rl\">R&#233;f&#233;rence</div><div class=\"pz-rv\">"+esc(s.reference)+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Cr&#233;&#233; le</div><div class=\"pz-rv\">"+s.dateCreation+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Mis &#224; jour</div><div class=\"pz-rv\">"+s.dateMiseAJour+"</div></div></div><div class=\"pz-info\"><div class=\"pz-fi\"><label>N&#176; Affaire</label><span>"+(esc(s.noAffaire)||"—")+"</span></div><div class=\"pz-fi\"><label>Charg&#233; d&#39;affaires</label><span>"+(esc(s.chargeAffaires)||"—")+"</span></div><div class=\"pz-fi\" style=\"grid-column:1/-1\"><label>Nom du chantier</label><span>"+(esc(s.nomChantier)||"—")+"</span></div>"+(s.conducteur?"<div class=\"pz-fi\"><label>Conducteur de travaux</label><span>"+esc(s.conducteur)+"</span></div>":"")+(s.clientSite?"<div class=\"pz-fi\"><label>Client / Site</label><span>"+esc(s.clientSite)+"</span></div>":"")+(s.adresseChantier?"<div class=\"pz-fi\" style=\"grid-column:1/-1\"><label>Adresse du chantier</label><span style=\"white-space:pre-wrap\">"+esc(s.adresseChantier)+"</span></div>":"")+(s.coordClient?"<div class=\"pz-fi\"><label>Coordonn&#233;es client</label><span style=\"white-space:pre-wrap\">"+esc(s.coordClient)+"</span></div>":"")+"</div>"+dRow+legH+secH+obsH+"<div class=\"pz-foot\"><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Charg&#233; d&#39;affaires</label></div><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Visa client</label></div></div>";
 }
 function isLongAppro(s){
   var n=0;["consommables","fournitures","outillage"].forEach(function(k){(s[k]||[]).forEach(function(r){if(r.designation&&(""+r.designation).trim())n++;});});
@@ -1953,7 +2030,7 @@ function doPrint(){
   var long=isLongAppro(cur);
   var inner=buildPZ(cur);
   var pz=document.getElementById("pz");
-  pz.innerHTML=long?("<div class=\"fold-line\"></div><div class=\"fold-tag\">\u2702 pli au milieu</div><div class=\"pz-cols\">"+inner+"</div>"):inner;
+  pz.innerHTML=long?("<div class=\"pz-cols\">"+inner+"</div>"):inner;
   var old=document.getElementById("dynprint");if(old)old.parentNode.removeChild(old);
   if(long){
     var st=document.createElement("style");st.id="dynprint";
@@ -1969,7 +2046,7 @@ function doPDF(){
   var pageStyle=long
     ?"@media print{@page{size:A3 landscape;margin:11mm}}.pz-cols{column-count:2;column-gap:16mm;column-fill:auto}.pz-cols>div{-webkit-column-break-inside:avoid;break-inside:avoid;page-break-inside:avoid}.fold-line{position:fixed;left:50%;top:0;bottom:0;border-left:1.5px dashed #CBD5E1}.fold-tag{position:fixed;left:50%;top:2mm;transform:translateX(-50%);font-size:9px;color:#94A3B8;background:#fff;padding:1px 7px;border:1px solid #E2E8F0;border-radius:10px}"
     :"@media print{@page{size:A4;margin:10mm 12mm}}";
-  var body=long?("<div class=\"fold-line\"></div><div class=\"fold-tag\">\u2702 pli au milieu</div><div class=\"pz-cols\">"+inner+"</div>"):inner;
+  var body=long?("<div class=\"pz-cols\">"+inner+"</div>"):inner;
   var h="<!DOCTYPE html><html lang=\"fr\"><head><meta charset=\"UTF-8\"><title>"+(cur.nomChantier||"Appro")+" &#8212; JARNIAS</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1E293B;font-size:11px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}.pz-hd{background:#0F172A;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}.pz-hd img{width:90px;border-radius:7px}.pz-hd-l{display:flex;align-items:center;gap:9px}.pz-hd-c{flex:1;text-align:center;padding:0 12px}.pz-hd-flag{flex-shrink:0}.pz-hd-r{text-align:right}.pz-hd-title{font-size:14px;font-weight:700;color:#F1F5F9}.pz-hd-sub{font-size:10px;color:#64748B;margin-top:2px}.pz-ref{background:#1E293B;padding:7px 16px;display:flex;gap:20px;margin-bottom:10px}.pz-ri{display:flex;flex-direction:column}.pz-rl{font-size:9px;color:#64748B;text-transform:uppercase}.pz-rv{font-size:11px;color:#E2E8F0;font-weight:600}.pz-info{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:10px 14px}.pz-dates{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;border:1px solid #FDE68A;background:#FFFBEB;border-radius:6px;padding:8px 14px}.pz-fi label{font-size:9px;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:1px}.pz-fi span{font-size:12px;font-weight:600;color:#0F172A}.pz-sec{margin-bottom:14px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden}.pz-sec-t{background:#1E293B;color:#fff;padding:6px 11px;font-size:11px;font-weight:600;text-transform:uppercase}.pz-tbl{width:100%;border-collapse:collapse}.pz-tbl th{background:#F1F5F9;padding:5px 8px;font-size:10px;text-transform:uppercase;color:#475569;text-align:left;border-bottom:1px solid #E2E8F0;font-weight:600}.pz-tbl td{padding:5px 8px;font-size:11px;border-bottom:1px solid #F1F5F9}.pz-tbl tr:last-child td{border-bottom:none}.pz-obs{border:1px solid #E2E8F0;padding:8px 10px;font-size:11px;min-height:36px;white-space:pre-wrap;border-radius:0 0 4px 4px}.pz-foot{margin-top:16px;display:flex;justify-content:flex-end;gap:36px;border-top:1px solid #E2E8F0;padding-top:10px}.pz-sign label{font-size:9px;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:20px;text-align:center}.pz-sign-line{border-top:1px solid #CBD5E1;width:120px;margin:0 auto}"+pageStyle+"</style></head><body>"+body+"<script>window.onload=function(){window.print();}<\/script></body></html>";
   var blob=new Blob([h],{type:"text/html;charset=utf-8"});
   var url=URL.createObjectURL(blob);
@@ -1982,6 +2059,28 @@ function doPDF(){
 // ═══════════════ NOTIFICATIONS ═══════════════
 // ═══════════════ NOUVEAUT\u00c9S ═══════════════
 var NEWS=[
+  {v:16,date:"29 juin 2026",items:[
+    "Nouvelle page Gestion des camions (admin) : l'\u00e9quipement de chaque Team Leader, import des 27 camions en un clic",
+    "D\u00e9duction automatique : quand vous choisissez le Team Leader dans une appro, le mat\u00e9riel d\u00e9j\u00e0 pr\u00e9sent dans son camion est signal\u00e9 (\u00ab d\u00e9j\u00e0 dans le camion \u00bb) avec le net \u00e0 pr\u00e9parer"
+  ]},
+  {v:15,date:"29 juin 2026",items:[
+    "Nouvelle page Param\u00e9trage interface (admin) : g\u00e9rez le catalogue, ajoutez des cat\u00e9gories, les types et les clients vous-m\u00eame, sans passer par le code",
+    "Import des kits JARNIAS (Ma\u00e7onnerie, Couverture, Peinture, Cordiste, \u00c9lectroportatif...) en un clic",
+    "Nouvelle page Gestion lien Alobees : \u00e9tat de la connexion, test et rafra\u00eechissement de la liste des chantiers"
+  ]},
+  {v:14,date:"29 juin 2026",items:[
+    "Quand le Team Leader ajoute du mat\u00e9riel une fois sur chantier, l'appro reste \u00ab sur chantier \u00bb : seul l'ajout passe en pr\u00e9paration chez le d\u00e9p\u00f4t",
+    "Le nom du Team Leader appara\u00eet d\u00e9sormais sur les \u00e9tiquettes \u00ab sur chantier \u00bb et \u00ab rendu \u00bb pour le chef d\u00e9p\u00f4t"
+  ]},
+  {v:13,date:"29 juin 2026",items:[
+    "Type de travaux en menu d\u00e9roulant : plus compact, la liste ne prend plus toute la place",
+    "Nouvel encadr\u00e9 Adresse du chantier (rempli automatiquement depuis Alobees)",
+    "Boutons du haut transform\u00e9s en ic\u00f4nes, plus clairs et discrets"
+  ]},
+  {v:12,date:"29 juin 2026",items:[
+    "Import d'un chantier depuis Alobees : le N\u00b0 d'affaire, le client, l'adresse et le conducteur se remplissent tout seuls",
+    "Les grandes appros s'impriment en A3 sur 2 colonnes pour rester lisibles"
+  ]},
   {v:11,date:"26 juin 2026",items:[
     "Acc\u00e8s Team Leader : partagez une appro par lien ou QR code (\u00e0 mettre sur Alobees ou la feuille). Le chef d'\u00e9quipe entre son nom et compl\u00e8te l'appro depuis le chantier",
     "Un compte d\u00e9j\u00e0 connect\u00e9 (conducteur/d\u00e9p\u00f4t) qui ouvre le lien va directement sur l'appro",
@@ -2049,6 +2148,8 @@ function loadLists(){
     // CLIENTS
     if(d.clients&&d.clients.length){CLIENTS=d.clients.slice();}
     else{apiCall("POST","/lists/clients/seed",{data:CLIENTS}).catch(function(){});}
+    // CAMIONS (TRUCKS)
+    if(d.trucks&&d.trucks.length){TRUCKS=d.trucks.slice();}
   }).catch(function(){});
 }
 // Recalcule l'ordre des cat\u00e9gories du catalogue (au cas o\u00f9 de nouvelles cat\u00e9gories apparaissent)
@@ -2057,6 +2158,274 @@ function rebuildCatOrder(){
     if(it.cat&&CAT_ORDER.indexOf(it.cat)<0){CAT_ORDER.push(it.cat);}
   });
 }
+
+// ═══ PARAMÉTRAGE INTERFACE (admin) ═══
+var SEC_LABELS={consommables:"Consommables",fournitures:"Fournitures",outillage:"Outillage"};
+function renderUISettings(){
+  if(typeof closeSidebar==="function")closeSidebar();
+  if(!isAdmin()){toast("Acc\u00e8s admin uniquement","ti-lock");return;}
+  cur=null;currentTab="uisettings";
+  var m=document.getElementById("main-area");
+  var h="<div style=\"max-width:880px;margin:0 auto;padding:22px 18px\">";
+  h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-adjustments\" style=\"font-size:24px;color:#6D28D9\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Param\u00e9trage de l'interface</h2></div>";
+  h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 22px\">Modifie ici le catalogue, les types et les clients. Tout est partag\u00e9 : tes changements s'appliquent imm\u00e9diatement \u00e0 toute l'\u00e9quipe.</p>";
+
+  // ---- CATALOGUE & KITS ----
+  h+="<div class=\"ui-sec\"><div class=\"ui-sec-hd\"><i class=\"ti ti-package\" style=\"color:#6D28D9\"></i> Catalogue &amp; kits</div>";
+  h+="<div style=\"background:#F5F3FF;border:1px solid #DDD6FE;border-radius:9px;padding:12px;margin-bottom:14px\"><div style=\"font-size:13px;color:#5B21B6;font-weight:600;margin-bottom:6px\"><i class=\"ti ti-download\"></i> Importer les kits JARNIAS</div><div style=\"font-size:12px;color:#6D28D9;margin-bottom:9px\">Ajoute d'un coup les kits du r\u00e9f\u00e9rentiel (Ma\u00e7onnerie, Couverture, Peinture, Cordiste, \u00c9lectroportatif...) comme cat\u00e9gories compl\u00e8tes du catalogue.</div><button onclick=\"importKits()\" id=\"btn-import-kits\" style=\"background:#6D28D9;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-download\"></i> Importer les kits</button></div>";
+
+  // Add item form
+  var catOpts="";CAT_ORDER.forEach(function(c){catOpts+="<option value=\""+esc(c)+"\"></option>";});
+  h+="<div style=\"background:#FAFAFA;border:1px solid #E2E8F0;border-radius:9px;padding:12px;margin-bottom:14px\"><div style=\"font-size:13px;font-weight:600;color:#334155;margin-bottom:9px\">Ajouter un article</div>";
+  h+="<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:8px\">";
+  h+="<input id=\"ui-cat-name\" placeholder=\"Nom de l'article\" class=\"ui-in\"/>";
+  h+="<input id=\"ui-cat-cat\" list=\"ui-cat-list\" placeholder=\"Cat\u00e9gorie (ou nouvelle)\" class=\"ui-in\"/><datalist id=\"ui-cat-list\">"+catOpts+"</datalist>";
+  h+="<select id=\"ui-cat-sec\" class=\"ui-in\"><option value=\"consommables\">Consommables</option><option value=\"fournitures\">Fournitures</option><option value=\"outillage\" selected>Outillage</option></select>";
+  h+="<input id=\"ui-cat-qty\" placeholder=\"Qt\u00e9 par d\u00e9faut\" value=\"1\" class=\"ui-in\"/>";
+  h+="</div><button onclick=\"uiAddCatItem()\" style=\"margin-top:9px;background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 15px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> Ajouter l'article</button></div>";
+
+  // Categories list with items
+  var byCat={};CAT_ITEMS.forEach(function(it,idx){var c=it.cat||"(sans cat\u00e9gorie)";(byCat[c]=byCat[c]||[]).push({it:it,idx:idx});});
+  var order=CAT_ORDER.slice();Object.keys(byCat).forEach(function(c){if(order.indexOf(c)<0)order.push(c);});
+  h+="<div style=\"font-size:13px;font-weight:600;color:#334155;margin-bottom:8px\">Cat\u00e9gories du catalogue ("+CAT_ITEMS.length+" articles)</div>";
+  if(!CAT_ITEMS.length){h+="<div style=\"color:#94A3B8;font-size:13px;padding:10px\">Catalogue vide. Importe les kits ou ajoute des articles.</div>";}
+  order.forEach(function(c){
+    var list=byCat[c];if(!list||!list.length)return;
+    h+="<div style=\"border:1px solid #E2E8F0;border-radius:9px;margin-bottom:8px;overflow:hidden\"><div style=\"background:#F1F5F9;padding:8px 12px;font-size:13px;font-weight:700;color:#1E293B;display:flex;justify-content:space-between;align-items:center\"><span><i class=\"ti ti-folder\" style=\"color:#6D28D9\"></i> "+esc(c)+"</span><span style=\"font-size:11px;color:#64748B;font-weight:500\">"+list.length+" article"+(list.length>1?"s":"")+"</span></div><div style=\"padding:4px 0\">";
+    list.forEach(function(o){
+      h+="<div style=\"display:flex;align-items:center;gap:8px;padding:5px 12px;font-size:13px\"><span style=\"flex:1;color:#334155\">"+esc(o.it.n)+"</span><span style=\"font-size:10px;color:#94A3B8;background:#F1F5F9;padding:2px 7px;border-radius:10px\">"+(SEC_LABELS[o.it.sec]||o.it.sec)+"</span><button onclick=\"uiDelCatItem("+o.idx+")\" title=\"Supprimer\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:2px 5px\"><i class=\"ti ti-trash\"></i></button></div>";
+    });
+    h+="</div></div>";
+  });
+  h+="</div>";
+
+  // ---- TYPES ----
+  h+="<div class=\"ui-sec\"><div class=\"ui-sec-hd\"><i class=\"ti ti-tag\" style=\"color:#B45309\"></i> Types de chantier</div>";
+  h+="<div style=\"display:flex;gap:8px;margin-bottom:10px\"><input id=\"ui-type-new\" placeholder=\"Nouveau type de travaux\" class=\"ui-in\" style=\"flex:1\"/><button onclick=\"uiAddType()\" style=\"background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 15px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> Ajouter</button></div>";
+  h+="<div style=\"display:flex;flex-wrap:wrap;gap:7px\">";
+  WT.forEach(function(t,i){h+="<span style=\"display:inline-flex;align-items:center;gap:6px;background:#FFF7ED;border:1px solid #FED7AA;color:#9A3412;border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600\">"+esc(t)+"<i class=\"ti ti-x\" onclick=\"uiDelType("+i+")\" style=\"cursor:pointer;font-size:14px;opacity:.6\"></i></span>";});
+  if(!WT.length)h+="<span style=\"color:#94A3B8;font-size:13px\">Aucun type</span>";
+  h+="</div></div>";
+
+  // ---- CLIENTS ----
+  h+="<div class=\"ui-sec\"><div class=\"ui-sec-hd\"><i class=\"ti ti-building\" style=\"color:#1D4ED8\"></i> Clients / Sites</div>";
+  h+="<div style=\"display:flex;gap:8px;margin-bottom:10px\"><input id=\"ui-client-new\" placeholder=\"Nouveau client / site\" class=\"ui-in\" style=\"flex:1\"/><button onclick=\"uiAddClient()\" style=\"background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 15px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> Ajouter</button></div>";
+  h+="<div style=\"display:flex;flex-wrap:wrap;gap:7px\">";
+  CLIENTS.forEach(function(c,i){h+="<span style=\"display:inline-flex;align-items:center;gap:6px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600\">"+esc(c)+"<i class=\"ti ti-x\" onclick=\"uiDelClient("+i+")\" style=\"cursor:pointer;font-size:14px;opacity:.6\"></i></span>";});
+  if(!CLIENTS.length)h+="<span style=\"color:#94A3B8;font-size:13px\">Aucun client</span>";
+  h+="</div></div>";
+
+  h+="</div>";
+  m.innerHTML=h;
+}
+function uiAddCatItem(){
+  var n=(document.getElementById("ui-cat-name")||{}).value||"";n=n.trim();
+  var c=(document.getElementById("ui-cat-cat")||{}).value||"";c=c.trim();
+  var sec=(document.getElementById("ui-cat-sec")||{}).value||"outillage";
+  var q=((document.getElementById("ui-cat-qty")||{}).value||"1").trim()||"1";
+  if(!n){toast("Indiquez un nom d'article","ti-alert-circle");return;}
+  if(!c){toast("Indiquez une cat\u00e9gorie","ti-alert-circle");return;}
+  apiCall("POST","/lists/catalogue/add",{item:{cat:c,sec:sec,n:n,q:q}}).then(function(d){
+    if(d&&d.data){CAT_ITEMS=d.data.slice();rebuildCatOrder();}
+    toast("Article ajout\u00e9","ti-check");renderUISettings();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function uiDelCatItem(i){
+  var it=CAT_ITEMS[i];if(!it)return;
+  if(!confirm("Supprimer \u00ab "+it.n+" \u00bb du catalogue pour tout le monde ?"))return;
+  apiCall("POST","/lists/catalogue/remove",{index:i}).then(function(d){
+    if(d&&d.data){CAT_ITEMS=d.data.slice();rebuildCatOrder();}
+    toast("Article supprim\u00e9","ti-trash");renderUISettings();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function uiAddType(){
+  var n=(document.getElementById("ui-type-new")||{}).value||"";n=n.trim();
+  if(!n)return;
+  if(WT.indexOf(n)>=0){toast("Ce type existe d\u00e9j\u00e0","ti-alert-circle");return;}
+  apiCall("POST","/lists/types/add",{item:n}).then(function(d){
+    if(d&&d.data)WT=d.data.slice();
+    toast("Type ajout\u00e9","ti-check");renderUISettings();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function uiDelType(i){
+  var t=WT[i];if(t===undefined)return;
+  if(!confirm("Supprimer le type \u00ab "+t+" \u00bb ?"))return;
+  apiCall("POST","/lists/types/remove",{index:i}).then(function(d){
+    if(d&&d.data)WT=d.data.slice();
+    toast("Type supprim\u00e9","ti-trash");renderUISettings();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function uiAddClient(){
+  var n=(document.getElementById("ui-client-new")||{}).value||"";n=n.trim();
+  if(!n)return;
+  if(CLIENTS.indexOf(n)>=0){toast("Ce client existe d\u00e9j\u00e0","ti-alert-circle");return;}
+  apiCall("POST","/lists/clients/add",{item:n}).then(function(d){
+    if(d&&d.data)CLIENTS=d.data.slice();
+    toast("Client ajout\u00e9","ti-check");renderUISettings();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function uiDelClient(i){
+  var c=CLIENTS[i];if(c===undefined)return;
+  if(!confirm("Supprimer le client \u00ab "+c+" \u00bb ?"))return;
+  apiCall("POST","/lists/clients/remove",{index:i}).then(function(d){
+    if(d&&d.data)CLIENTS=d.data.slice();
+    toast("Client supprim\u00e9","ti-trash");renderUISettings();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function importKits(){
+  var KITS={
+    "Kit Ma\u00e7onnerie":{sec:"outillage",items:["2 seaux","Bidon d'eau","Truelle","Langue de chat","Brosse m\u00e9tallique","Taloche","\u00c9ponge","Riflard","Lisseuse","Vaporisateur"]},
+    "Kit Couverture":{sec:"outillage",items:["Caisse couverture","Petit flambard / recharge","Pax alu","Langue de chat","Cutter","Torche","Bouteille de gaz","Pistolet silicone"]},
+    "Kit Peinture":{sec:"fournitures",items:["Rouleau polyane","Camion de peintre + prot\u00e8ge camion","Pinceau r\u00e9champir","Manchon 18 / recharge","Patte de lapin / recharge","Petit pinceau finition","Surchausson","Tiveck","Grille antigoutte","Gant de peintre"]},
+    "Kit Lavage de vitre":{sec:"outillage",items:["Seau de laveur de vitre","Scrapper","Carquois","Mouilleur","Vaporisateur / liquide vaisselle","Raclette","Chiffons","Ventouse","Lame scrapper / recharge","Recharge raclette","Surchausson"]},
+    "Kit Thermologue / B\u00e2che":{sec:"fournitures",items:["Kit thermo","Gant soudeur","Bouteille de gaz","Thermo 1000\u00b5","Thermo 320\u00b5","Sangle","Scotch thermo","Double face / liner","Tasseau","Cheville \u00e0 frapper","Extincteur","Cutter","Marteau","Pissette","Fermeture","Bavette","Leister","Sandow","B\u00e2che anti feu"]},
+    "\u00c9lectroportatif":{sec:"outillage",items:["Tri pack","Pack perfo + m\u00e8che","Pack visseuse + embout","Pack disqueuse 125/250","Pack boulonneuse","Pack scie sabre","Pack leister","Pack scie circulaire","Pack scie sauteuse","Pack spot accu","Caisse \u00e0 outil","Cl\u00e9 dynamom\u00e9trique","Extractom\u00e8tre","Agrafeuse","Ponceuse","Pist silicone","Pist scellement chimique","D\u00e9cam\u00e8tre","Riveteuse","Acastillage"]},
+    "Mat\u00e9riel cordiste":{sec:"outillage",items:["Corde 30m","Corde 50m","Corde 75m","Corde 100m","Sangle","Peltor","Mousqueton","Rig","Pro trac","Grillon","Jag syst\u00e8me","Poign\u00e9e jumar","Tripod","Poulie simple","Poulie double","Manille","Goutte d'eau","Genouill\u00e8re","Frontale","\u00c9lingue textile","\u00c9lingue m\u00e9tal","Manu croche"]},
+    "C\u00e2blerie":{sec:"fournitures",items:["Cablette","C\u00e2ble de 4","C\u00e2ble de 6","C\u00e2ble de 8","C\u00e2ble de 8 G 10","C\u00e2ble de 10","C\u00e2ble de 10 G 12","C\u00e2ble de 12","Coupe c\u00e2ble","Tire vite","Grenouille"]},
+    "Balisage":{sec:"fournitures",items:["Rubalise","Barri\u00e8re R/B","C\u00f4ne","Panneau"]},
+    "\u00c9lectricit\u00e9":{sec:"outillage",items:["Touret","Rallonge","Stylo d\u00e9tecteur","Multim\u00e8tre"]},
+    "Consommables JARNIAS":{sec:"consommables",items:["Gant anticoupure","Gant cuir","Gant chimique","Scotch","Cutter + lame","Colson blanc","Colson noir","Lunette de protection","Masque de ski","Bouchon d'oreille"]}
+  };
+  // \u00c9vite les doublons : ne r\u00e9importe pas une cat\u00e9gorie d\u00e9j\u00e0 pr\u00e9sente
+  var existingCats={};CAT_ITEMS.forEach(function(it){if(it.cat)existingCats[it.cat]=true;});
+  var toAdd=[];var skipped=[];
+  Object.keys(KITS).forEach(function(kit){
+    if(existingCats[kit]){skipped.push(kit);return;}
+    KITS[kit].items.forEach(function(n){toAdd.push({cat:kit,sec:KITS[kit].sec,n:n,q:"1"});});
+  });
+  if(!toAdd.length){toast("Les kits sont d\u00e9j\u00e0 import\u00e9s","ti-info-circle");return;}
+  if(!confirm("Importer "+toAdd.length+" articles dans le catalogue ?"+(skipped.length?"\n\n("+skipped.length+" kit(s) d\u00e9j\u00e0 pr\u00e9sent(s) seront ignor\u00e9s)":"")))return;
+  var btn=document.getElementById("btn-import-kits");if(btn){btn.disabled=true;btn.innerHTML="<i class=\"ti ti-loader-2\"></i> Import...";}
+  apiCall("POST","/lists/catalogue/addmany",{items:toAdd}).then(function(d){
+    if(d&&d.data){CAT_ITEMS=d.data.slice();rebuildCatOrder();}
+    toast(toAdd.length+" articles import\u00e9s","ti-check");renderUISettings();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");renderUISettings();});
+}
+
+var TRUCKS_SEED=[{tl:"Alexandru Tudose",items:[{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Jag",q:1},{n:"Frontale",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Bryan Silva",items:[{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Corentin Monnier",items:[{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"David Leger",items:[{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Diakharidia Drame",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:1},{n:"Pro Tack",q:1},{n:"Mousqueton",q:20},{n:"Corde 25m",q:2},{n:"Corde 50m",q:2},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Troussse De Secours",q:1},{n:"Gilet Orange",q:1}]},{tl:"Elyesse Bouhffour",items:[{n:"Poulie Simple",q:2},{n:"Pro Tack",q:1},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Flavien Hollard",items:[{n:"Poulie Simple",q:2},{n:"Pro Track",q:2},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Frederic Tissier",items:[{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Gaetan Delahaye",items:[{n:"Poulie Simple",q:2},{n:"Pro Tack",q:1},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Jean Tristan Bernard",items:[{n:"Poulie Simple",q:2},{n:"Pro Tack",q:2},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Johan Coursimaux",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:3},{n:"Pro Tack",q:3},{n:"Mousqueton",q:20},{n:"Corde 25m",q:2},{n:"Corde 50m",q:2},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Troussse De Secours",q:1},{n:"Gilet Orange",q:1}]},{tl:"Juan Masias",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:2},{n:"Pro Tack",q:2},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Trousse De Secours",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Kenny Cescut",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:1},{n:"Pro Tack",q:1},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Trousse De Secours",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Lebonnec Lilian",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:2},{n:"Pro Tack",q:2},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Trousse De Secours",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Luis Ramon",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:2},{n:"Pro Tack",q:2},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Trousse De Secours",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Loyce",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:2},{n:"Pro Tack",q:2},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Trousse De Secours",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Malik Sahraoui",items:[{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Mathieu Delaire",items:[{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Extincteur",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Mathieu Esposito",items:[{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Mbengue Mansour",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:1},{n:"Pro Tack",q:1},{n:"Mousqueton",q:20},{n:"Corde 25m",q:2},{n:"Corde 50m",q:2},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Troussse De Secours",q:1},{n:"Gilet Orange",q:1}]},{tl:"Mickael Baron",items:[{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Extincteur",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2},{n:"Decametre",q:1}]},{tl:"Mohamed Benaraour",items:[{n:"Poulie Simple",q:2},{n:"Pro Tack",q:2},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Extincteur",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2},{n:"Decametre",q:1}]},{tl:"Ntandou Gesse",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:1},{n:"Pro Tack",q:1},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Trousse De Secours",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Rachid El Hansali",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:2},{n:"Pro Tack",q:2},{n:"Mousqueton",q:20},{n:"Corde 25m",q:2},{n:"Corde 50m",q:2},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Troussse De Secours",q:1},{n:"Gilet Orange",q:1}]},{tl:"Thibault Hus",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:2},{n:"Pro Tack",q:2},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Trousse De Secours",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"Walther Zarri",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:2},{n:"Pro Tack",q:2},{n:"Mousqueton",q:20},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Trousse De Secours",q:1},{n:"Corde 50m",q:2},{n:"Corde 25m",q:2}]},{tl:"William Cala",items:[{n:"Elingues Textiles",q:2},{n:"Poulie Simple",q:2},{n:"Pro Tack",q:2},{n:"Mousqueton",q:20},{n:"Corde 25m",q:2},{n:"Corde 50m",q:2},{n:"Sangle",q:20},{n:"Frontale",q:1},{n:"Troussse De Secours",q:1},{n:"Gilet Orange",q:1}]}];
+
+// ═══ GESTION DES CAMIONS (admin) ═══
+function truckByTL(name){
+  if(!name)return null;
+  var n=(""+name).trim().toLowerCase();
+  for(var i=0;i<TRUCKS.length;i++){if((""+(TRUCKS[i].tl||"")).trim().toLowerCase()===n)return TRUCKS[i];}
+  return null;
+}
+function saveTrucks(cb){
+  apiCall("POST","/lists/trucks/set",{data:TRUCKS}).then(function(d){
+    if(d&&d.data)TRUCKS=d.data.slice();
+    if(cb)cb();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function renderTrucksSettings(){
+  if(typeof closeSidebar==="function")closeSidebar();
+  if(!isAdmin()){toast("Acc\u00e8s admin uniquement","ti-lock");return;}
+  cur=null;currentTab="trucks";
+  var m=document.getElementById("main-area");
+  var h="<div style=\"max-width:880px;margin:0 auto;padding:22px 18px\">";
+  h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-truck\" style=\"font-size:24px;color:#A16207\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Gestion des camions</h2></div>";
+  h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 20px\">Chaque camion est rattach\u00e9 \u00e0 un Team Leader. L'\u00e9quipement saisi ici permet de d\u00e9duire automatiquement le mat\u00e9riel d\u00e9j\u00e0 pr\u00e9sent dans le camion lors d'une appro.</p>";
+
+  if(!TRUCKS.length){
+    h+="<div style=\"background:#FEFCE8;border:1px solid #FEF08A;border-radius:11px;padding:18px;margin-bottom:16px\"><div style=\"font-size:14px;color:#A16207;font-weight:600;margin-bottom:6px\"><i class=\"ti ti-download\"></i> Importer les 27 camions JARNIAS</div><div style=\"font-size:12px;color:#854D0E;margin-bottom:10px\">Cr\u00e9e les 27 camions avec l'\u00e9quipement chiffr\u00e9 du fichier Excel (cordes, mousquetons, sangles...). Tu pourras tout ajuster ensuite.</div><button onclick=\"importTrucks()\" id=\"btn-imp-trucks\" style=\"background:#A16207;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-download\"></i> Importer les camions</button></div>";
+  } else {
+    h+="<div style=\"display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap\"><input id=\"truck-new-tl\" placeholder=\"Nom du Team Leader (nouveau camion)\" class=\"ui-in\" style=\"flex:1;min-width:200px\"/><button onclick=\"addTruck()\" style=\"background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 15px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> Nouveau camion</button></div>";
+  }
+
+  TRUCKS.forEach(function(t,ti){
+    h+="<div style=\"border:1px solid #E2E8F0;border-radius:11px;margin-bottom:12px;overflow:hidden\">";
+    h+="<div style=\"background:#FEFCE8;padding:10px 14px;display:flex;justify-content:space-between;align-items:center\"><span style=\"font-weight:700;font-size:14px;color:#854D0E\"><i class=\"ti ti-truck\"></i> "+esc(t.tl)+"</span><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:11px;color:#A16207\">"+(t.items?t.items.length:0)+" \u00e9quipement"+((t.items&&t.items.length>1)?"s":"")+"</span><button onclick=\"delTruck("+ti+")\" title=\"Supprimer le camion\" style=\"background:none;border:none;color:#DC2626;cursor:pointer\"><i class=\"ti ti-trash\"></i></button></div></div>";
+    h+="<div style=\"padding:8px 14px\">";
+    (t.items||[]).forEach(function(it,ii){
+      h+="<div style=\"display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px\"><span style=\"flex:1;color:#334155\">"+esc(it.n)+"</span><span style=\"font-size:12px;color:#A16207;font-weight:700;background:#FEF9C3;padding:2px 9px;border-radius:10px\">x"+it.q+"</span><button onclick=\"delTruckItem("+ti+","+ii+")\" title=\"Retirer\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:2px 5px\"><i class=\"ti ti-x\"></i></button></div>";
+    });
+    if(!t.items||!t.items.length)h+="<div style=\"color:#94A3B8;font-size:12px;padding:4px 0\">Aucun \u00e9quipement</div>";
+    // add equipment row
+    h+="<div style=\"display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid #F1F5F9\"><input id=\"tk-n-"+ti+"\" placeholder=\"\u00c9quipement\" class=\"ui-in\" style=\"flex:1;font-size:12px;padding:6px 9px\"/><input id=\"tk-q-"+ti+"\" placeholder=\"Qt\u00e9\" value=\"1\" class=\"ui-in\" style=\"width:60px;font-size:12px;padding:6px 9px\"/><button onclick=\"addTruckItem("+ti+")\" style=\"background:#F1F5F9;border:1px solid #E2E8F0;color:#475569;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i></button></div>";
+    h+="</div></div>";
+  });
+
+  h+="</div>";
+  m.innerHTML=h;
+}
+function importTrucks(){
+  if(typeof TRUCKS_SEED==="undefined"){toast("Donn\u00e9es indisponibles","ti-alert-circle");return;}
+  if(!confirm("Importer les "+TRUCKS_SEED.length+" camions avec leur \u00e9quipement ?"))return;
+  var btn=document.getElementById("btn-imp-trucks");if(btn){btn.disabled=true;btn.innerHTML="<i class=\"ti ti-loader-2\"></i> Import...";}
+  TRUCKS=JSON.parse(JSON.stringify(TRUCKS_SEED));
+  saveTrucks(function(){toast(TRUCKS.length+" camions import\u00e9s","ti-check");renderTrucksSettings();});
+}
+function addTruck(){
+  var n=(document.getElementById("truck-new-tl")||{}).value||"";n=n.trim();
+  if(!n)return;
+  if(truckByTL(n)){toast("Ce camion existe d\u00e9j\u00e0","ti-alert-circle");return;}
+  TRUCKS.push({tl:n,items:[]});
+  saveTrucks(function(){toast("Camion ajout\u00e9","ti-check");renderTrucksSettings();});
+}
+function delTruck(ti){
+  var t=TRUCKS[ti];if(!t)return;
+  if(!confirm("Supprimer le camion de \u00ab "+t.tl+" \u00bb ?"))return;
+  TRUCKS.splice(ti,1);
+  saveTrucks(function(){toast("Camion supprim\u00e9","ti-trash");renderTrucksSettings();});
+}
+function addTruckItem(ti){
+  var t=TRUCKS[ti];if(!t)return;
+  var n=(document.getElementById("tk-n-"+ti)||{}).value||"";n=n.trim();
+  var q=parseInt((document.getElementById("tk-q-"+ti)||{}).value||"1",10);if(isNaN(q)||q<1)q=1;
+  if(!n)return;
+  if(!t.items)t.items=[];
+  t.items.push({n:n,q:q});
+  saveTrucks(function(){renderTrucksSettings();});
+}
+function delTruckItem(ti,ii){
+  var t=TRUCKS[ti];if(!t||!t.items)return;
+  t.items.splice(ii,1);
+  saveTrucks(function(){renderTrucksSettings();});
+}
+
+// ═══ GESTION LIEN ALOBEES (admin) ═══
+function renderAlobeesSettings(){
+  if(typeof closeSidebar==="function")closeSidebar();
+  if(!isAdmin()){toast("Acc\u00e8s admin uniquement","ti-lock");return;}
+  cur=null;currentTab="alosettings";
+  var m=document.getElementById("main-area");
+  var h="<div style=\"max-width:760px;margin:0 auto;padding:22px 18px\">";
+  h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-plug-connected\" style=\"font-size:24px;color:#0E7490\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Gestion du lien Alobees</h2></div>";
+  h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 22px\">\u00c9tat de la connexion \u00e0 Alobees et gestion du cache des chantiers.</p>";
+  h+="<div id=\"alo-set-status\" style=\"background:#F8FAFC;border:1px solid #E2E8F0;border-radius:11px;padding:18px;margin-bottom:14px\"><div style=\"color:#94A3B8;font-size:13px\"><i class=\"ti ti-loader-2\"></i> V\u00e9rification...</div></div>";
+  h+="<div class=\"ui-sec\"><div class=\"ui-sec-hd\"><i class=\"ti ti-refresh\" style=\"color:#0E7490\"></i> Cache des chantiers</div><p style=\"font-size:13px;color:#64748B;margin:0 0 10px\">Les chantiers Alobees sont gard\u00e9s en m\u00e9moire 10 minutes. Force le rafra\u00eechissement si tu viens de cr\u00e9er un chantier dans Alobees et qu'il n'appara\u00eet pas encore.</p><button onclick=\"aloRefreshCache()\" style=\"background:#0E7490;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-refresh\"></i> Rafra\u00eechir la liste des chantiers</button></div>";
+  h+="<div style=\"background:#FFFBEB;border:1px solid #FDE68A;border-radius:11px;padding:14px;font-size:12px;color:#92400E\"><i class=\"ti ti-info-circle\"></i> La cl\u00e9 API Alobees se configure dans les variables Railway (jamais ici, pour la s\u00e9curit\u00e9). La modification du lien directement depuis cette page sera ajout\u00e9e plus tard.</div>";
+  h+="</div>";
+  m.innerHTML=h;
+  apiCall("GET","/alobees/status").then(function(d){
+    var on=d&&d.configured;
+    var el=document.getElementById("alo-set-status");if(!el)return;
+    if(on){
+      el.innerHTML="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:12px\"><span style=\"width:11px;height:11px;border-radius:50%;background:#22C55E;display:inline-block\"></span><span style=\"font-size:15px;font-weight:700;color:#15803D\">Connect\u00e9 \u00e0 Alobees</span></div><button onclick=\"aloTest()\" id=\"alo-test-btn\" style=\"background:#fff;border:1px solid #CBD5E1;color:#334155;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plug\"></i> Tester la connexion</button><div id=\"alo-test-res\" style=\"margin-top:10px;font-size:13px\"></div>";
+    }else{
+      el.innerHTML="<div style=\"display:flex;align-items:center;gap:10px\"><span style=\"width:11px;height:11px;border-radius:50%;background:#94A3B8;display:inline-block\"></span><span style=\"font-size:15px;font-weight:700;color:#475569\">Non configur\u00e9</span></div><div style=\"font-size:13px;color:#64748B;margin-top:8px\">Ajoute la variable <b>ALOBEES_API_KEY</b> dans Railway pour activer l'import des chantiers.</div>";
+    }
+  }).catch(function(){var el=document.getElementById("alo-set-status");if(el)el.innerHTML="<div style=\"color:#DC2626;font-size:13px\">Erreur de v\u00e9rification</div>";});
+}
+function aloTest(){
+  var res=document.getElementById("alo-test-res");var btn=document.getElementById("alo-test-btn");
+  if(btn){btn.disabled=true;btn.innerHTML="<i class=\"ti ti-loader-2\"></i> Test...";}
+  apiCall("GET","/alobees/sites?limit=1").then(function(d){
+    var total=(d&&(d.grandTotal!=null?d.grandTotal:d.total))||0;
+    if(res)res.innerHTML="<span style=\"color:#15803D;font-weight:600\"><i class=\"ti ti-circle-check\"></i> Connexion OK \u2014 "+total+" chantiers accessibles</span>";
+    if(btn){btn.disabled=false;btn.innerHTML="<i class=\"ti ti-plug\"></i> Tester la connexion";}
+  }).catch(function(e){
+    if(res)res.innerHTML="<span style=\"color:#DC2626;font-weight:600\"><i class=\"ti ti-alert-circle\"></i> "+esc(e.message||"\u00c9chec")+"</span>";
+    if(btn){btn.disabled=false;btn.innerHTML="<i class=\"ti ti-plug\"></i> Tester la connexion";}
+  });
+}
+function aloRefreshCache(){
+  apiCall("POST","/alobees/refresh",{}).then(function(){
+    if(window._aloCache)window._aloCache=null;
+    toast("Cache rafra\u00eechi \u2014 prochaine recherche \u00e0 jour","ti-refresh");
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+
 function isAdmin(){return currentUser&&currentUser.role==="admin";}
 var histOpen=false;
 function toggleHistory(){
@@ -2163,12 +2532,12 @@ function pickAlobeesSite(idx){
     if(nomCh)cur.nomChantier=nomCh;
     // Client
     if(x.customer)cur.clientSite=x.customer;
-    // Adresse compl\u00e8te (champs structur\u00e9s, sinon celle du nom)
+    // Adresse compl\u00e8te (champs structur\u00e9s, sinon celle du nom) -> encadr\u00e9 adresse d\u00e9di\u00e9
     var fullAddr=[x.address,x.complement,((""+(x.zipCode||""))+" "+(""+(x.city||""))).trim()].filter(function(a){return a&&(""+a).trim();}).join(", ").trim();
     if(!fullAddr)fullAddr=adresseName;
-    // Coordonn\u00e9es : adresse + contact + t\u00e9l
+    if(fullAddr)cur.adresseChantier=fullAddr;
+    // Coordonn\u00e9es : contact + t\u00e9l (l'adresse est dans son propre encadr\u00e9)
     var coord=[];
-    if(fullAddr)coord.push(fullAddr);
     if(x.ext_contact)coord.push("Contact : "+x.ext_contact);
     if(x.phone)coord.push("T\u00e9l : "+x.phone);
     if(coord.length)cur.coordClient=coord.join("\n");
@@ -2589,6 +2958,9 @@ function enterApp(){
   document.getElementById("sb-user-role").textContent=ri.label;
   document.getElementById("btn-admin").style.display=(currentUser.role==="admin")?"flex":"none";
   var bd=document.getElementById("btn-dash");if(bd)bd.style.display=(currentUser.role==="admin")?"flex":"none";
+  var bui=document.getElementById("btn-ui");if(bui)bui.style.display=(currentUser.role==="admin")?"flex":"none";
+  var balo=document.getElementById("btn-alo");if(balo)balo.style.display=(currentUser.role==="admin")?"flex":"none";
+  var btr=document.getElementById("btn-trucks");if(btr)btr.style.display=(currentUser.role==="admin")?"flex":"none";
   // currentRole pilote l'affichage (conducteur/depot)
   currentRole=(currentUser.role==="depot")?"depot":"conducteur";
   document.getElementById("auth-screen").style.display="none";
