@@ -398,7 +398,28 @@ table.at td{padding:0}
 .news-item i{color:#7C3AED;font-size:14px;flex-shrink:0;margin-top:1px}
 .spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* ===== THEME SOMBRE (inversion intelligente) ===== */
+html.dark{filter:invert(1) hue-rotate(180deg);background:#0b1120;}
+html.dark img,html.dark [data-noinvert]{filter:invert(1) hue-rotate(180deg);}
+@media print{html.dark{filter:none!important}html.dark img{filter:none!important}}
+.btn-theme{width:30px;height:30px;border:none;background:rgba(148,163,184,.16);color:#64748B;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-theme:hover{background:rgba(148,163,184,.28)}
+/* ===== 3 MODES D'AFFICHAGE DES APPROS ===== */
+.vm-seg{display:inline-flex;background:#F1F5F9;border-radius:8px;padding:2px;gap:2px;margin-right:4px}
+.vm-b{border:none;background:transparent;color:#94A3B8;width:28px;height:26px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px}
+.vm-b.active{background:#fff;color:#6D28D9;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.vm-b:hover:not(.active){color:#64748B}
+body.vm-hybrid .at td{padding-top:4px;padding-bottom:4px}
+body.vm-hybrid .at .cin,body.vm-hybrid .at .csel{padding:4px 6px}
+body.vm-hybrid .at td.td-d .cin{font-size:14px}
+body.vm-compact .at th.th-c,body.vm-compact .at td.td-c{display:none}
+body.vm-compact .at td{padding:2px 5px!important}
+body.vm-compact .at .cin,body.vm-compact .at .csel{padding:3px 6px!important;font-size:12px!important}
+body.vm-compact .at td.td-d .cin{font-size:13px!important;font-weight:600}
+body.vm-compact .btn-add-row{padding:5px 9px;font-size:12px}
+@media(max-width:760px){body.vm-compact .at td.td-d{padding-bottom:3px}}
 </style>
+<script>try{if(localStorage.getItem("appro_theme")==="dark")document.documentElement.classList.add("dark");}catch(e){}</script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -484,6 +505,7 @@ table.at td{padding:0}
             <div class="notif-list" id="notif-list"></div>
           </div>
         </div>
+        <button class="btn-theme" id="theme-btn" onclick="toggleTheme()" title="Th&#232;me clair / sombre"><i class="ti ti-moon" style="font-size:15px"></i></button>
         <button class="btn-logout" onclick="doLogout()" title="D\u00e9connexion"><i class="ti ti-logout" style="font-size:13px"></i></button>
       </div>
     </div>
@@ -496,6 +518,8 @@ table.at td{padding:0}
       <button class="btn-admin" id="btn-ui" onclick="renderUISettings()" style="display:none;background:#F5F3FF;color:#6D28D9"><i class="ti ti-adjustments" style="font-size:15px"></i> Param&#233;trage interface</button>
       <button class="btn-admin" id="btn-alo" onclick="renderAlobeesSettings()" style="display:none;background:#ECFEFF;color:#0E7490"><i class="ti ti-plug-connected" style="font-size:15px"></i> Gestion lien Alobees</button>
       <button class="btn-admin" id="btn-trucks" onclick="renderTrucksSettings()" style="display:none;background:#FEFCE8;color:#A16207"><i class="ti ti-truck" style="font-size:15px"></i> Gestion des camions</button>
+      <button class="btn-admin" id="btn-cmd" onclick="renderCommandes()" style="display:none;background:#F5F3FF;color:#6D28D9"><i class="ti ti-clipboard-list" style="font-size:15px"></i> Commande</button>
+      <button class="btn-admin" id="btn-annonce" onclick="renderAnnonces()" style="display:none;background:#FFF1F2;color:#BE123C"><i class="ti ti-speakerphone" style="font-size:15px"></i> Annonces</button>
       <div id="sheets-list"></div>
     </div>
   </aside>
@@ -558,6 +582,8 @@ var AP=[
 ];
 var DEPOT_C={bg:"#E2E8F0",left:"#475569",text:"#334155",label:"D\u00e9p\u00f4t"};
 var TRUCKS=[];
+var COMMANDES=[];
+var ANNONCES=[];
 var CAT_ITEMS=[
   // SÉCURITÉ / EPI
   {cat:"S\u00e9curit\u00e9 / EPI",sec:"outillage",n:"Harnais cordiste",q:"1"},
@@ -1587,7 +1613,7 @@ function tblH(sec,secColor){
     row+="<input class=\"cin cin-d\" value=\""+esc(r.designation)+"\"";
     row+=" placeholder=\"D&#233;signation...\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'designation',this.value)\"";
-    row+=" style=\""+st+"\"/>"+(r.truckQ?"<div style=\"font-size:10px;color:#A16207;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px\"><i class=\"ti ti-truck\" style=\"font-size:11px\"></i> "+r.truckQ+" d\u00e9j\u00e0 dans le camion"+(_qtyNum(r.quantite)>r.truckQ?" \u00b7 "+(_qtyNum(r.quantite)-r.truckQ)+" \u00e0 pr\u00e9parer":" \u00b7 rien \u00e0 pr\u00e9parer")+"</div>":"")+"</td>";
+    row+=" style=\""+st+"\"/>"+(r.truckQ?"<div style=\"font-size:10px;color:#A16207;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px\"><i class=\"ti ti-truck\" style=\"font-size:11px\"></i> "+r.truckQ+" d\u00e9j\u00e0 dans le camion"+(_qtyNum(r.quantite)>r.truckQ?" \u00b7 "+(_qtyNum(r.quantite)-r.truckQ)+" \u00e0 pr\u00e9parer":" \u00b7 rien \u00e0 pr\u00e9parer")+"</div>":"")+(r.commandeId?(function(){var st=(typeof cmdStatutById==="function"&&cmdStatutById(r.commandeId))||r.commandeStatut||"en_attente";var rc=st==="recu";return "<div style=\"font-size:10px;font-weight:600;margin-top:3px;display:inline-flex;align-items:center;gap:3px;color:"+(rc?"#065F46":"#92400E")+"\"><i class=\"ti ti-clipboard-"+(rc?"check":"list")+"\" style=\"font-size:11px\"></i> Commande : "+(rc?"re\u00e7ue":"en attente")+"</div>";})():"")+"</td>";
     row+="<td data-label=\"Qt&#233;\" class=\"td-q\"><input class=\"cin\" value=\""+esc(r.quantite)+"\"";
     row+=" placeholder=\"0\" style=\"text-align:center;"+st+"\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'quantite',this.value)\"/></td>";
@@ -1682,7 +1708,7 @@ function renderForm(){
   }).join("");
 
   var h="<div class=\"fv\">";
-  h+="<div class=\"topbar\"><button class=\"btn-back\" onclick=\"goBack()\"><i class=\"ti ti-arrow-left\" style=\"font-size:13px\"></i> Retour</button><div class=\"tb-right\"><button class=\"tbi\" style=\"color:#6D28D9\" title=\"Catalogue\" onclick=\"showCp()\"><i class=\"ti ti-package\"></i></button><button class=\"tbi\" id=\"btn-ai\" style=\"color:#92400E\" title=\"Classifier avec l'IA\" onclick=\"classify()\"><i class=\"ti ti-sparkles\"></i></button>"+addBtn+"<button class=\"tbi\" style=\"color:#475569\" title=\"Imprimer\" onclick=\"doPrint()\"><i class=\"ti ti-printer\"></i></button><button class=\"tbi\" style=\"color:#B91C1C\" title=\"Exporter en PDF\" onclick=\"doPDF()\"><i class=\"ti ti-file-type-pdf\"></i></button>"+shareBtn+saveBtn+"</div></div>";
+  h+="<div class=\"topbar\"><button class=\"btn-back\" onclick=\"goBack()\"><i class=\"ti ti-arrow-left\" style=\"font-size:13px\"></i> Retour</button><div class=\"tb-right\">"+viewModeSeg()+"<button class=\"tbi\" style=\"color:#6D28D9\" title=\"Catalogue\" onclick=\"showCp()\"><i class=\"ti ti-package\"></i></button><button class=\"tbi\" id=\"btn-ai\" style=\"color:#92400E\" title=\"Classifier avec l'IA\" onclick=\"classify()\"><i class=\"ti ti-sparkles\"></i></button>"+addBtn+"<button class=\"tbi\" style=\"color:#475569\" title=\"Imprimer\" onclick=\"doPrint()\"><i class=\"ti ti-printer\"></i></button><button class=\"tbi\" style=\"color:#B91C1C\" title=\"Exporter en PDF\" onclick=\"doPDF()\"><i class=\"ti ti-file-type-pdf\"></i></button>"+shareBtn+saveBtn+"</div></div>";
   h+=tplNotice+addBanner;
   if(cur.draft&&!(currentUser&&currentUser.role==="team_leader")){
     h+="<div style=\"background:#FEF9C3;border:1px solid #FDE68A;border-radius:11px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap\"><div style=\"display:flex;align-items:center;gap:9px\"><i class=\"ti ti-pencil\" style=\"font-size:20px;color:#A16207\"></i><div><div style=\"font-size:14px;font-weight:700;color:#854D0E\">Brouillon</div><div style=\"font-size:12px;color:#A16207\">Le chef d\u00e9p\u00f4t ne voit pas encore cette appro. Envoie-la en production quand elle est pr\u00eate.</div></div></div><button onclick=\"sendToProduction()\" style=\"background:#15803D;color:#fff;border:none;border-radius:9px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;white-space:nowrap\"><i class=\"ti ti-send\"></i> Envoyer en production</button></div>";
@@ -1690,7 +1716,7 @@ function renderForm(){
   h+="<div class=\"card\" id=\"info-card\"><div class=\"doc-band\"><img src=\"data:image/png;base64,"+LB64+"\" alt=\"JARNIAS\"/><div class=\"doc-band-r\"><div class=\"doc-band-title\">Feuille d&#39;approvisionnement</div><div class=\"doc-band-sub\">Les experts de la hauteur</div><div style=\"margin-top:6px\" id=\"pz-pill\">"+pill(cur,cur.typeConfirmed)+"</div><div style=\"margin-top:6px;display:flex;gap:6px;justify-content:flex-end;align-items:center\">"+prioBadge(cur.priorite)+"</div></div></div>";
   h+="<div class=\"doc-meta\"><div class=\"dm\"><label>R&#233;f&#233;rence</label><input class=\"dm-in\" value=\""+esc(cur.reference)+"\" oninput=\"upF('reference',this.value)\" placeholder=\"REF-001\"/></div><div class=\"dm\"><label>Cr&#233;&#233; le</label><div class=\"dm-val\">"+cur.dateCreation+"</div></div><div class=\"dm\"><label>Mis &#224; jour</label><div class=\"dm-val\" id=\"datemaj\">"+cur.dateMiseAJour+"</div></div></div>";
   h+="<div class=\"card-fields\">";
-  h+="<div class=\"fg\"><label>N&#176; Affaire</label><input class=\"fin\" value=\""+esc(cur.noAffaire)+"\" placeholder=\"2024-001\" oninput=\"upF('noAffaire',this.value)\"/></div>";
+  h+="<div class=\"fg\"><label>N&#176; Affaire</label><input class=\"fin\" value=\""+esc(cur.noAffaire)+"\" placeholder=\"2024-001\" oninput=\"upF('noAffaire',this.value)\" onchange=\"checkCommandesForAffaire()\"/></div>";
   if(window.alobeesOn&&!(currentUser&&currentUser.role==="team_leader")){
     h+="<div class=\"fg fg-full\"><button type=\"button\" onclick=\"showAlobeesPicker()\" style=\"display:inline-flex;align-items:center;gap:7px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-cloud-download\" style=\"font-size:16px\"></i> Importer un chantier depuis Alobees</button>"+(cur.alobeesSiteId?" <span style=\"font-size:11px;color:#15803D;background:#DCFCE7;padding:4px 9px;border-radius:20px;font-weight:600\"><i class=\"ti ti-link\"></i> Li\u00e9 \u00e0 Alobees</span>":"")+"</div>";
   }
@@ -2003,6 +2029,7 @@ function doSave(){
   }
   p.then(function(){
     saved=true;tpl=null;
+    if(typeof syncApproCommandes==="function"&&syncApproCommandes(cur)){saveCommandes();}
     var sb2=document.querySelector(".btn-save");
     if(sb2){sb2.innerHTML="<i class=\"ti ti-check\"></i> Enregistr\u00e9";sb2.classList.add("saved");sb2.disabled=true;}
     renderList();toast("Appro enregistr\u00e9e");
@@ -2087,6 +2114,30 @@ function doPDF(){
 // ═══════════════ NOTIFICATIONS ═══════════════
 // ═══════════════ NOUVEAUT\u00c9S ═══════════════
 var NEWS=[
+  {v:21,date:"30 juin 2026",items:[
+    "Nouvel onglet Annonces (admin + chef d\u00e9p\u00f4t) : publie un message qui s'affiche en pop-up",
+    "Deux canaux : Annonce g\u00e9n\u00e9rale (conducteurs, d\u00e9p\u00f4t, admin) et Annonce cibl\u00e9e Team Leaders (ex. mat\u00e9riel perdu)",
+    "Chaque personne voit l'annonce une fois, puis peut la fermer"
+  ]},
+  {v:20,date:"30 juin 2026",items:[
+    "3 modes d'affichage des appros (boutons en haut \u00e0 droite) : D\u00e9compress\u00e9 (fiches d\u00e9taill\u00e9es), Hybride (densit\u00e9 interm\u00e9diaire) et Compact (aper\u00e7u serr\u00e9, id\u00e9al mobile)",
+    "Le camion a maintenant un type (Camionnette / Trafic / Master) et l'\u00e9quipement se modifie directement dans la liste"
+  ]},
+  {v:19,date:"30 juin 2026",items:[
+    "Th\u00e8me sombre : bouton lune/soleil \u00e0 c\u00f4t\u00e9 de la d\u00e9connexion, plus reposant pour les yeux. Ton choix est m\u00e9moris\u00e9 sur l'appareil",
+    "Les logos et QR codes restent lisibles, et l'impression PDF reste en clair"
+  ]},
+  {v:18,date:"30 juin 2026",items:[
+    "Nouvel onglet Commande : retrouve tout le mat\u00e9riel en commande, issu des appros (articles \u00ab En commande \u00bb) ou ajout\u00e9 \u00e0 la main",
+    "Lien automatique par N\u00b0 d'affaire : une commande saisie d'avance s'ajoute toute seule \u00e0 l'appro du m\u00eame N\u00b0 d'affaire, avec l'indication re\u00e7ue / en attente",
+    "Suivi re\u00e7u / en attente sur chaque commande"
+  ]},
+  {v:17,date:"30 juin 2026",items:[
+    "Vrai mode brouillon : une nouvelle appro reste un brouillon (invisible au d\u00e9p\u00f4t) jusqu'\u00e0 ce que tu cliques \u00ab Envoyer en production \u00bb",
+    "Bascule Appros / Brouillons dans la biblioth\u00e8que",
+    "Le chef d\u00e9p\u00f4t a maintenant acc\u00e8s \u00e0 la gestion du catalogue et des camions",
+    "La d\u00e9duction du mat\u00e9riel d\u00e9j\u00e0 dans le camion appara\u00eet aussi sur le PDF (net \u00e0 pr\u00e9parer)"
+  ]},
   {v:16,date:"29 juin 2026",items:[
     "Nouvelle page Gestion des camions (admin) : l'\u00e9quipement de chaque Team Leader, import des 27 camions en un clic",
     "D\u00e9duction automatique : quand vous choisissez le Team Leader dans une appro, le mat\u00e9riel d\u00e9j\u00e0 pr\u00e9sent dans son camion est signal\u00e9 (\u00ab d\u00e9j\u00e0 dans le camion \u00bb) avec le net \u00e0 pr\u00e9parer"
@@ -2178,6 +2229,11 @@ function loadLists(){
     else{apiCall("POST","/lists/clients/seed",{data:CLIENTS}).catch(function(){});}
     // CAMIONS (TRUCKS)
     if(d.trucks&&d.trucks.length){TRUCKS=d.trucks.slice();}
+    // COMMANDES
+    COMMANDES=(d.commandes&&d.commandes.length)?d.commandes.slice():[];
+    // ANNONCES
+    ANNONCES=(d.annonces&&d.annonces.length)?d.annonces.slice():[];
+    setTimeout(function(){if(typeof showAnnoncePopups==="function")showAnnoncePopups();},700);
   }).catch(function(){});
 }
 // Recalcule l'ordre des cat\u00e9gories du catalogue (au cas o\u00f9 de nouvelles cat\u00e9gories apparaissent)
@@ -2389,11 +2445,14 @@ function renderTrucksSettings(){
   }
 
   TRUCKS.forEach(function(t,ti){
+    var _TT=["Camionnette","Trafic","Master"];
+    var tsel="<select onchange=\"setTruckType("+ti+",this.value)\" style=\"font-size:11px;padding:3px 7px;border:1px solid #FDE68A;border-radius:6px;background:#fff;color:#854D0E;font-family:inherit;cursor:pointer\"><option value=\"\">Type\u2026</option>"+_TT.map(function(x){return "<option value=\""+x+"\""+(t.type===x?" selected":"")+">"+x+"</option>";}).join("")+"</select>";
     h+="<div style=\"border:1px solid #E2E8F0;border-radius:11px;margin-bottom:12px;overflow:hidden\">";
     h+="<div style=\"background:#FEFCE8;padding:10px 14px;display:flex;justify-content:space-between;align-items:center\"><span style=\"font-weight:700;font-size:14px;color:#854D0E\"><i class=\"ti ti-truck\"></i> "+esc(t.tl)+"</span><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:11px;color:#A16207\">"+(t.items?t.items.length:0)+" \u00e9quipement"+((t.items&&t.items.length>1)?"s":"")+"</span><button onclick=\"delTruck("+ti+")\" title=\"Supprimer le camion\" style=\"background:none;border:none;color:#DC2626;cursor:pointer\"><i class=\"ti ti-trash\"></i></button></div></div>";
+    h+="<div style=\"padding:6px 14px;background:#FFFDF5;border-bottom:1px solid #FEF3C7;display:flex;align-items:center;gap:8px\"><span style=\"font-size:11px;color:#A16207;font-weight:600\">Type de v\u00e9hicule :</span>"+tsel+"</div>";
     h+="<div style=\"padding:8px 14px\">";
     (t.items||[]).forEach(function(it,ii){
-      h+="<div style=\"display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px\"><span style=\"flex:1;color:#334155\">"+(it.m?"<i class=\"ti ti-tool\" style=\"color:#A16207;font-size:12px\"></i> ":"")+esc(it.n)+(it.ref?" <span style=\"font-size:11px;color:#0E7490;background:#ECFEFF;padding:1px 7px;border-radius:8px\">n\u00b0 "+esc(it.ref)+"</span>":"")+"</span><span style=\"font-size:12px;color:#A16207;font-weight:700;background:#FEF9C3;padding:2px 9px;border-radius:10px\">x"+it.q+"</span><button onclick=\"delTruckItem("+ti+","+ii+")\" title=\"Retirer\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:2px 5px\"><i class=\"ti ti-x\"></i></button></div>";
+      h+="<div style=\"display:flex;align-items:center;gap:6px;padding:4px 0\">"+(it.m?"<i class=\"ti ti-tool\" style=\"color:#A16207;font-size:13px;flex-shrink:0\"></i>":"")+"<input value=\""+esc(it.n)+"\" onchange=\"updTruckItem("+ti+","+ii+",'n',this.value)\" class=\"ui-in\" style=\"flex:1;min-width:90px;font-size:12px;padding:5px 8px\"/><input value=\""+esc(it.ref||"")+"\" placeholder=\"n\u00b0\" onchange=\"updTruckItem("+ti+","+ii+",'ref',this.value)\" class=\"ui-in\" style=\"width:82px;font-size:12px;padding:5px 8px\"/><input value=\""+it.q+"\" onchange=\"updTruckItem("+ti+","+ii+",'q',this.value)\" class=\"ui-in\" style=\"width:46px;font-size:12px;padding:5px 8px;text-align:center\"/><button onclick=\"delTruckItem("+ti+","+ii+")\" title=\"Retirer\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:2px 4px;flex-shrink:0\"><i class=\"ti ti-x\"></i></button></div>";
     });
     if(!t.items||!t.items.length)h+="<div style=\"color:#94A3B8;font-size:12px;padding:4px 0\">Aucun \u00e9quipement</div>";
     // add equipment row
@@ -2410,6 +2469,14 @@ function importTrucks(){
   var btn=document.getElementById("btn-imp-trucks");if(btn){btn.disabled=true;btn.innerHTML="<i class=\"ti ti-loader-2\"></i> Import...";}
   TRUCKS=JSON.parse(JSON.stringify(TRUCKS_SEED));
   saveTrucks(function(){toast(TRUCKS.length+" camions import\u00e9s","ti-check");renderTrucksSettings();});
+}
+function setTruckType(ti,v){var t=TRUCKS[ti];if(!t)return;t.type=v;saveTrucks(function(){renderTrucksSettings();});}
+function updTruckItem(ti,ii,field,val){
+  var t=TRUCKS[ti];if(!t||!t.items||!t.items[ii])return;
+  if(field==="q"){var q=parseInt(val,10);if(isNaN(q)||q<1)q=1;t.items[ii].q=q;}
+  else if(field==="ref"){val=(""+val).trim();if(val)t.items[ii].ref=val;else delete t.items[ii].ref;}
+  else if(field==="n"){val=(""+val).trim();if(val)t.items[ii].n=val;}
+  saveTrucks();
 }
 function addTruck(){
   var n=(document.getElementById("truck-new-tl")||{}).value||"";n=n.trim();
@@ -2439,6 +2506,232 @@ function delTruckItem(ti,ii){
   var t=TRUCKS[ti];if(!t||!t.items)return;
   t.items.splice(ii,1);
   saveTrucks(function(){renderTrucksSettings();});
+}
+
+
+// ═══ ONGLET COMMANDE ═══
+function saveCommandes(cb){
+  apiCall("POST","/lists/commandes/set",{data:COMMANDES}).then(function(d){
+    if(d&&d.data)COMMANDES=d.data.slice();
+    if(cb)cb();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function cmdStatutById(id){
+  for(var i=0;i<COMMANDES.length;i++){if(COMMANDES[i].id===id)return COMMANDES[i].statut;}
+  return null;
+}
+// Réconcilie les articles "En commande" d'une appro -> enregistrements commande
+function syncApproCommandes(appro){
+  if(!appro||!appro._id)return false;
+  var changed=false;
+  var desired=[];
+  ["consommables","fournitures","outillage"].forEach(function(k){
+    (appro[k]||[]).forEach(function(r){
+      if(r.designation&&r.disponibilite==="En commande"&&!r.commandeId){
+        desired.push({produit:r.designation,qty:r.quantite,sec:k});
+      }
+    });
+  });
+  // commandes existantes liées à cette appro
+  var existing=COMMANDES.filter(function(c){return c.origine==="appro"&&c.approId===appro._id;});
+  // Ajouter les nouvelles
+  desired.forEach(function(d){
+    var found=existing.filter(function(c){return _normEq(c.produit)===_normEq(d.produit);})[0];
+    if(!found){
+      COMMANDES.push({id:uid(),produit:d.produit,qty:d.qty||"",noAffaire:appro.noAffaire||"",chantier:appro.nomChantier||"",statut:"en_attente",origine:"appro",approId:appro._id,sec:d.sec,fournisseur:"",createdAt:new Date().toISOString()});
+      changed=true;
+    } else if(found.noAffaire!==(appro.noAffaire||"")||found.chantier!==(appro.nomChantier||"")||found.qty!==(d.qty||"")){
+      found.noAffaire=appro.noAffaire||"";found.chantier=appro.nomChantier||"";found.qty=d.qty||"";changed=true;
+    }
+  });
+  // Retirer celles dont l'article "En commande" a disparu
+  for(var i=COMMANDES.length-1;i>=0;i--){
+    var c=COMMANDES[i];
+    if(c.origine==="appro"&&c.approId===appro._id){
+      var still=desired.filter(function(d){return _normEq(d.produit)===_normEq(c.produit);}).length;
+      if(!still){COMMANDES.splice(i,1);changed=true;}
+    }
+  }
+  return changed;
+}
+// Lien inverse : ajoute à l'appro courante les commandes manuelles du même N° d'affaire
+function checkCommandesForAffaire(){
+  if(!cur||!cur.noAffaire)return;
+  var na=_normEq(cur.noAffaire);
+  if(!na)return;
+  var already={};
+  ["consommables","fournitures","outillage"].forEach(function(k){(cur[k]||[]).forEach(function(r){if(r.commandeId)already[r.commandeId]=1;});});
+  var toAdd=COMMANDES.filter(function(c){return c.origine==="manuel"&&_normEq(c.noAffaire)===na&&!already[c.id];});
+  if(!toAdd.length)return;
+  toAdd.forEach(function(c){
+    if(!cur.consommables)cur.consommables=[];
+    var r=mkR(c.produit,c.qty);r.disponibilite="En commande";r.commandeId=c.id;r.commandeStatut=c.statut;
+    cur.consommables.push(r);
+  });
+  saved=false;renderForm();
+  toast(toAdd.length+" produit(s) en commande ajout\u00e9(s) pour ce N\u00b0 d'affaire","ti-clipboard-check");
+}
+function renderCommandes(){
+  if(typeof closeSidebar==="function")closeSidebar();
+  if(currentUser&&currentUser.role==="team_leader")return;
+  cur=null;currentTab="commande";
+  var m=document.getElementById("main-area");
+  var h="<div style=\"max-width:920px;margin:0 auto;padding:22px 18px\">";
+  h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-clipboard-list\" style=\"font-size:24px;color:#6D28D9\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Commandes</h2></div>";
+  h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 18px\">Mat\u00e9riel en commande, issu des appros (articles \u00ab En commande \u00bb) ou ajout\u00e9 manuellement. Le lien se fait par <b>N\u00b0 d'affaire</b>.</p>";
+  // Formulaire d'ajout manuel
+  h+="<div style=\"background:#F5F3FF;border:1px solid #DDD6FE;border-radius:11px;padding:14px;margin-bottom:18px\">";
+  h+="<div style=\"font-size:13px;font-weight:700;color:#6D28D9;margin-bottom:9px\"><i class=\"ti ti-plus\"></i> Ajouter une commande</div>";
+  h+="<div style=\"display:flex;gap:8px;flex-wrap:wrap\">";
+  h+="<input id=\"cmd-prod\" placeholder=\"Produit\" class=\"ui-in\" style=\"flex:2;min-width:160px\"/>";
+  h+="<input id=\"cmd-qty\" placeholder=\"Qt\u00e9\" class=\"ui-in\" style=\"width:70px\"/>";
+  h+="<input id=\"cmd-aff\" placeholder=\"N\u00b0 d'affaire\" class=\"ui-in\" style=\"flex:1;min-width:120px\"/>";
+  h+="<input id=\"cmd-chan\" placeholder=\"Chantier (option)\" class=\"ui-in\" style=\"flex:1;min-width:120px\"/>";
+  h+="<button onclick=\"addCommandeManual()\" style=\"background:#6D28D9;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> Ajouter</button>";
+  h+="</div></div>";
+
+  if(!COMMANDES.length){
+    h+="<div style=\"text-align:center;color:#94A3B8;padding:40px 0;font-size:14px\"><i class=\"ti ti-clipboard-off\" style=\"font-size:32px;display:block;margin-bottom:8px;opacity:.5\"></i>Aucune commande en cours</div></div>";
+    m.innerHTML=h;return;
+  }
+  // Grouper par N° d'affaire
+  var groups={};
+  COMMANDES.forEach(function(c){var k=c.noAffaire||"\u2014 Sans N\u00b0 d'affaire";if(!groups[k])groups[k]=[];groups[k].push(c);});
+  var enAttente=COMMANDES.filter(function(c){return c.statut!=="recu";}).length;
+  var recues=COMMANDES.length-enAttente;
+  h+="<div style=\"display:flex;gap:10px;margin-bottom:14px\"><div style=\"flex:1;background:#FEF3C7;border:1px solid #FDE68A;border-radius:9px;padding:10px 14px\"><div style=\"font-size:22px;font-weight:800;color:#92400E\">"+enAttente+"</div><div style=\"font-size:11px;color:#A16207;font-weight:600\">EN ATTENTE</div></div><div style=\"flex:1;background:#D1FAE5;border:1px solid #A7F3D0;border-radius:9px;padding:10px 14px\"><div style=\"font-size:22px;font-weight:800;color:#065F46\">"+recues+"</div><div style=\"font-size:11px;color:#047857;font-weight:600\">RE\u00c7UES</div></div></div>";
+
+  Object.keys(groups).sort().forEach(function(aff){
+    h+="<div style=\"margin-bottom:14px\"><div style=\"font-size:12px;font-weight:700;color:#475569;margin-bottom:6px;display:flex;align-items:center;gap:6px\"><i class=\"ti ti-folder\" style=\"color:#6D28D9\"></i> N\u00b0 affaire : "+esc(aff)+"</div>";
+    groups[aff].forEach(function(c){
+      var recu=c.statut==="recu";
+      h+="<div style=\"border:1px solid "+(recu?"#A7F3D0":"#E2E8F0")+";background:"+(recu?"#F0FDF4":"#fff")+";border-radius:9px;padding:10px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px;flex-wrap:wrap\">";
+      h+="<div style=\"flex:1;min-width:160px\"><div style=\"font-size:14px;font-weight:600;color:#0F172A\">"+esc(c.produit)+(c.qty?" <span style=\"color:#64748B;font-weight:400\">\u00d7 "+esc(c.qty)+"</span>":"")+"</div>";
+      var meta=[];if(c.chantier)meta.push(esc(c.chantier));
+      meta.push(c.origine==="appro"?"<i class=\"ti ti-link\" style=\"font-size:11px\"></i> depuis une appro":"<i class=\"ti ti-hand-click\" style=\"font-size:11px\"></i> ajout manuel");
+      h+="<div style=\"font-size:11px;color:#94A3B8;margin-top:2px;display:flex;align-items:center;gap:5px\">"+meta.join(" \u00b7 ")+"</div></div>";
+      h+="<span style=\"font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;background:"+(recu?"#D1FAE5":"#FEF3C7")+";color:"+(recu?"#065F46":"#92400E")+"\">"+(recu?"Re\u00e7u":"En attente")+"</span>";
+      h+="<button onclick=\"toggleCommandeRecu('"+c.id+"')\" title=\""+(recu?"Repasser en attente":"Marquer re\u00e7u")+"\" style=\"background:"+(recu?"#F1F5F9":"#15803D")+";color:"+(recu?"#475569":"#fff")+";border:none;border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti "+(recu?"ti-rotate":"ti-check")+"\"></i> "+(recu?"Annuler":"Re\u00e7u")+"</button>";
+      h+="<button onclick=\"delCommande('"+c.id+"')\" title=\"Supprimer\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:4px\"><i class=\"ti ti-trash\"></i></button>";
+      h+="</div>";
+    });
+    h+="</div>";
+  });
+  h+="</div>";
+  m.innerHTML=h;
+}
+function addCommandeManual(){
+  var prod=(document.getElementById("cmd-prod")||{}).value||"";prod=prod.trim();
+  if(!prod){toast("Indiquez un produit","ti-alert-circle");return;}
+  var qty=((document.getElementById("cmd-qty")||{}).value||"").trim();
+  var aff=((document.getElementById("cmd-aff")||{}).value||"").trim();
+  var chan=((document.getElementById("cmd-chan")||{}).value||"").trim();
+  COMMANDES.push({id:uid(),produit:prod,qty:qty,noAffaire:aff,chantier:chan,statut:"en_attente",origine:"manuel",approId:null,sec:null,fournisseur:"",createdAt:new Date().toISOString()});
+  saveCommandes(function(){toast("Commande ajout\u00e9e","ti-check");renderCommandes();});
+}
+function toggleCommandeRecu(id){
+  var c=COMMANDES.filter(function(x){return x.id===id;})[0];if(!c)return;
+  c.statut=(c.statut==="recu")?"en_attente":"recu";
+  saveCommandes(function(){renderCommandes();});
+}
+function delCommande(id){
+  var c=COMMANDES.filter(function(x){return x.id===id;})[0];if(!c)return;
+  if(!confirm("Supprimer la commande \u00ab "+c.produit+" \u00bb ?"))return;
+  COMMANDES=COMMANDES.filter(function(x){return x.id!==id;});
+  saveCommandes(function(){toast("Commande supprim\u00e9e","ti-trash");renderCommandes();});
+}
+
+
+// ═══ ANNONCES (admin + dépôt) ═══
+function saveAnnonces(cb){
+  apiCall("POST","/lists/annonces/set",{data:ANNONCES}).then(function(d){
+    if(d&&d.data)ANNONCES=d.data.slice();
+    if(cb)cb();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function renderAnnonces(){
+  if(typeof closeSidebar==="function")closeSidebar();
+  if(!canManage()){toast("Acc\u00e8s admin ou d\u00e9p\u00f4t","ti-lock");return;}
+  cur=null;currentTab="annonces";
+  var m=document.getElementById("main-area");
+  var h="<div style=\"max-width:820px;margin:0 auto;padding:22px 18px\">";
+  h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-speakerphone\" style=\"font-size:24px;color:#BE123C\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Annonces</h2></div>";
+  h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 18px\">Publie un message qui s'affichera en pop-up. <b>G\u00e9n\u00e9rale</b> : vue par les conducteurs, le d\u00e9p\u00f4t et les admins. <b>Team Leaders</b> : vue uniquement par les TL (ex. mat\u00e9riel perdu).</p>";
+  // Formulaire
+  h+="<div style=\"background:#FFF1F2;border:1px solid #FECDD3;border-radius:11px;padding:14px;margin-bottom:18px\">";
+  h+="<div style=\"display:flex;gap:8px;margin-bottom:10px\"><button id=\"an-t-general\" onclick=\"setAnnonceType('general')\" style=\"flex:1;border:1px solid "+(_anType==="general"?"#BE123C":"#FECDD3")+";background:"+(_anType==="general"?"#BE123C":"#fff")+";color:"+(_anType==="general"?"#fff":"#BE123C")+";border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-users\"></i> G\u00e9n\u00e9rale</button><button id=\"an-t-tl\" onclick=\"setAnnonceType('tl')\" style=\"flex:1;border:1px solid "+(_anType==="tl"?"#BE123C":"#FECDD3")+";background:"+(_anType==="tl"?"#BE123C":"#fff")+";color:"+(_anType==="tl"?"#fff":"#BE123C")+";border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-hard-hat\"></i> Team Leaders</button></div>";
+  h+="<input id=\"an-titre\" placeholder=\"Titre (optionnel)\" class=\"ui-in\" style=\"width:100%;margin-bottom:8px\"/>";
+  h+="<textarea id=\"an-msg\" placeholder=\"Message de l'annonce...\" class=\"ui-in\" style=\"width:100%;min-height:70px;resize:vertical;font-family:inherit\"></textarea>";
+  h+="<button onclick=\"addAnnonce()\" style=\"margin-top:10px;background:#BE123C;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-send\"></i> Publier l'annonce</button>";
+  h+="</div>";
+  // Liste
+  if(!ANNONCES.length){
+    h+="<div style=\"text-align:center;color:#94A3B8;padding:34px 0;font-size:14px\"><i class=\"ti ti-bell-off\" style=\"font-size:30px;display:block;margin-bottom:8px;opacity:.5\"></i>Aucune annonce</div>";
+  } else {
+    var sorted=ANNONCES.slice().sort(function(a,b){return (b.createdAt||"").localeCompare(a.createdAt||"");});
+    sorted.forEach(function(a){
+      var tl=a.type==="tl";
+      h+="<div style=\"border:1px solid "+(a.active?"#E2E8F0":"#F1F5F9")+";border-radius:10px;padding:12px 14px;margin-bottom:9px;opacity:"+(a.active?"1":".55")+"\">";
+      h+="<div style=\"display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px\"><span style=\"font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:"+(tl?"#FEF3C7":"#DBEAFE")+";color:"+(tl?"#92400E":"#1D4ED8")+"\">"+(tl?"Team Leaders":"G\u00e9n\u00e9rale")+"</span><div style=\"display:flex;gap:6px\"><button onclick=\"toggleAnnonceActive('"+a.id+"')\" style=\"background:"+(a.active?"#F1F5F9":"#DCFCE7")+";color:"+(a.active?"#64748B":"#15803D")+";border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit\">"+(a.active?"D\u00e9sactiver":"R\u00e9activer")+"</button><button onclick=\"delAnnonce('"+a.id+"')\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:3px\"><i class=\"ti ti-trash\"></i></button></div></div>";
+      if(a.titre)h+="<div style=\"font-size:14px;font-weight:700;color:#0F172A;margin-bottom:2px\">"+esc(a.titre)+"</div>";
+      h+="<div style=\"font-size:13px;color:#334155;white-space:pre-wrap\">"+esc(a.message)+"</div>";
+      h+="<div style=\"font-size:11px;color:#94A3B8;margin-top:6px\">"+esc(a.auteur||"")+(a.createdAt?" \u00b7 "+fd(a.createdAt.slice(0,10)):"")+"</div>";
+      h+="</div>";
+    });
+  }
+  h+="</div>";
+  m.innerHTML=h;
+}
+var _anType="general";
+function setAnnonceType(t){_anType=t;renderAnnonces();}
+function addAnnonce(){
+  var msg=((document.getElementById("an-msg")||{}).value||"").trim();
+  if(!msg){toast("\u00c9cris un message","ti-alert-circle");return;}
+  var titre=((document.getElementById("an-titre")||{}).value||"").trim();
+  ANNONCES.push({id:uid(),type:_anType,titre:titre,message:msg,auteur:(currentUser&&currentUser.name)||"",createdAt:new Date().toISOString(),active:true});
+  saveAnnonces(function(){toast("Annonce publi\u00e9e","ti-check");renderAnnonces();});
+}
+function toggleAnnonceActive(id){
+  var a=ANNONCES.filter(function(x){return x.id===id;})[0];if(!a)return;
+  a.active=!a.active;saveAnnonces(function(){renderAnnonces();});
+}
+function delAnnonce(id){
+  if(!confirm("Supprimer cette annonce ?"))return;
+  ANNONCES=ANNONCES.filter(function(x){return x.id!==id;});
+  saveAnnonces(function(){toast("Annonce supprim\u00e9e","ti-trash");renderAnnonces();});
+}
+// Affichage des pop-ups selon le rôle
+function showAnnoncePopups(){
+  if(!currentUser||!ANNONCES||!ANNONCES.length)return;
+  var isTL=currentUser.role==="team_leader";
+  var wanted=isTL?"tl":"general";
+  var seen={};try{seen=JSON.parse(localStorage.getItem("annonce_seen")||"{}");}catch(e){}
+  var todo=ANNONCES.filter(function(a){return a.active&&a.type===wanted&&!seen[a.id];});
+  if(!todo.length)return;
+  var ov=document.createElement("div");
+  ov.id="annonce-ov";
+  ov.style.cssText="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px";
+  var inner="<div style=\"background:#fff;border-radius:16px;max-width:440px;width:100%;max-height:85vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.3)\">";
+  inner+="<div style=\"background:linear-gradient(135deg,#BE123C,#9F1239);padding:16px 20px;border-radius:16px 16px 0 0;display:flex;align-items:center;gap:10px\"><i class=\"ti ti-speakerphone\" style=\"font-size:22px;color:#fff\"></i><span style=\"font-size:17px;font-weight:700;color:#fff\">"+(todo.length>1?todo.length+" annonces":"Annonce")+"</span></div>";
+  inner+="<div style=\"padding:18px 20px\">";
+  todo.forEach(function(a){
+    inner+="<div style=\"margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #F1F5F9\">";
+    if(a.titre)inner+="<div style=\"font-size:15px;font-weight:700;color:#0F172A;margin-bottom:4px\">"+esc(a.titre)+"</div>";
+    inner+="<div style=\"font-size:14px;color:#334155;white-space:pre-wrap;line-height:1.5\">"+esc(a.message)+"</div>";
+    inner+="<div style=\"font-size:11px;color:#94A3B8;margin-top:6px\">"+esc(a.auteur||"")+"</div></div>";
+  });
+  inner+="<button onclick=\"dismissAnnonces()\" style=\"width:100%;background:#BE123C;color:#fff;border:none;border-radius:9px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit\">J'ai compris</button>";
+  inner+="</div></div>";
+  ov.innerHTML=inner;
+  ov._ids=todo.map(function(a){return a.id;});
+  document.body.appendChild(ov);
+}
+function dismissAnnonces(){
+  var ov=document.getElementById("annonce-ov");if(!ov)return;
+  var seen={};try{seen=JSON.parse(localStorage.getItem("annonce_seen")||"{}");}catch(e){}
+  (ov._ids||[]).forEach(function(id){seen[id]=1;});
+  try{localStorage.setItem("annonce_seen",JSON.stringify(seen));}catch(e){}
+  ov.remove();
 }
 
 // ═══ GESTION LIEN ALOBEES (admin) ═══
@@ -2486,6 +2779,24 @@ function aloRefreshCache(){
 
 function isAdmin(){return currentUser&&currentUser.role==="admin";}
 function canManage(){return currentUser&&(currentUser.role==="admin"||currentUser.role==="depot");}
+function updateThemeBtn(){var d=document.documentElement.classList.contains("dark");var b=document.getElementById("theme-btn");if(b)b.innerHTML="<i class=\"ti "+(d?"ti-sun":"ti-moon")+"\" style=\"font-size:15px\"></i>";}
+function toggleTheme(){var d=!document.documentElement.classList.contains("dark");document.documentElement.classList.toggle("dark",d);try{localStorage.setItem("appro_theme",d?"dark":"light");}catch(e){}updateThemeBtn();}
+if(document.readyState!=="loading")updateThemeBtn();else document.addEventListener("DOMContentLoaded",updateThemeBtn);
+function setViewMode(mode){
+  window._viewMode=mode;
+  try{localStorage.setItem("appro_vm",mode);}catch(e){}
+  document.body.classList.remove("vm-full","vm-hybrid","vm-compact");
+  document.body.classList.add("vm-"+mode);
+  var seg=document.getElementById("vm-seg");
+  if(seg){[].forEach.call(seg.querySelectorAll(".vm-b"),function(b){b.classList.toggle("active",b.getAttribute("data-vm")===mode);});}
+}
+function applyViewMode(){var mode=null;try{mode=localStorage.getItem("appro_vm");}catch(e){}setViewMode(mode||"full");}
+if(document.readyState!=="loading")applyViewMode();else document.addEventListener("DOMContentLoaded",applyViewMode);
+function viewModeSeg(){
+  var vm=window._viewMode||"full";
+  function b(m,ic,t){return "<button class=\"vm-b"+(vm===m?" active":"")+"\" data-vm=\""+m+"\" onclick=\"setViewMode('"+m+"')\" title=\""+t+"\"><i class=\"ti "+ic+"\"></i></button>";}
+  return "<div class=\"vm-seg\" id=\"vm-seg\">"+b("full","ti-layout-rows","D\u00e9compress\u00e9")+b("hybrid","ti-layout-list","Hybride")+b("compact","ti-list","Compact")+"</div>";
+}
 var histOpen=false;
 function toggleHistory(){
   histOpen=!histOpen;
@@ -3020,6 +3331,8 @@ function enterApp(){
   var bui=document.getElementById("btn-ui");if(bui)bui.style.display=canManage()?"flex":"none";
   var balo=document.getElementById("btn-alo");if(balo)balo.style.display=(currentUser.role==="admin")?"flex":"none";
   var btr=document.getElementById("btn-trucks");if(btr)btr.style.display=canManage()?"flex":"none";
+  var bcmd=document.getElementById("btn-cmd");if(bcmd)bcmd.style.display=(currentUser.role!=="team_leader")?"flex":"none";
+  var bann=document.getElementById("btn-annonce");if(bann)bann.style.display=canManage()?"flex":"none";
   // currentRole pilote l'affichage (conducteur/depot)
   currentRole=(currentUser.role==="depot")?"depot":"conducteur";
   document.getElementById("auth-screen").style.display="none";
