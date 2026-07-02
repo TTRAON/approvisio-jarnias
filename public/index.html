@@ -12,7 +12,7 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F1F5F9;color:#1E293B;font-size:14px}
 .app{display:flex;height:100vh;overflow:hidden}
 .sidebar{width:272px;min-width:272px;background:#fff;border-right:1px solid #E2E8F0;display:flex;flex-direction:column;overflow:hidden}
-.sb-brand{background:#0F172A;padding:14px 16px;display:flex;align-items:center;gap:10px}
+.sb-brand{background:var(--accent,#0F172A);padding:14px 16px;display:flex;align-items:center;gap:10px}
 .sb-brand img{width:72px;border-radius:8px}
 .sb-brand-name{font-size:13px;font-weight:700;color:#F1F5F9}
 .sb-brand-tag{font-size:10px;color:#64748B;margin-top:1px}
@@ -138,7 +138,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .card-hd{padding:13px 18px;border-bottom:1px solid #F1F5F9;display:flex;justify-content:space-between;align-items:center}
 .card-hd-t{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#0F172A}
 .card-hd-n{font-size:11px;background:#F1F5F9;color:#64748B;padding:2px 9px;border-radius:10px}
-.doc-band{background:#0F172A;padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
+.doc-band{background:var(--accent,#0F172A);padding:12px 18px;display:flex;align-items:center;justify-content:space-between}
 .doc-band img{width:80px;border-radius:8px}
 .doc-band-r{text-align:right}
 .doc-band-title{font-size:14px;font-weight:700;color:#F1F5F9}
@@ -258,7 +258,7 @@ table.at td{padding:0}
 }
 #pz{display:none}
 .pz-hd,.pz-ref,.pz-sec-t,.pz-info,.pz-dates,.pz-hd-flag>div{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-.pz-hd{background:#0F172A;border-radius:6px 6px 0 0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.pz-hd{background:var(--accent,#0F172A);border-radius:6px 6px 0 0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
 .pz-hd img{width:90px;border-radius:7px}
 .pz-hd-l{display:flex;align-items:center;gap:9px}
 .pz-hd-c{flex:1;text-align:center;padding:0 12px}
@@ -270,8 +270,8 @@ table.at td{padding:0}
 .pz-ri{display:flex;flex-direction:column}
 .pz-rl{font-size:9px;color:#64748B;text-transform:uppercase;letter-spacing:.5px}
 .pz-rv{font-size:11px;color:#E2E8F0;font-weight:600}
-.pz-info{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:10px 14px}
-.pz-dates{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;border:1px solid #FDE68A;background:#FFFBEB;border-radius:6px;padding:8px 14px}
+.pz-bt{padding:4px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#fff;background:var(--accent,#0F172A);border-radius:6px 6px 0 0;margin-top:10px}.pz-info{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;background:#F8FAFC;border:1px solid #E2E8F0;border-top:none;border-radius:0 0 6px 6px;padding:10px 14px}
+.pz-dates{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;border:1px solid #FDE68A;border-top:none;background:#FFFBEB;border-radius:0 0 6px 6px;padding:8px 14px}
 .pz-fi label{font-size:9px;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:1px}
 .pz-fi span{font-size:12px;font-weight:600;color:#0F172A}
 .pz-sec{margin-bottom:14px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden}
@@ -1016,11 +1016,18 @@ function apiCall(method,path,body){
     });
   });
 }
-// Charge les appros depuis le serveur
-function loadSheetsFromServer(){
+// Charge les appros depuis le serveur (avec retry si le serveur se r\u00e9veille)
+function loadSheetsFromServer(retries){
+  if(retries===undefined)retries=3;
   return apiCall("GET","/appros").then(function(data){
     sheets=(data||[]).map(function(s){return mig(s);});
     return sheets;
+  }).catch(function(e){
+    if(retries>0){
+      if(typeof toast==="function")toast("Connexion au serveur\u2026","ti-refresh");
+      return new Promise(function(res){setTimeout(res,1800);}).then(function(){return loadSheetsFromServer(retries-1);});
+    }
+    throw e;
   });
 }
 function findServerId(localId){
@@ -1579,9 +1586,10 @@ function _approSearchText(s){
   ["consommables","fournitures","outillage"].forEach(function(k){(s[k]||[]).forEach(function(r){if(r){parts.push(r.designation);parts.push(r.commentaire);}});});
   return parts.filter(Boolean).join(" ").toLowerCase();
 }
+function onLibSearch(v){var sb=document.getElementById("srch");if(sb)sb.value=v;renderList();setTimeout(function(){var e=document.getElementById("srch-lib");if(e){e.focus();try{e.setSelectionRange(e.value.length,e.value.length);}catch(x){}}},0);}
 function renderList(){
   if(typeof renderDeadlineBanner==="function")renderDeadlineBanner();
-  var q=(document.getElementById("srch").value||"").toLowerCase().trim();
+  var _sl=document.getElementById("srch-lib");var q=((_sl?_sl.value:(document.getElementById("srch")||{}).value)||"").toLowerCase().trim();
   var filtered=sheets.filter(function(s){
     if(s.statut==="sortie"&&!q)return false;
     if(window._draftView){if(!s.draft)return false;}else{if(s.draft)return false;}
@@ -1634,7 +1642,8 @@ function renderList(){
   if(!(currentUser&&(currentUser.role==="depot"||currentUser.role==="team_leader"))){
     toggle="<div style=\"display:flex;gap:5px;padding:2px 0 9px\"><button onclick=\"setDraftView(false)\" style=\"flex:1;border:1px solid "+(_dv?"#E2E8F0":"#1D4ED8")+";background:"+(_dv?"#fff":"#EFF6FF")+";color:"+(_dv?"#64748B":"#1D4ED8")+";border-radius:7px;padding:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\">Appros</button><button onclick=\"setDraftView(true)\" style=\"flex:1;border:1px solid "+(_dv?"#A16207":"#E2E8F0")+";background:"+(_dv?"#FEF9C3":"#fff")+";color:"+(_dv?"#854D0E":"#64748B")+";border-radius:7px;padding:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-pencil\" style=\"font-size:12px\"></i> Brouillons"+(_dc?" ("+_dc+")":"")+"</button></div>";
   }
-  document.getElementById("sheets-list").innerHTML=toggle+html;
+  var srchBar="<div style=\"position:relative;margin-bottom:8px\"><i class=\"ti ti-search\" style=\"position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:15px\"></i><input id=\"srch-lib\" value=\""+esc(q)+"\" oninput=\"onLibSearch(this.value)\" placeholder=\"Rechercher : chantier, adresse, N\u00b0 affaire, article...\" style=\"width:100%;box-sizing:border-box;padding:9px 12px 9px 33px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;font-family:inherit;background:#fff\"/></div>";
+  document.getElementById("sheets-list").innerHTML=srchBar+toggle+html;
 }
 function togC(cid,key){
   openC[key]=openC[key]===false;
@@ -1694,6 +1703,7 @@ function truckSelectorHTML(){
   var opts="<option value=\"\">\u2014 Aucun camion \u2014</option>";
   TRUCKS.forEach(function(t){opts+="<option value=\""+esc(t.tl)+"\""+(cur.tlCamion===t.tl?" selected":"")+">"+esc(t.tl)+"</option>";});
   var h="<div class=\"fg fg-full\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-truck\" style=\"font-size:12px;color:#A16207\"></i> Team Leader / Camion</label><select class=\"fin\" onchange=\"setTlCamion(this.value)\">"+opts+"</select></div>";
+  h+="<div class=\"fg fg-full\"><button onclick=\"toggleCamionSujet()\" style=\"background:"+(cur.camionSujet?"#B91C1C":"#fff")+";color:"+(cur.camionSujet?"#fff":"#B91C1C")+";border:1px solid #FCA5A5;border-radius:8px;padding:8px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-alert-triangle\"></i> "+(cur.camionSujet?"Sujet camion signal\u00e9 \u00b7 cliquer pour retirer":"Sujet camion (technicien sans camion ?)")+"</button>"+(cur.camionSujet?"<div style=\"margin-top:7px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:#B91C1C\"><i class=\"ti ti-alert-triangle\"></i> <b>Sujet camion :</b> le technicien en charge n'a peut-\u00eatre pas de camion \u2014 solution \u00e0 trouver.</div>":"")+"</div>";
   var t=truckByTL(cur.tlCamion);
   if(t){
     h+="<div class=\"fg fg-full\" style=\"background:#FEFCE8;border:1px solid #FEF08A;border-radius:10px;padding:12px\">";
@@ -1862,26 +1872,32 @@ function renderForm(){
   if(cur.draft&&!(currentUser&&currentUser.role==="team_leader")){
     h+="<div style=\"background:#FEF9C3;border:1px solid #FDE68A;border-radius:11px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap\"><div style=\"display:flex;align-items:center;gap:9px\"><i class=\"ti ti-pencil\" style=\"font-size:20px;color:#A16207\"></i><div><div style=\"font-size:14px;font-weight:700;color:#854D0E\">Brouillon</div><div style=\"font-size:12px;color:#A16207\">Le chef d\u00e9p\u00f4t ne voit pas encore cette appro. Envoie-la en production quand elle est pr\u00eate.</div></div></div><button onclick=\"sendToProduction()\" style=\"background:#15803D;color:#fff;border:none;border-radius:9px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;white-space:nowrap\"><i class=\"ti ti-send\"></i> Envoyer en production</button></div>";
   }
-  h+="<div class=\"card\" id=\"info-card\"><div class=\"doc-band\"><img src=\"data:image/png;base64,"+LB64+"\" alt=\"JARNIAS\"/><div class=\"doc-band-r\"><div class=\"doc-band-title\">Feuille d&#39;approvisionnement</div><div class=\"doc-band-sub\">Les experts de la hauteur</div><div style=\"margin-top:6px\" id=\"pz-pill\">"+pill(cur,cur.typeConfirmed)+"</div><div style=\"margin-top:6px;display:flex;gap:6px;justify-content:flex-end;align-items:center\">"+prioBadge(cur.priorite)+"</div></div></div>";
+  h+="<div class=\"card info-sec\" id=\"info-card\"><div class=\"doc-band\"><img src=\"data:image/png;base64,"+LB64+"\" alt=\"JARNIAS\"/><div class=\"doc-band-r\"><div class=\"doc-band-title\">Feuille d&#39;approvisionnement</div><div class=\"doc-band-sub\">"+(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.tagline?esc(CONFIG.tagline):"Les experts de la hauteur")+"</div><div style=\"margin-top:6px\" id=\"pz-pill\">"+pill(cur,cur.typeConfirmed)+"</div><div style=\"margin-top:6px;display:flex;gap:6px;justify-content:flex-end;align-items:center\">"+prioBadge(cur.priorite)+"</div></div></div>";
   h+="<div class=\"doc-meta\"><div class=\"dm\"><label>R&#233;f&#233;rence</label><input class=\"dm-in\" value=\""+esc(cur.reference)+"\" oninput=\"upF('reference',this.value)\" placeholder=\"REF-001\"/></div><div class=\"dm\"><label>Cr&#233;&#233; le</label><div class=\"dm-val\">"+cur.dateCreation+"</div></div><div class=\"dm\"><label>Mis &#224; jour</label><div class=\"dm-val\" id=\"datemaj\">"+cur.dateMiseAJour+"</div></div></div>";
   h+="<div class=\"card-fields\">";
   h+="<div class=\"fg\"><label>N&#176; Affaire</label><input class=\"fin\" value=\""+esc(cur.noAffaire)+"\" placeholder=\"2024-001\" oninput=\"upF('noAffaire',this.value)\" onchange=\"checkCommandesForAffaire()\"/></div>";
   if(window.alobeesOn&&!(currentUser&&currentUser.role==="team_leader")){
-    h+="<div class=\"fg fg-full\"><button type=\"button\" onclick=\"showAlobeesPicker()\" style=\"display:inline-flex;align-items:center;gap:7px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-cloud-download\" style=\"font-size:16px\"></i> Importer un chantier depuis Alobees</button>"+(cur.alobeesSiteId?" <span style=\"font-size:11px;color:#15803D;background:#DCFCE7;padding:4px 9px;border-radius:20px;font-weight:600\"><i class=\"ti ti-link\"></i> Li\u00e9 \u00e0 Alobees</span>":"")+"</div>";
+    h+="<div class=\"fg fg-full\" style=\"display:flex;align-items:center;gap:10px;flex-wrap:wrap\"><button type=\"button\" onclick=\"showAlobeesPicker()\" style=\"display:inline-flex;align-items:center;gap:7px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-cloud-download\" style=\"font-size:16px\"></i> Importer un chantier depuis Alobees</button>"+(cur.alobeesSiteId?" <span style=\"font-size:11px;color:#15803D;background:#DCFCE7;padding:4px 9px;border-radius:20px;font-weight:600\"><i class=\"ti ti-link\"></i> Li\u00e9 \u00e0 Alobees</span>":"")+"</div>";
   }
+  h+="</div></div>";
+  h+="<div class=\"card info-sec\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class=\"ti ti-building-community\" style=\"font-size:16px;color:#6D28D9\"></i> Chantier</div></div><div class=\"card-fields\">";
   h+="<div class=\"fg\"><label>Nom du chantier</label><input class=\"fin\" value=\""+esc(cur.nomChantier)+"\" placeholder=\"Ex: Ravalement fa&#231;ade...\" oninput=\"upF('nomChantier',this.value)\"/></div>";
+  h+="<div class=\"fg fg-full\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-map-pin\" style=\"font-size:12px;color:#DC2626\"></i> Adresse du chantier</label><textarea class=\"fin\" rows=\"2\" style=\"resize:vertical\" placeholder=\"Adresse compl&#232;te du chantier (rue, code postal, ville)...\" oninput=\"upF('adresseChantier',this.value)\">"+esc(cur.adresseChantier||"")+"</textarea></div>";
+  h+="<div class=\"fg fg-full\"><label>Types de travaux (plusieurs possibles)</label><div class=\"type-ms\" id=\"type-ms\">"+typeSelectorHTML()+"</div></div>";
+h+="<div class=\"fg\"><label>&#9889; Priorit\u00e9</label><select class=\"fin\" style=\"cursor:pointer\" onchange=\"upF('priorite',this.value)\"><option value=\"normale\""+(cur.priorite==="normale"?" selected":"")+">Normale</option><option value=\"urgente\""+(cur.priorite==="urgente"?" selected":"")+">Urgente</option><option value=\"tres_urgente\""+(cur.priorite==="tres_urgente"?" selected":"")+">Tr\u00e8s urgente</option></select></div>";
+  h+="</div></div>";
+  h+="<div class=\"card info-sec\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class=\"ti ti-users\" style=\"font-size:16px;color:#6D28D9\"></i> Intervenants</div></div><div class=\"card-fields\">";
   h+="<div class=\"fg\"><label>Charg&#233; d&#39;affaires</label><input class=\"fin\" value=\""+esc(cur.chargeAffaires)+"\" placeholder=\"Nom Pr&#233;nom\" oninput=\"upF('chargeAffaires',this.value)\"/></div>";
   var clientOpts=CLIENTS.map(function(c){return "<option value=\""+esc(c)+"\"></option>";}).join("");
   h+="<div class=\"fg\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-building\" style=\"font-size:12px;vertical-align:-1px\"></i> Client / Site <button type=\"button\" onclick=\"addNewClient()\" title=\"Ajouter un client\" style=\"background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:5px;padding:1px 6px;font-size:11px;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i></button>"+(isAdmin()?"<button type=\"button\" onclick=\"manageClients()\" title=\"G\u00e9rer les clients\" style=\"background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;border-radius:5px;padding:1px 6px;font-size:11px;cursor:pointer;font-family:inherit\"><i class=\"ti ti-settings\"></i></button>":"")+"</label><input class=\"fin\" list=\"clients-list\" value=\""+esc(cur.clientSite||"")+"\" placeholder=\"Rechercher ou saisir...\" oninput=\"upF('clientSite',this.value)\"/><datalist id=\"clients-list\">"+clientOpts+"</datalist></div>";
-  h+="<div class=\"fg fg-full\"><label>Types de travaux (plusieurs possibles)</label><div class=\"type-ms\" id=\"type-ms\">"+typeSelectorHTML()+"</div></div>";
-  h+=truckSelectorHTML();
-  h+="<div class=\"fg\"><label><i class=\"ti ti-calendar-due\" style=\"font-size:12px;vertical-align:-1px\"></i> Date limite d&#39;appro</label><input class=\"fin\" type=\"date\" value=\""+esc(cur.dateAppro)+"\" oninput=\"upF('dateAppro',this.value)\"/></div>";
-  h+="<div class=\"fg\"><label><i class=\"ti ti-calendar-event\" style=\"font-size:12px;vertical-align:-1px\"></i> Date d&#233;but de chantier</label><input class=\"fin\" type=\"date\" value=\""+esc(cur.dateChantier)+"\" oninput=\"upF('dateChantier',this.value)\"/></div>";
-h+="<div class=\"fg\"><label>&#9889; Priorit\u00e9</label><select class=\"fin\" style=\"cursor:pointer\" onchange=\"upF('priorite',this.value)\"><option value=\"normale\""+(cur.priorite==="normale"?" selected":"")+">Normale</option><option value=\"urgente\""+(cur.priorite==="urgente"?" selected":"")+">Urgente</option><option value=\"tres_urgente\""+(cur.priorite==="tres_urgente"?" selected":"")+">Tr\u00e8s urgente</option></select></div>";
   var condOpts=(typeof serverConductors!=="undefined"?serverConductors:[]).map(function(c){return "<option value=\""+esc(c.name)+"\"></option>";}).join("");
   h+="<div class=\"fg fg-full\"><label>Conducteur de travaux responsable</label><input class=\"fin\" list=\"conducteurs-list\" value=\""+esc(cur.conducteur||"")+"\" placeholder=\"Nom Pr\u00e9nom\" oninput=\"upF('conducteur',this.value)\"/><datalist id=\"conducteurs-list\">"+condOpts+"</datalist></div>";
-  h+="<div class=\"fg fg-full\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-map-pin\" style=\"font-size:12px;color:#DC2626\"></i> Adresse du chantier</label><textarea class=\"fin\" rows=\"2\" style=\"resize:vertical\" placeholder=\"Adresse compl&#232;te du chantier (rue, code postal, ville)...\" oninput=\"upF('adresseChantier',this.value)\">"+esc(cur.adresseChantier||"")+"</textarea></div>";
   h+="<div class=\"fg fg-full\"><label>Coordonn\u00e9es client</label><textarea class=\"fin\" rows=\"2\" style=\"resize:vertical\" placeholder=\"Nom, t\u00e9l, contact...\" oninput=\"upF('coordClient',this.value)\">"+esc(cur.coordClient||"")+"</textarea></div>";
+  h+="</div></div>";
+  h+="<div class=\"card info-sec\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class=\"ti ti-calendar-clock\" style=\"font-size:16px;color:#6D28D9\"></i> Planning &amp; camion</div></div><div class=\"card-fields\">";
+  h+="<div class=\"fg\"><label><i class=\"ti ti-calendar-due\" style=\"font-size:12px;vertical-align:-1px\"></i> Date limite d&#39;appro</label><input class=\"fin\" type=\"date\" value=\""+esc(cur.dateAppro)+"\" oninput=\"upF('dateAppro',this.value)\"/></div>";
+  h+="<div class=\"fg\"><label><i class=\"ti ti-calendar-event\" style=\"font-size:12px;vertical-align:-1px\"></i> Date d&#233;but de chantier</label><input class=\"fin\" type=\"date\" value=\""+esc(cur.dateChantier)+"\" oninput=\"upF('dateChantier',this.value)\"/></div>";
+  h+=truckSelectorHTML();
   h+="</div></div>";
   h+="<div class=\"card\" style=\"border-left:4px solid \"+((STATUT[cur.statut]||STATUT.en_attente).color)+\"\"><div style=\"padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap\"><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:12px;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.5px\">Statut :</span>"+statutBadge(cur.statut)+(cur.preparedAt?"<span style=\"font-size:11px;color:#94A3B8\">pr\u00e9par\u00e9e le "+cur.preparedAt+"</span>":"")+"</div><div style=\"display:flex;gap:6px\">"+statutButtons()+"</div></div></div>";
   h+=tlTicketSection();
@@ -1895,15 +1911,18 @@ h+="<div class=\"card\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class
   }
   document.getElementById("main-area").innerHTML=h;
   if(currentUser&&currentUser.role==="team_leader"){
-    var ic=document.getElementById("info-card");
-    if(ic){
+    var _isecs=document.querySelectorAll(".info-sec");
+    _isecs.forEach(function(ic){
       ic.querySelectorAll("input,select,textarea").forEach(function(el){el.disabled=true;el.style.background="#F8FAFC";el.style.color="#475569";el.style.cursor="default";});
       ic.querySelectorAll("button").forEach(function(b){b.style.display="none";});
-      var ms=ic.querySelector("#type-ms");if(ms){ms.style.pointerEvents="none";ms.style.opacity=".75";}
+    });
+    document.querySelectorAll("#type-ms").forEach(function(ms){ms.style.pointerEvents="none";ms.style.opacity=".75";});
+    var _last=_isecs[_isecs.length-1];
+    if(_last){
       var lock=document.createElement("div");
-      lock.style.cssText="font-size:11px;color:#9A3412;background:#FFEDD5;padding:8px 16px;display:flex;align-items:center;gap:6px;font-weight:600";
+      lock.style.cssText="font-size:11px;color:#9A3412;background:#FFEDD5;padding:8px 16px;display:flex;align-items:center;gap:6px;font-weight:600;border-radius:0 0 12px 12px";
       lock.innerHTML="<i class=\"ti ti-lock\"></i> Infos chantier verrouill\u00e9es \u2014 vous pouvez modifier le mat\u00e9riel ci-dessous";
-      ic.appendChild(lock);
+      _last.appendChild(lock);
     }
   }
   renderList();
@@ -2225,10 +2244,10 @@ function buildPZ(s){
   });
   if(retTotal>0){secH+="<div style=\"margin-top:8px;border:1px dashed #FCA5A5;background:#FFF5F5;border-radius:8px;padding:9px 13px;font-size:11px;color:#B91C1C;display:flex;align-items:center;gap:8px\"><span style=\"font-size:15px\">&#8617;</span><span><b>"+retTotal+" article"+(retTotal>1?"s":"")+" rendu"+(retTotal>1?"s":"")+" au d&#233;p&#244;t</b> &#8212; d&#233;duit"+(retTotal>1?"s":"")+" du stock, non d&#233;taill&#233;"+(retTotal>1?"s":"")+" ci-dessus.</span></div>";}
   var tTag=typeTagsHTML(s,11);
-  var pTag=prioBadge(s.priorite||"normale");var _pr=PRIO[s.priorite||"normale"];var prioFlag="<div style=\"background:"+_pr.color+";color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 2px 6px "+_pr.color+"55\"><span style=\"font-size:15px\">&#9873;</span>"+_pr.label+"</div>";var dRow=(s.dateAppro||s.dateChantier)?"<div class=\"pz-dates\"><div class=\"pz-fi\"><label>&#128197; Date limite d&#39;appro</label><span style=\"color:#C2410C\">"+(s.dateAppro?fd(s.dateAppro):"Non d&#233;finie")+"</span></div><div class=\"pz-fi\"><label>&#127959; D&#233;but de chantier</label><span style=\"color:#1D4ED8\">"+(s.dateChantier?fd(s.dateChantier):"Non d&#233;fini")+"</span></div></div>":"";
+  var pTag=prioBadge(s.priorite||"normale");var _pr=PRIO[s.priorite||"normale"];var prioFlag="<div style=\"background:"+_pr.color+";color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 2px 6px "+_pr.color+"55\"><span style=\"font-size:15px\">&#9873;</span>"+_pr.label+"</div>";var dRow=(s.dateAppro||s.dateChantier)?"<div class=\"pz-bt\">Planning</div><div class=\"pz-dates\"><div class=\"pz-fi\"><label>&#128197; Date limite d&#39;appro</label><span style=\"color:#C2410C\">"+(s.dateAppro?fd(s.dateAppro):"Non d&#233;finie")+"</span></div><div class=\"pz-fi\"><label>&#127959; D&#233;but de chantier</label><span style=\"color:#1D4ED8\">"+(s.dateChantier?fd(s.dateChantier):"Non d&#233;fini")+"</span></div></div>":"";
   var legH=dates.length?"<div style=\"margin-bottom:8px;padding:6px 10px;border:1px solid #E2E8F0;border-radius:6px;font-size:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap\"><strong>L&#233;gende :</strong>"+dates.map(function(d,i){var c=AP[i%AP.length];return"<span style=\"display:inline-flex;align-items:center;gap:4px\"><span style=\"display:inline-block;width:10px;height:10px;background:"+c.bg+";border:1px solid "+c.left+";border-radius:2px\"></span> Ajout "+fdB(d)+" ("+c.label+")</span>";}).join("")+"<span style=\"display:inline-flex;align-items:center;gap:4px\"><span style=\"display:inline-block;width:10px;height:10px;background:#FEE2E2;border:1px solid #FECACA;border-radius:2px\"></span> Retourn&#233; d&#233;p&#244;t</span></div>":"";
   var obsH=s.observation?"<div class=\"pz-sec\"><div class=\"pz-sec-t\">Observation</div><div class=\"pz-obs\">"+esc(s.observation)+"</div></div>":"";
-  var _qr=s._id?qrDataURL(window.location.origin+"/?appro="+s._id):"";var _qrB=_qr?"<img src=\""+_qr+"\" style=\"width:82px;height:82px;background:#fff;border-radius:8px;padding:3px\" alt=\"QR\"/>":"";return "<div class=\"pz-hd\"><div class=\"pz-hd-l\"><img src=\"data:image/png;base64,"+LB64+"\" alt=\"JARNIAS\"/>"+_qrB+"</div><div class=\"pz-hd-c\"><div class=\"pz-hd-title\">Feuille d&#39;approvisionnement</div><div class=\"pz-hd-sub\">Les experts de la hauteur</div><div style=\"margin-top:5px;display:flex;gap:5px;justify-content:center;flex-wrap:wrap\">"+tTag+"</div></div><div class=\"pz-hd-flag\">"+prioFlag+"</div></div><div class=\"pz-ref\"><div class=\"pz-ri\"><div class=\"pz-rl\">R&#233;f&#233;rence</div><div class=\"pz-rv\">"+esc(s.reference)+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Cr&#233;&#233; le</div><div class=\"pz-rv\">"+s.dateCreation+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Mis &#224; jour</div><div class=\"pz-rv\">"+s.dateMiseAJour+"</div></div></div><div class=\"pz-info\"><div class=\"pz-fi\"><label>N&#176; Affaire</label><span>"+(esc(s.noAffaire)||"—")+"</span></div><div class=\"pz-fi\"><label>Charg&#233; d&#39;affaires</label><span>"+(esc(s.chargeAffaires)||"—")+"</span></div><div class=\"pz-fi\" style=\"grid-column:1/-1\"><label>Nom du chantier</label><span>"+(esc(s.nomChantier)||"—")+"</span></div>"+(s.conducteur?"<div class=\"pz-fi\"><label>Conducteur de travaux</label><span>"+esc(s.conducteur)+"</span></div>":"")+(s.clientSite?"<div class=\"pz-fi\"><label>Client / Site</label><span>"+esc(s.clientSite)+"</span></div>":"")+(s.adresseChantier?"<div class=\"pz-fi\" style=\"grid-column:1/-1\"><label>Adresse du chantier</label><span style=\"white-space:pre-wrap\">"+esc(s.adresseChantier)+"</span></div>":"")+(s.coordClient?"<div class=\"pz-fi\"><label>Coordonn&#233;es client</label><span style=\"white-space:pre-wrap\">"+esc(s.coordClient)+"</span></div>":"")+"</div>"+dRow+legH+secH+obsH+"<div class=\"pz-foot\"><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Charg&#233; d&#39;affaires</label></div><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Visa client</label></div></div>";
+  var _qr=s._id?qrDataURL(window.location.origin+"/?appro="+s._id):"";var _qrB=_qr?"<img src=\""+_qr+"\" style=\"width:82px;height:82px;background:#fff;border-radius:8px;padding:3px\" alt=\"QR\"/>":"";return "<div class=\"pz-hd\"><div class=\"pz-hd-l\"><img src=\"data:image/png;base64,"+LB64+"\" alt=\"JARNIAS\"/>"+_qrB+"</div><div class=\"pz-hd-c\"><div class=\"pz-hd-title\">Feuille d&#39;approvisionnement</div><div class=\"pz-hd-sub\">"+(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.tagline?esc(CONFIG.tagline):"Les experts de la hauteur")+"</div><div style=\"margin-top:5px;display:flex;gap:5px;justify-content:center;flex-wrap:wrap\">"+tTag+"</div></div><div class=\"pz-hd-flag\">"+prioFlag+"</div></div><div class=\"pz-ref\"><div class=\"pz-ri\"><div class=\"pz-rl\">R&#233;f&#233;rence</div><div class=\"pz-rv\">"+esc(s.reference)+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Cr&#233;&#233; le</div><div class=\"pz-rv\">"+s.dateCreation+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Mis &#224; jour</div><div class=\"pz-rv\">"+s.dateMiseAJour+"</div></div></div><div class=\"pz-bt\">Informations chantier</div><div class=\"pz-info\"><div class=\"pz-fi\"><label>N&#176; Affaire</label><span>"+(esc(s.noAffaire)||"—")+"</span></div><div class=\"pz-fi\"><label>Charg&#233; d&#39;affaires</label><span>"+(esc(s.chargeAffaires)||"—")+"</span></div><div class=\"pz-fi\" style=\"grid-column:1/-1\"><label>Nom du chantier</label><span>"+(esc(s.nomChantier)||"—")+"</span></div>"+(s.conducteur?"<div class=\"pz-fi\"><label>Conducteur de travaux</label><span>"+esc(s.conducteur)+"</span></div>":"")+(s.clientSite?"<div class=\"pz-fi\"><label>Client / Site</label><span>"+esc(s.clientSite)+"</span></div>":"")+(s.adresseChantier?"<div class=\"pz-fi\" style=\"grid-column:1/-1\"><label>Adresse du chantier</label><span style=\"white-space:pre-wrap\">"+esc(s.adresseChantier)+"</span></div>":"")+(s.coordClient?"<div class=\"pz-fi\"><label>Coordonn&#233;es client</label><span style=\"white-space:pre-wrap\">"+esc(s.coordClient)+"</span></div>":"")+"</div>"+dRow+legH+secH+obsH+"<div class=\"pz-foot\"><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Charg&#233; d&#39;affaires</label></div><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Visa client</label></div></div>";
 }
 function isLongAppro(s){
   var n=0;["consommables","fournitures","outillage"].forEach(function(k){(s[k]||[]).forEach(function(r){if(r.designation&&(""+r.designation).trim())n++;});});
@@ -2256,7 +2275,7 @@ function doPDF(){
     ?"@media print{@page{size:A3 landscape;margin:11mm}}.pz-cols{column-count:2;column-gap:16mm;column-fill:auto}.pz-cols>div{-webkit-column-break-inside:avoid;break-inside:avoid;page-break-inside:avoid}.fold-line{position:fixed;left:50%;top:0;bottom:0;border-left:1.5px dashed #CBD5E1}.fold-tag{position:fixed;left:50%;top:2mm;transform:translateX(-50%);font-size:9px;color:#94A3B8;background:#fff;padding:1px 7px;border:1px solid #E2E8F0;border-radius:10px}"
     :"@media print{@page{size:A4;margin:10mm 12mm}}";
   var body=long?("<div class=\"pz-cols\">"+inner+"</div>"):inner;
-  var h="<!DOCTYPE html><html lang=\"fr\"><head><meta charset=\"UTF-8\"><title>"+(cur.nomChantier||"Appro")+" &#8212; JARNIAS</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1E293B;font-size:11px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}.pz-hd{background:#0F172A;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}.pz-hd img{width:90px;border-radius:7px}.pz-hd-l{display:flex;align-items:center;gap:9px}.pz-hd-c{flex:1;text-align:center;padding:0 12px}.pz-hd-flag{flex-shrink:0}.pz-hd-r{text-align:right}.pz-hd-title{font-size:14px;font-weight:700;color:#F1F5F9}.pz-hd-sub{font-size:10px;color:#64748B;margin-top:2px}.pz-ref{background:#1E293B;padding:7px 16px;display:flex;gap:20px;margin-bottom:10px}.pz-ri{display:flex;flex-direction:column}.pz-rl{font-size:9px;color:#64748B;text-transform:uppercase}.pz-rv{font-size:11px;color:#E2E8F0;font-weight:600}.pz-info{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;padding:10px 14px}.pz-dates{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;border:1px solid #FDE68A;background:#FFFBEB;border-radius:6px;padding:8px 14px}.pz-fi label{font-size:9px;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:1px}.pz-fi span{font-size:12px;font-weight:600;color:#0F172A}.pz-sec{margin-bottom:14px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden}.pz-sec-t{background:#1E293B;color:#fff;padding:6px 11px;font-size:11px;font-weight:600;text-transform:uppercase}.pz-tbl{width:100%;border-collapse:collapse}.pz-tbl th{background:#F1F5F9;padding:5px 8px;font-size:10px;text-transform:uppercase;color:#475569;text-align:left;border-bottom:1px solid #E2E8F0;font-weight:600}.pz-tbl td{padding:5px 8px;font-size:11px;border-bottom:1px solid #F1F5F9}.pz-tbl tr:last-child td{border-bottom:none}.pz-obs{border:1px solid #E2E8F0;padding:8px 10px;font-size:11px;min-height:36px;white-space:pre-wrap;border-radius:0 0 4px 4px}.pz-foot{margin-top:16px;display:flex;justify-content:flex-end;gap:36px;border-top:1px solid #E2E8F0;padding-top:10px}.pz-sign label{font-size:9px;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:20px;text-align:center}.pz-sign-line{border-top:1px solid #CBD5E1;width:120px;margin:0 auto}"+pageStyle+"</style></head><body>"+body+"<script>window.onload=function(){window.print();}<\/script></body></html>";
+  var h="<!DOCTYPE html><html lang=\"fr\"><head><meta charset=\"UTF-8\"><title>"+(cur.nomChantier||"Appro")+" &#8212; JARNIAS</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1E293B;font-size:11px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}.pz-hd{background:"+_accentCol()+";padding:12px 16px;display:flex;align-items:center;justify-content:space-between}.pz-hd img{width:90px;border-radius:7px}.pz-hd-l{display:flex;align-items:center;gap:9px}.pz-hd-c{flex:1;text-align:center;padding:0 12px}.pz-hd-flag{flex-shrink:0}.pz-hd-r{text-align:right}.pz-hd-title{font-size:14px;font-weight:700;color:#F1F5F9}.pz-hd-sub{font-size:10px;color:#64748B;margin-top:2px}.pz-ref{background:#1E293B;padding:7px 16px;display:flex;gap:20px;margin-bottom:10px}.pz-ri{display:flex;flex-direction:column}.pz-rl{font-size:9px;color:#64748B;text-transform:uppercase}.pz-rv{font-size:11px;color:#E2E8F0;font-weight:600}.pz-bt{padding:4px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#fff;background:var(--accent,#0F172A);border-radius:6px 6px 0 0;margin-top:10px}.pz-info{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;background:#F8FAFC;border:1px solid #E2E8F0;border-top:none;border-radius:0 0 6px 6px;padding:10px 14px}.pz-dates{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;border:1px solid #FDE68A;border-top:none;background:#FFFBEB;border-radius:0 0 6px 6px;padding:8px 14px}.pz-fi label{font-size:9px;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:1px}.pz-fi span{font-size:12px;font-weight:600;color:#0F172A}.pz-sec{margin-bottom:14px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden}.pz-sec-t{background:#1E293B;color:#fff;padding:6px 11px;font-size:11px;font-weight:600;text-transform:uppercase}.pz-tbl{width:100%;border-collapse:collapse}.pz-tbl th{background:#F1F5F9;padding:5px 8px;font-size:10px;text-transform:uppercase;color:#475569;text-align:left;border-bottom:1px solid #E2E8F0;font-weight:600}.pz-tbl td{padding:5px 8px;font-size:11px;border-bottom:1px solid #F1F5F9}.pz-tbl tr:last-child td{border-bottom:none}.pz-obs{border:1px solid #E2E8F0;padding:8px 10px;font-size:11px;min-height:36px;white-space:pre-wrap;border-radius:0 0 4px 4px}.pz-foot{margin-top:16px;display:flex;justify-content:flex-end;gap:36px;border-top:1px solid #E2E8F0;padding-top:10px}.pz-sign label{font-size:9px;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:20px;text-align:center}.pz-sign-line{border-top:1px solid #CBD5E1;width:120px;margin:0 auto}"+pageStyle+"</style></head><body>"+body+"<script>window.onload=function(){window.print();}<\/script></body></html>";
   var blob=new Blob([h],{type:"text/html;charset=utf-8"});
   var url=URL.createObjectURL(blob);
   var win=window.open(url,"_blank","width=820,height=900");
@@ -2268,6 +2287,23 @@ function doPDF(){
 // ═══════════════ NOTIFICATIONS ═══════════════
 // ═══════════════ NOUVEAUT\u00c9S ═══════════════
 var NEWS=[
+  {v:37,date:"2 juillet 2026",items:[
+    "Feuille d'appro relook\u00e9e facon \u00ab app moderne \u00bb : les informations sont regroup\u00e9es en 4 cartes th\u00e9matiques (Identification, Chantier, Intervenants, Planning & camion) \u2014 bien plus lisible et a\u00e9r\u00e9",
+    "PDF assorti : bandeaux de section \u00e0 la couleur d'accent (Informations chantier, Planning) pour un rendu coh\u00e9rent avec l'appli",
+    "Les bandeaux (feuille, PDF, menu) suivent la couleur d'accent choisie dans la personnalisation"
+  ]},
+  {v:36,date:"2 juillet 2026",items:[
+    "Personnalisation embellie : aper\u00e7u en direct (logo + nom + slogan) en haut de la page",
+    "Nouvelle couleur d'accent : 8 pastilles + s\u00e9lecteur libre, appliqu\u00e9e aux bandeaux de la feuille, du PDF et du menu (aper\u00e7u instantan\u00e9)",
+    "Petit nettoyage visuel du bouton Alobees et du badge \u00ab Li\u00e9 \u00e0 Alobees \u00bb sur la feuille"
+  ]},
+  {v:35,date:"2 juillet 2026",items:[
+    "Personnalisation : bug d'affichage des accents corrig\u00e9 + slogan de l'entreprise d\u00e9sormais modifiable (visible sur la feuille et le PDF)",
+    "Recherche par adresse/chantier ajout\u00e9e directement dans l'onglet Biblioth\u00e8que (barre de gauche conserv\u00e9e, les deux sont synchronis\u00e9es)",
+    "Commande re\u00e7ue : l'article de l'appro li\u00e9e passe automatiquement en \u00ab En stock \u00bb (et revient si on annule)",
+    "Camions : \u00e9tats \u00ab Au d\u00e9p\u00f4t \u00bb et \u00ab En r\u00e9vision \u00bb, pr\u00eat en un clic depuis la vue d'ensemble, et bouton \u00ab Sujet camion \u00bb sur l'appro (technicien sans camion)",
+    "Chargement plus robuste : nouvelle tentative automatique si le serveur met du temps \u00e0 r\u00e9pondre (\u00e9vite la biblioth\u00e8que vide au r\u00e9veil)"
+  ]},
   {v:34,date:"2 juillet 2026",items:[
     "Param\u00e9trage interface plus compact : les sections Types de chantier et Clients / Sites s'affichent c\u00f4te \u00e0 c\u00f4te sur 2 colonnes (moins de d\u00e9filement)"
   ]},
@@ -2427,9 +2463,15 @@ function loadConductors(){
   }).catch(function(){});
 }
 // Listes partag\u00e9es (types / catalogue / clients) charg\u00e9es du serveur
+function _getListsWithRetry(n){
+  return apiCall("GET","/lists").catch(function(e){
+    if(n>0){return new Promise(function(r){setTimeout(r,1800);}).then(function(){return _getListsWithRetry(n-1);});}
+    throw e;
+  });
+}
 function loadLists(){
   if(!authToken)return Promise.resolve();
-  return apiCall("GET","/lists").then(function(d){
+  return _getListsWithRetry(3).then(function(d){
     d=d||{};
     // TYPES
     if(d.types&&d.types.length){WT=d.types.slice();}
@@ -2888,7 +2930,7 @@ function renderTrucksSettings(){
     var tsel="<select onchange=\"setTruckType("+ti+",this.value)\" style=\"font-size:11px;padding:3px 7px;border:1px solid #FDE68A;border-radius:6px;background:#fff;color:#854D0E;font-family:inherit;cursor:pointer\"><option value=\"\">Type\u2026</option>"+_TT.map(function(x){return "<option value=\""+x+"\""+(t.type===x?" selected":"")+">"+x+"</option>";}).join("")+"</select>";
     h+="<div style=\"border:1px solid #E2E8F0;border-radius:11px;margin-bottom:12px;overflow:hidden\">";
     h+="<div style=\"background:#FEFCE8;padding:10px 14px;display:flex;justify-content:space-between;align-items:center\"><span style=\"font-weight:700;font-size:14px;color:#854D0E\"><i class=\"ti ti-truck\"></i> "+esc(t.tl)+"</span><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:11px;color:#A16207\">"+(t.items?t.items.length:0)+" \u00e9quipement"+((t.items&&t.items.length>1)?"s":"")+"</span><button onclick=\"delTruck("+ti+")\" title=\"Supprimer le camion\" style=\"background:none;border:none;color:#DC2626;cursor:pointer\"><i class=\"ti ti-trash\"></i></button></div></div>";
-    h+="<div style=\"padding:6px 14px;background:#FFFDF5;border-bottom:1px solid #FEF3C7;display:flex;align-items:center;gap:8px\"><span style=\"font-size:11px;color:#A16207;font-weight:600\">Type de v\u00e9hicule :</span>"+tsel+"<span style=\"font-size:11px;color:#A16207;font-weight:600;margin-left:10px\">Plaque :</span><input value=\""+esc(t.plaque||"")+"\" onchange=\"setTruckPlaque("+ti+",this.value)\" placeholder=\"AB-123-CD\" style=\"font-size:11px;padding:3px 7px;border:1px solid #FDE68A;border-radius:6px;background:#fff;color:#854D0E;font-family:inherit;width:112px;text-transform:uppercase\"/></div>";
+    h+="<div style=\"padding:6px 14px;background:#FFFDF5;border-bottom:1px solid #FEF3C7;display:flex;align-items:center;gap:8px\"><span style=\"font-size:11px;color:#A16207;font-weight:600\">Type de v\u00e9hicule :</span>"+tsel+"<span style=\"font-size:11px;color:#A16207;font-weight:600;margin-left:10px\">Plaque :</span><input value=\""+esc(t.plaque||"")+"\" onchange=\"setTruckPlaque("+ti+",this.value)\" placeholder=\"AB-123-CD\" style=\"font-size:11px;padding:3px 7px;border:1px solid #FDE68A;border-radius:6px;background:#fff;color:#854D0E;font-family:inherit;width:112px;text-transform:uppercase\"/>"+truckEtatButtons(t,ti)+"</div>";
     h+=pretRowHTML(t,ti);
     h+="<div style=\"padding:8px 14px\">";
     (t.items||[]).forEach(function(it,ii){
@@ -2914,15 +2956,26 @@ function importTrucks(){
 // ═══ PRÊT DE CAMION ENTRE TL (traçabilité) ═══
 function trucksSimpleView(){
   if(!TRUCKS.length)return "";
+  var names=[];TRUCKS.forEach(function(x){if(x.tl&&names.indexOf(x.tl)<0)names.push(x.tl);});names.sort();
   var h="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-list-details\" style=\"color:#A16207\"></i> Vue d'ensemble \u2014 camions &amp; attributions</div>";
   h+="<div style=\"overflow-x:auto\"><table style=\"width:100%;border-collapse:collapse;font-size:13px\">";
-  h+="<thead><tr style=\"background:#FFFDF5;color:#854D0E\"><th style=\"text-align:left;padding:8px 12px\">Camion</th><th style=\"text-align:left;padding:8px 12px\">Type</th><th style=\"text-align:left;padding:8px 12px\">Plaque</th><th style=\"text-align:left;padding:8px 12px\">Attribu\u00e9 \u00e0</th></tr></thead><tbody>";
-  TRUCKS.forEach(function(t){
+  h+="<thead><tr style=\"background:#FFFDF5;color:#854D0E\"><th style=\"text-align:left;padding:8px 10px\">Camion</th><th style=\"text-align:left;padding:8px 10px\">Type</th><th style=\"text-align:left;padding:8px 10px\">Plaque</th><th style=\"text-align:left;padding:8px 10px\">\u00c9tat</th><th style=\"text-align:left;padding:8px 10px\">Attribu\u00e9 \u00e0</th><th style=\"text-align:left;padding:8px 10px\">Action</th></tr></thead><tbody>";
+  TRUCKS.forEach(function(t,ti){
     var loaned=t.pret&&t.pret.to;var holder=loaned?t.pret.to:t.tl;
-    h+="<tr style=\"border-top:1px solid #F1F5F9\"><td style=\"padding:8px 12px;font-weight:600\"><i class=\"ti ti-truck\" style=\"color:#A16207;font-size:13px\"></i> "+esc(t.tl)+"</td>";
-    h+="<td style=\"padding:8px 12px;color:#64748B\">"+(t.type?esc(t.type):"\u2014")+"</td>";
-    h+="<td style=\"padding:8px 12px\"><span style=\"background:#0F172A;color:#fff;border-radius:5px;padding:2px 8px;font-family:monospace;font-size:12px;letter-spacing:1px\">"+(t.plaque?esc(t.plaque):"\u2014")+"</span></td>";
-    h+="<td style=\"padding:8px 12px\">"+(loaned?"<span style=\"color:#C2410C;font-weight:600\"><i class=\"ti ti-arrows-exchange\" style=\"font-size:12px\"></i> "+esc(holder)+"</span>":"<span style=\"color:#15803D\">"+esc(holder)+"</span>")+"</td></tr>";
+    h+="<tr style=\"border-top:1px solid #F1F5F9\">";
+    h+="<td style=\"padding:7px 10px;font-weight:600\"><i class=\"ti ti-truck\" style=\"color:#A16207;font-size:13px\"></i> "+esc(t.tl)+"</td>";
+    h+="<td style=\"padding:7px 10px;color:#64748B\">"+(t.type?esc(t.type):"\u2014")+"</td>";
+    h+="<td style=\"padding:7px 10px\"><span style=\"background:#0F172A;color:#fff;border-radius:5px;padding:2px 8px;font-family:monospace;font-size:12px;letter-spacing:1px\">"+(t.plaque?esc(t.plaque):"\u2014")+"</span></td>";
+    h+="<td style=\"padding:7px 10px\">"+truckEtatBadge(t)+"</td>";
+    h+="<td style=\"padding:7px 10px\">"+(loaned?"<span style=\"color:#C2410C;font-weight:600\"><i class=\"ti ti-arrows-exchange\" style=\"font-size:12px\"></i> "+esc(holder)+"</span>":"<span style=\"color:#15803D\">"+esc(holder)+"</span>")+"</td>";
+    if(loaned){
+      h+="<td style=\"padding:7px 10px\"><button onclick=\"endPret("+ti+")\" style=\"background:#15803D;color:#fff;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-arrow-back-up\"></i> R\u00e9cup\u00e9rer</button></td>";
+    } else {
+      var opts="<option value=\"\">Pr\u00eater \u00e0\u2026</option>";
+      names.forEach(function(nm){if(nm!==t.tl)opts+="<option value=\""+esc(nm)+"\">"+esc(nm)+"</option>";});
+      h+="<td style=\"padding:7px 10px\"><select onchange=\"quickLend("+ti+",this.value)\" style=\"font-size:12px;padding:4px 7px;border:1px solid #FDBA74;border-radius:7px;background:#fff;color:#C2410C;font-family:inherit;cursor:pointer\">"+opts+"</select></td>";
+    }
+    h+="</tr>";
   });
   h+="</tbody></table></div></div>";
   return h;
@@ -2966,6 +3019,23 @@ function pretRowHTML(t,ti){
   }
   return h;
 }
+
+// ═══ CAMIONS — états (dépôt/révision), prêt rapide, sujet camion ═══
+function truckEtatBadge(t){
+  if(t.etat==="depot")return "<span style=\"background:#DBEAFE;color:#1D4ED8;border-radius:9px;padding:2px 8px;font-size:11px;font-weight:600;white-space:nowrap\"><i class=\"ti ti-building-warehouse\" style=\"font-size:11px\"></i> Au d\u00e9p\u00f4t</span>";
+  if(t.etat==="revision")return "<span style=\"background:#FEE2E2;color:#B91C1C;border-radius:9px;padding:2px 8px;font-size:11px;font-weight:600;white-space:nowrap\"><i class=\"ti ti-tool\" style=\"font-size:11px\"></i> En r\u00e9vision</span>";
+  return "<span style=\"background:#DCFCE7;color:#15803D;border-radius:9px;padding:2px 8px;font-size:11px;font-weight:600\">Actif</span>";
+}
+function setTruckEtat(ti,etat){var t=TRUCKS[ti];if(!t)return;t.etat=(t.etat===etat)?"":etat;saveTrucks(function(){renderTrucksSettings();});}
+function truckEtatButtons(t,ti){
+  var d=t.etat==="depot",r=t.etat==="revision";
+  return "<span style=\"font-size:11px;color:#A16207;font-weight:600;margin-left:10px\">\u00c9tat :</span>"
+    +"<button onclick=\"setTruckEtat("+ti+",'depot')\" style=\"font-size:11px;padding:3px 9px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:600;border:1px solid "+(d?"#1D4ED8":"#E2E8F0")+";background:"+(d?"#1D4ED8":"#fff")+";color:"+(d?"#fff":"#64748B")+"\"><i class=\"ti ti-building-warehouse\"></i> D\u00e9p\u00f4t</button>"
+    +"<button onclick=\"setTruckEtat("+ti+",'revision')\" style=\"font-size:11px;padding:3px 9px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:600;border:1px solid "+(r?"#B91C1C":"#E2E8F0")+";background:"+(r?"#B91C1C":"#fff")+";color:"+(r?"#fff":"#64748B")+"\"><i class=\"ti ti-tool\"></i> R\u00e9vision</button>";
+}
+function quickLend(ti,to){if(!to)return;var t=TRUCKS[ti];if(!t)return;t.pret={to:to,since:new Date().toISOString(),note:""};saveTrucks(function(){toast("Camion pr\u00eat\u00e9 \u00e0 "+to,"ti-arrows-exchange");renderTrucksSettings();});}
+function toggleCamionSujet(){if(!cur)return;cur.camionSujet=!cur.camionSujet;saved=false;renderForm();}
+
 function pretTruck(ti){window._pretOpen=ti;renderTrucksSettings();}
 function cancelPret(){window._pretOpen=null;renderTrucksSettings();}
 function confirmPret(ti){
@@ -3161,6 +3231,18 @@ function addCommandeManual(){
 function toggleCommandeRecu(id){
   var c=COMMANDES.filter(function(x){return x.id===id;})[0];if(!c)return;
   c.statut=(c.statut==="recu")?"en_attente":"recu";
+  // Renvoi vers l'appro li\u00e9e : refl\u00e9ter la r\u00e9ception sur l'article
+  if(c.approId&&typeof sheets!=="undefined"){
+    var ap=sheets.filter(function(s){return (s._id||s.id)===c.approId;})[0];
+    if(ap){
+      var nd=(c.statut==="recu")?"En stock":"En commande";
+      var touched=false;
+      ["consommables","fournitures","outillage"].forEach(function(k){
+        (ap[k]||[]).forEach(function(r){if(r.designation&&_normEq(r.designation)===_normEq(c.produit)&&r.disponibilite!==nd){r.disponibilite=nd;touched=true;}});
+      });
+      if(touched){apiCall("PUT","/appros/"+(ap._id||ap.id),ap).catch(function(){});if(cur&&(cur._id||cur.id)===(ap._id||ap.id))renderForm();}
+    }
+  }
   saveCommandes(function(){renderCommandes();});
 }
 function delCommande(id){
@@ -3434,12 +3516,15 @@ function tlTicketSection(){
 
 
 // ═══ PERSONNALISATION ═══
+function _accentCol(){return (typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.accent)?CONFIG.accent:"#0F172A";}
 function applyConfig(){
   try{
     for(var k in _DEF_STATUT_LABELS){if(STATUT[k]){STATUT[k].label=(CONFIG.statutLabels&&CONFIG.statutLabels[k])?CONFIG.statutLabels[k]:_DEF_STATUT_LABELS[k];}}
     var nm=CONFIG.appName||"AppROVISIO";
     var els=document.querySelectorAll(".sb-brand-name,.mtop-title");for(var i=0;i<els.length;i++)els[i].textContent=nm;
+    var tg=CONFIG.tagline||"Les experts de la hauteur";var tels=document.querySelectorAll(".sb-brand-tag");for(var j=0;j<tels.length;j++)tels[j].textContent=tg;
     fillLogos();
+    try{document.documentElement.style.setProperty("--accent",CONFIG.accent||"#0F172A");}catch(e){}
     if(typeof applyCatOrder==="function"){applyCatOrder();if(currentTab==="ui")renderUISettings();}
   }catch(e){}
 }
@@ -3449,6 +3534,7 @@ function saveConfig(cb){
     applyConfig();if(cb)cb();
   }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
 }
+function setAccentPreview(c){if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};CONFIG.accent=c;try{document.documentElement.style.setProperty("--accent",c);}catch(e){}renderPersonnalisation();}
 function renderPersonnalisation(){
   if(typeof closeSidebar==="function")closeSidebar();
   if(!isAdmin()){toast("Acc\u00e8s admin uniquement","ti-lock");return;}
@@ -3457,19 +3543,26 @@ function renderPersonnalisation(){
   var SL=CONFIG.statutLabels||{};
   var h="<div style=\"max-width:680px;margin:0 auto;padding:22px 18px\">";
   h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-palette\" style=\"font-size:24px;color:#6D28D9\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Personnalisation</h2></div>";
-  h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 20px\">Adapte l'appli \\u00e0 ton entreprise. Ces r\\u00e9glages sont partag\\u00e9s par toute l'\\u00e9quipe.</p>";
+  h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 20px\">Adapte l'appli à ton entreprise. Ces réglages sont partagés par toute l'équipe.</p>";
+  h+="<div style=\"border-radius:12px;overflow:hidden;border:1px solid #E2E8F0;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,.05)\"><div style=\"background:"+(CONFIG.accent||"#0F172A")+";padding:14px 18px;display:flex;align-items:center;gap:12px\"><img src=\""+(CONFIG.logo||("data:image/png;base64,"+(typeof LB64!=="undefined"?LB64:"")))+"\" style=\"width:54px;height:54px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,.06)\"/><div><div style=\"color:#F1F5F9;font-weight:800;font-size:18px\">"+esc(CONFIG.appName||"AppROVISIO")+"</div><div style=\"color:#94A3B8;font-size:12px\">"+esc(CONFIG.tagline||"Les experts de la hauteur")+"</div></div><div style=\"margin-left:auto;color:#94A3B8;font-size:11px;background:rgba(255,255,255,.08);padding:3px 10px;border-radius:20px\">Aperçu</div></div></div>";
   // Nom
-  h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-signature\" style=\"color:#6D28D9\"></i> Nom de l'application</div><div style=\"padding:12px 14px\"><input id=\"perso-name\" class=\"ui-in\" style=\"width:100%\" value=\""+esc(CONFIG.appName||"AppROVISIO")+"\" placeholder=\"AppROVISIO\"/></div></div>";
+  h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-signature\" style=\"color:#6D28D9\"></i> Nom de l'application</div><div style=\"padding:12px 14px\"><input id=\"perso-name\" class=\"ui-in\" style=\"width:100%\" value=\""+esc(CONFIG.appName||"AppROVISIO")+"\" placeholder=\"AppROVISIO\"/><div style=\"margin-top:10px;font-size:12px;color:#64748B;font-weight:600\">Slogan (sous le nom)</div><input id=\"perso-tag\" class=\"ui-in\" style=\"width:100%;margin-top:4px\" value=\""+esc(CONFIG.tagline||"Les experts de la hauteur")+"\" placeholder=\"Les experts de la hauteur\"/></div></div>";
   // Logo
   var logoSrc=CONFIG.logo||("data:image/png;base64,"+(typeof LB64!=="undefined"?LB64:""));
   h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-photo\" style=\"color:#6D28D9\"></i> Logo</div><div style=\"padding:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap\">";
   h+="<div style=\"background:#0F172A;border-radius:12px;padding:12px;display:flex;align-items:center;justify-content:center;min-width:120px\"><img src=\""+logoSrc+"\" style=\"max-width:110px;max-height:70px;border-radius:6px\"/></div>";
   h+="<div style=\"display:flex;flex-direction:column;gap:8px\"><button onclick=\"pickLogo()\" style=\"background:#6D28D9;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-upload\"></i> Changer le logo</button>";
-  if(CONFIG.logo)h+="<button onclick=\"persoResetLogo()\" style=\"background:#fff;border:1px solid #E2E8F0;color:#64748B;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-rotate\"></i> Logo par d\\u00e9faut</button>";
+  if(CONFIG.logo)h+="<button onclick=\"persoResetLogo()\" style=\"background:#fff;border:1px solid #E2E8F0;color:#64748B;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-rotate\"></i> Logo par défaut</button>";
   h+="<span style=\"font-size:11px;color:#94A3B8\">PNG ou JPG, max 400 Ko</span></div></div></div>";
+  // Couleur d'accent
+  var _ACC=[["#0F172A","Marine"],["#1E3A5F","Bleu"],["#14532D","Vert"],["#0F766E","Teal"],["#4C1D95","Violet"],["#831843","Bordeaux"],["#7C2D12","Terracotta"],["#1F2937","Charbon"]];
+  var _ca=(CONFIG.accent||"#0F172A").toLowerCase();
+  h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-color-swatch\" style=\"color:#6D28D9\"></i> Couleur d'accent</div><div style=\"padding:14px\"><div style=\"font-size:12px;color:#64748B;margin-bottom:10px\">Couleur des bandeaux (feuille, PDF, menu). Choisis une teinte foncée pour garder le texte lisible.</div><div style=\"display:flex;gap:10px;flex-wrap:wrap\">";
+  _ACC.forEach(function(a){var sel=_ca===a[0].toLowerCase();h+="<button onclick=\"setAccentPreview('"+a[0]+"')\" title=\""+a[1]+"\" style=\"width:42px;height:42px;border-radius:10px;background:"+a[0]+";border:3px solid "+(sel?"#6D28D9":"transparent")+";cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.18)\"></button>";});
+  h+="</div><div style=\"margin-top:12px;display:flex;align-items:center;gap:10px\"><span style=\"font-size:12px;color:#64748B\">Personnalisée :</span><input type=\"color\" value=\""+(CONFIG.accent||"#0F172A")+"\" onchange=\"setAccentPreview(this.value)\" style=\"width:46px;height:32px;border:1px solid #E2E8F0;border-radius:8px;cursor:pointer;background:none\"/></div></div></div>";
   // Libellés de statuts
-  h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-tags\" style=\"color:#6D28D9\"></i> Libell\\u00e9s des statuts</div><div style=\"padding:12px 14px;display:flex;flex-direction:column;gap:9px\">";
-  [["en_attente","En attente"],["prete","Pr\\u00eate au d\\u00e9p\\u00f4t"],["sur_chantier","Sur chantier"],["rendu","Rendu \\u00e0 traiter"],["sortie","Chantier fini"]].forEach(function(p){
+  h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-tags\" style=\"color:#6D28D9\"></i> Libellés des statuts</div><div style=\"padding:12px 14px;display:flex;flex-direction:column;gap:9px\">";
+  [["en_attente","En attente"],["prete","Prête au dépôt"],["sur_chantier","Sur chantier"],["rendu","Rendu à traiter"],["sortie","Chantier fini"]].forEach(function(p){
     h+="<div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:12px;color:#94A3B8;width:130px;flex-shrink:0\">"+p[1]+"</span><input id=\"perso-st-"+p[0]+"\" class=\"ui-in\" style=\"flex:1\" value=\""+esc(SL[p[0]]||"")+"\" placeholder=\""+p[1]+"\"/></div>";
   });
   h+="</div></div>";
@@ -3490,6 +3583,7 @@ function persoResetLogo(){delete CONFIG.logo;saveConfig(function(){toast("Logo p
 function savePerso(){
   CONFIG.appName=((document.getElementById("perso-name")||{}).value||"").trim();
   if(!CONFIG.appName)delete CONFIG.appName;
+  CONFIG.tagline=((document.getElementById("perso-tag")||{}).value||"").trim();if(!CONFIG.tagline)delete CONFIG.tagline;
   CONFIG.statutLabels=CONFIG.statutLabels||{};
   ["en_attente","prete","sur_chantier","rendu","sortie"].forEach(function(k){var v=((document.getElementById("perso-st-"+k)||{}).value||"").trim();if(v)CONFIG.statutLabels[k]=v;else delete CONFIG.statutLabels[k];});
   saveConfig(function(){toast("Personnalisation enregistr\u00e9e","ti-check");renderPersonnalisation();});
