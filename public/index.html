@@ -407,7 +407,7 @@ table.at td{padding:0}
 .spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 /* ===== THEME SOMBRE (inversion intelligente) ===== */
-html.dark{filter:invert(1) hue-rotate(180deg);background:#0b1120;}
+html.dark{filter:invert(0.91) hue-rotate(180deg);background:#0f172a;}
 html.dark img,html.dark [data-noinvert]{filter:invert(1) hue-rotate(180deg);}
 @media print{html.dark{filter:none!important}html.dark img{filter:none!important}}
 .btn-theme{width:30px;height:30px;border:none;background:rgba(148,163,184,.16);color:#64748B;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -428,15 +428,16 @@ body.vm-compact .btn-add-row{padding:5px 9px;font-size:12px}
 @media(max-width:768px){
   body.vm-hybrid .at tr{margin-bottom:6px;padding:7px 10px}
   body.vm-hybrid .at td.td-d .cin{font-size:15px!important}
-  body.vm-compact .at tr{margin-bottom:4px;padding:6px 9px;border-radius:8px}
-  body.vm-compact .at td.td-d{padding-bottom:2px}
-  body.vm-compact .at td.td-d .cin{font-size:13.5px!important}
-  body.vm-compact .at td.td-q{flex:0 0 50px;margin-right:8px}
-  body.vm-compact .at td.td-q .cin{font-size:12px!important;padding:3px!important}
-  body.vm-compact .at td.td-av .csel{font-size:11px!important;padding:3px!important}
-  body.vm-compact .at td::before{font-size:9px!important;margin-bottom:0!important}
-  body.vm-compact .at td.cact{margin-top:5px}
-  body.vm-compact .at td.cact .btn-ret,body.vm-compact .at td.cact .btn-del,body.vm-compact .at td.cmt-cell .btn-cmt{padding:4px 7px}
+  body.vm-compact .at tr{margin-bottom:3px;padding:5px 8px;border-radius:7px}
+  body.vm-compact .at td{padding:1px 0!important}
+  body.vm-compact .at td::before{display:none!important}
+  body.vm-compact .at td.td-d{padding-bottom:1px}
+  body.vm-compact .at td.td-d .cin{font-size:13px!important;padding:3px 5px!important}
+  body.vm-compact .at td.td-q{flex:0 0 46px;margin-right:6px}
+  body.vm-compact .at td.td-q .cin{font-size:12px!important;padding:2px 3px!important}
+  body.vm-compact .at td.td-av .csel{font-size:11px!important;padding:2px 4px!important}
+  body.vm-compact .at td.cact{margin-top:3px}
+  body.vm-compact .at td.cact .btn-ret,body.vm-compact .at td.cact .btn-del,body.vm-compact .at td.cmt-cell .btn-cmt{padding:3px 6px;font-size:11px}
 }
 </style>
 <script>try{if(localStorage.getItem("appro_theme")==="dark")document.documentElement.classList.add("dark");}catch(e){}</script>
@@ -1582,7 +1583,7 @@ function renderList(){
   if(typeof renderDeadlineBanner==="function")renderDeadlineBanner();
   var q=(document.getElementById("srch").value||"").toLowerCase().trim();
   var filtered=sheets.filter(function(s){
-    if(s.statut==="sortie")return false;
+    if(s.statut==="sortie"&&!q)return false;
     if(window._draftView){if(!s.draft)return false;}else{if(s.draft)return false;}
     if(!q)return true;
     return q.split(/\s+/).every(function(w){return _approSearchText(s).indexOf(w)>=0;});
@@ -1680,6 +1681,14 @@ function catDatalistHTML(){
   return "<datalist id=\"cat-datalist\">"+opts+"</datalist>";
 }
 function _normEq(s){return (""+(s||"")).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"");}
+function _truckAssignInfo(t){
+  var loaned=t.pret&&t.pret.to;var holder=loaned?t.pret.to:t.tl;
+  var h="<div style=\"font-size:12px;color:#854D0E;margin:0 0 9px;display:flex;gap:14px;flex-wrap:wrap;align-items:center\">";
+  if(t.type)h+="<span><i class=\"ti ti-car\"></i> "+esc(t.type)+"</span>";
+  h+="<span><i class=\"ti ti-id\"></i> Plaque : <b>"+(t.plaque?esc(t.plaque):"\u2014")+"</b></span>";
+  h+="<span><i class=\"ti ti-user\"></i> "+(loaned?"Pr\u00eat\u00e9 \u00e0 ":"Titulaire : ")+"<b>"+esc(holder)+"</b></span>";
+  h+="</div>";return h;
+}
 function truckSelectorHTML(){
   if(!TRUCKS.length)return "";
   var opts="<option value=\"\">\u2014 Aucun camion \u2014</option>";
@@ -1690,7 +1699,7 @@ function truckSelectorHTML(){
     h+="<div class=\"fg fg-full\" style=\"background:#FEFCE8;border:1px solid #FEF08A;border-radius:10px;padding:12px\">";
     h+="<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px\"><span style=\"font-size:13px;font-weight:700;color:#854D0E\"><i class=\"ti ti-truck\"></i> \u00c9quipement du camion de "+esc(t.tl)+"</span>";
     h+=cur.truckApplied?"<button onclick=\"clearTruckDeduction()\" style=\"background:#fff;border:1px solid #E2E8F0;color:#475569;border-radius:7px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-x\"></i> Annuler la d\u00e9duction</button>":"<button onclick=\"applyTruckDeduction()\" style=\"background:#A16207;color:#fff;border:none;border-radius:7px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-arrow-down\"></i> D\u00e9duire de l'appro</button>";
-    h+="</div><div style=\"display:flex;flex-wrap:wrap;gap:6px\">";
+    h+="</div>"+_truckAssignInfo(t)+"<div style=\"display:flex;flex-wrap:wrap;gap:6px\">";
     var _eq=(t.items||[]).filter(function(x){return !x.ref;});
     var _num=(t.items||[]).filter(function(x){return x.ref;});
     _eq.forEach(function(it){h+="<span style=\"font-size:11px;background:#fff;border:1px solid #FDE68A;color:#854D0E;border-radius:14px;padding:3px 9px\">"+esc(it.n)+" <b>x"+it.q+"</b></span>";});
@@ -1753,7 +1762,7 @@ function tblH(sec,secColor){
     row+=" placeholder=\"D&#233;signation...\"";
     row+=" list=\"cat-datalist\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'designation',this.value)\"";
-    row+=" style=\""+st+"\"/>"+(r.truckQ?"<div style=\"font-size:10px;color:#A16207;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px\"><i class=\"ti ti-truck\" style=\"font-size:11px\"></i> "+r.truckQ+" d\u00e9j\u00e0 dans le camion"+(_qtyNum(r.quantite)>r.truckQ?" \u00b7 "+(_qtyNum(r.quantite)-r.truckQ)+" \u00e0 pr\u00e9parer":" \u00b7 rien \u00e0 pr\u00e9parer")+"</div>":"")+(r.commandeId?(function(){var st=(typeof cmdStatutById==="function"&&cmdStatutById(r.commandeId))||r.commandeStatut||"en_attente";var rc=st==="recu";return "<div style=\"font-size:10px;font-weight:600;margin-top:3px;display:inline-flex;align-items:center;gap:3px;color:"+(rc?"#065F46":"#92400E")+"\"><i class=\"ti ti-clipboard-"+(rc?"check":"list")+"\" style=\"font-size:11px\"></i> Commande : "+(rc?"re\u00e7ue":"en attente")+"</div>";})():"")+"</td>";
+    row+=" style=\""+st+"\"/>"+(r.truckQ?"<div style=\"font-size:10px;color:#A16207;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px\"><i class=\"ti ti-truck\" style=\"font-size:11px\"></i> "+r.truckQ+" d\u00e9j\u00e0 dans le camion"+(_qtyNum(r.quantite)>r.truckQ?" \u00b7 "+(_qtyNum(r.quantite)-r.truckQ)+" \u00e0 pr\u00e9parer":" \u00b7 rien \u00e0 pr\u00e9parer")+"</div>":"")+_cmdRowBadge(r)+"</td>";
     row+="<td data-label=\"Qt&#233;\" class=\"td-q\"><input class=\"cin\" value=\""+esc(r.quantite)+"\"";
     row+=" placeholder=\"0\" style=\"text-align:center;"+st+"\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'quantite',this.value)\"/></td>";
@@ -2259,6 +2268,32 @@ function doPDF(){
 // ═══════════════ NOTIFICATIONS ═══════════════
 // ═══════════════ NOUVEAUT\u00c9S ═══════════════
 var NEWS=[
+  {v:34,date:"2 juillet 2026",items:[
+    "Param\u00e9trage interface plus compact : les sections Types de chantier et Clients / Sites s'affichent c\u00f4te \u00e0 c\u00f4te sur 2 colonnes (moins de d\u00e9filement)"
+  ]},
+  {v:33,date:"2 juillet 2026",items:[
+    "Catalogue repens\u00e9 : les cat\u00e9gories s'affichent en cases sur 2 colonnes (voire plus sur grand \u00e9cran), bien plus lisible",
+    "R\u00e9agencement : fl\u00e8ches monter/descendre sur chaque cat\u00e9gorie pour choisir l'ordre d'affichage (m\u00e9moris\u00e9, appliqu\u00e9 partout y compris dans l'appro)",
+    "Kits m\u00e9tiers pr\u00eats \u00e0 l'emploi : Ma\u00e7onnerie, Couverture / Zinguerie, Peinture / Ravalement, D\u00e9molition \u2014 ajout\u00e9s en un clic"
+  ]},
+  {v:32,date:"2 juillet 2026",items:[
+    "Tableau de bord enrichi : nouveau panneau \u00ab \u00c0 traiter maintenant \u00bb avec 8 indicateurs cliquables (\u00e0 pr\u00e9parer, rendus, sur chantier, commandes en attente, demandes d\u00e9p\u00f4t, camions pr\u00eat\u00e9s, priorit\u00e9 urgente, brouillons) \u2014 un clic ouvre directement l'\u00e9cran concern\u00e9"
+  ]},
+  {v:31,date:"2 juillet 2026",items:[
+    "Annonces : possibilit\u00e9 d'envoyer une annonce \u00e0 une personne pr\u00e9cise (bouton \u00ab Une personne \u00bb, avec menu d\u00e9roulant et barre de recherche parmi tous les utilisateurs)",
+    "Th\u00e8me sombre revu : moins agressif, gris fonc\u00e9 doux et texte gris clair au lieu du noir/blanc pur, plus confortable pour les yeux"
+  ]},
+  {v:30,date:"1 juillet 2026",items:[
+    "Camions : ajout de la plaque d'immatriculation (modifiable dans Gestion des camions)",
+    "Nouvelle vue d'ensemble en haut de Gestion des camions : chaque camion avec son type, sa plaque et la personne \u00e0 qui il est attribu\u00e9 (ou \u00e0 qui il est pr\u00eat\u00e9)",
+    "Dans l'appro, le camion attribu\u00e9 affiche d\u00e9sormais son type, sa plaque et son titulaire/d\u00e9tenteur",
+    "La plaque est incluse dans l'import/export Excel des camions"
+  ]},
+  {v:29,date:"1 juillet 2026",items:[
+    "Recherche biblioth\u00e8que globale : en tapant une recherche, les appros termin\u00e9es apparaissent aussi (recherche par adresse, N\u00b0 d'affaire, article\u2026)",
+    "Mode compact nettement plus dense sur t\u00e9l\u00e9phone (libell\u00e9s de colonnes masqu\u00e9s, lignes resserr\u00e9es)",
+    "Indicateur de r\u00e9ception de commande directement sur les articles de l'appro : \u00ab Commande : re\u00e7ue \u00bb (vert) ou \u00ab en attente \u00bb (orange)"
+  ]},
   {v:28,date:"1 juillet 2026",items:[
     "Mode compact d\u00e9sormais efficace sur t\u00e9l\u00e9phone : les cartes d'articles sont vraiment resserr\u00e9es",
     "Recherche biblioth\u00e8que globale : on peut retrouver une appro par n'importe quel mot (adresse de chantier, nom d'article, conducteur, commentaire...)"
@@ -2421,10 +2456,99 @@ function loadLists(){
   }).catch(function(){});
 }
 // Recalcule l'ordre des cat\u00e9gories du catalogue (au cas o\u00f9 de nouvelles cat\u00e9gories apparaissent)
+
+// ═══ CATALOGUE — réagencement des catégories ═══
+function applyCatOrder(){
+  if(typeof CONFIG==="undefined"||!CONFIG||!CONFIG.catOrder||!CONFIG.catOrder.length)return;
+  var ordered=[];
+  CONFIG.catOrder.forEach(function(c){if(CAT_ORDER.indexOf(c)>=0&&ordered.indexOf(c)<0)ordered.push(c);});
+  CAT_ORDER.forEach(function(c){if(ordered.indexOf(c)<0)ordered.push(c);});
+  CAT_ORDER=ordered;
+}
+function moveCat(i,dir){
+  var j=i+dir;
+  if(j<0||j>=CAT_ORDER.length)return;
+  var tmp=CAT_ORDER[i];CAT_ORDER[i]=CAT_ORDER[j];CAT_ORDER[j]=tmp;
+  if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};
+  CONFIG.catOrder=CAT_ORDER.slice();
+  if(typeof saveConfig==="function")saveConfig(function(){});
+  renderUISettings();
+}
+
+
+// ═══ CATALOGUE — kits métiers génériques ═══
+var TRADE_PRESETS={
+  maconnerie:{label:"Ma\u00e7onnerie",items:[
+    {cat:"Ma\u00e7onnerie",sec:"consommables",n:"Ciment (sac 35kg)",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"consommables",n:"Mortier pr\u00eat \u00e0 l'emploi",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"consommables",n:"Sable (sac)",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"consommables",n:"Enduit de fa\u00e7ade",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"fournitures",n:"Parpaing",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"fournitures",n:"Brique",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"fournitures",n:"Fer \u00e0 b\u00e9ton",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"fournitures",n:"Treillis soud\u00e9",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"outillage",n:"Truelle",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"outillage",n:"Taloche",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"outillage",n:"Niveau \u00e0 bulle",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"outillage",n:"Auge de ma\u00e7on",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"outillage",n:"Massette",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"outillage",n:"Burin",q:"1"},
+    {cat:"Ma\u00e7onnerie",sec:"outillage",n:"Brouette",q:"1"}
+  ]},
+  couverture:{label:"Couverture / Zinguerie",items:[
+    {cat:"Couverture / Zinguerie",sec:"fournitures",n:"Tuile",q:"1"},
+    {cat:"Couverture / Zinguerie",sec:"fournitures",n:"Ardoise",q:"1"},
+    {cat:"Couverture / Zinguerie",sec:"fournitures",n:"Zinc en rouleau",q:"1"},
+    {cat:"Couverture / Zinguerie",sec:"fournitures",n:"Goutti\u00e8re",q:"1"},
+    {cat:"Couverture / Zinguerie",sec:"fournitures",n:"Crochet de goutti\u00e8re",q:"1"},
+    {cat:"Couverture / Zinguerie",sec:"consommables",n:"Solin",q:"1"},
+    {cat:"Couverture / Zinguerie",sec:"consommables",n:"Mastic d'\u00e9tanch\u00e9it\u00e9",q:"1"},
+    {cat:"Couverture / Zinguerie",sec:"outillage",n:"Pince \u00e0 sertir",q:"1"},
+    {cat:"Couverture / Zinguerie",sec:"outillage",n:"Cisaille \u00e0 zinc",q:"1"},
+    {cat:"Couverture / Zinguerie",sec:"outillage",n:"Marteau de couvreur",q:"1"}
+  ]},
+  peinture:{label:"Peinture / Ravalement",items:[
+    {cat:"Peinture / Ravalement",sec:"consommables",n:"Peinture fa\u00e7ade (pot)",q:"1"},
+    {cat:"Peinture / Ravalement",sec:"consommables",n:"Sous-couche",q:"1"},
+    {cat:"Peinture / Ravalement",sec:"consommables",n:"Enduit de rebouchage",q:"1"},
+    {cat:"Peinture / Ravalement",sec:"consommables",n:"Ruban de masquage",q:"1"},
+    {cat:"Peinture / Ravalement",sec:"outillage",n:"Rouleau",q:"1"},
+    {cat:"Peinture / Ravalement",sec:"outillage",n:"Pinceau",q:"1"},
+    {cat:"Peinture / Ravalement",sec:"outillage",n:"Bac \u00e0 peinture",q:"1"},
+    {cat:"Peinture / Ravalement",sec:"fournitures",n:"B\u00e2che de protection",q:"1"}
+  ]},
+  demolition:{label:"D\u00e9molition / Gros \u0153uvre",items:[
+    {cat:"D\u00e9molition",sec:"outillage",n:"Marteau-piqueur",q:"1"},
+    {cat:"D\u00e9molition",sec:"outillage",n:"Masse",q:"1"},
+    {cat:"D\u00e9molition",sec:"outillage",n:"Pied-de-biche",q:"1"},
+    {cat:"D\u00e9molition",sec:"outillage",n:"Disqueuse",q:"1"},
+    {cat:"D\u00e9molition",sec:"consommables",n:"Disque diamant",q:"1"},
+    {cat:"D\u00e9molition",sec:"fournitures",n:"Sac \u00e0 gravats",q:"1"},
+    {cat:"D\u00e9molition",sec:"consommables",n:"B\u00e2che",q:"1"}
+  ]}
+};
+function addTradePreset(key){
+  var p=TRADE_PRESETS[key];if(!p)return;
+  if(!confirm("Ajouter le kit \u00ab "+p.label+" \u00bb ("+p.items.length+" articles) au catalogue ?"))return;
+  apiCall("POST","/lists/catalogue/addmany",{items:p.items}).then(function(d){
+    if(d&&d.data){CAT_ITEMS=d.data.slice();rebuildCatOrder();}
+    toast("Kit "+p.label+" ajout\u00e9","ti-check");renderUISettings();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function tradePresetButtons(){
+  var h="<div style=\"font-size:12px;color:#64748B;margin-bottom:7px\">Kits m\u00e9tiers pr\u00eats \u00e0 l'emploi :</div><div style=\"display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px\">";
+  Object.keys(TRADE_PRESETS).forEach(function(k){
+    h+="<button onclick=\"addTradePreset('"+k+"')\" style=\"background:#F5F3FF;border:1px solid #DDD6FE;color:#6D28D9;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> "+esc(TRADE_PRESETS[k].label)+"</button>";
+  });
+  h+="</div>";
+  return h;
+}
+
 function rebuildCatOrder(){
   CAT_ITEMS.forEach(function(it){
     if(it.cat&&CAT_ORDER.indexOf(it.cat)<0){CAT_ORDER.push(it.cat);}
   });
+  if(typeof applyCatOrder==="function")applyCatOrder();
 }
 
 // ═══ PARAMÉTRAGE INTERFACE (admin) ═══
@@ -2444,6 +2568,7 @@ function renderUISettings(){
   h+="<div style=\"display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px\"><button onclick=\"downloadCatalogueTemplate()\" style=\"background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-file-download\"></i> Mod\u00e8le Excel</button><button onclick=\"pickExcel(importCatalogueExcel)\" style=\"background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-file-import\"></i> Importer un Excel</button><button onclick=\"exportCatalogueExcel()\" style=\"background:#fff;border:1px solid #E2E8F0;color:#64748B;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-download\"></i> Exporter</button></div>";
 
   // Add item form
+  h+=tradePresetButtons();
   var catOpts="";CAT_ORDER.forEach(function(c){catOpts+="<option value=\""+esc(c)+"\"></option>";});
   h+="<div style=\"background:#FAFAFA;border:1px solid #E2E8F0;border-radius:9px;padding:12px;margin-bottom:14px\"><div style=\"font-size:13px;font-weight:600;color:#334155;margin-bottom:9px\">Ajouter un article</div>";
   h+="<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:8px\">";
@@ -2456,19 +2581,29 @@ function renderUISettings(){
   // Categories list with items
   var byCat={};CAT_ITEMS.forEach(function(it,idx){var c=it.cat||"(sans cat\u00e9gorie)";(byCat[c]=byCat[c]||[]).push({it:it,idx:idx});});
   var order=CAT_ORDER.slice();Object.keys(byCat).forEach(function(c){if(order.indexOf(c)<0)order.push(c);});
-  h+="<div style=\"font-size:13px;font-weight:600;color:#334155;margin-bottom:8px\">Cat\u00e9gories du catalogue ("+CAT_ITEMS.length+" articles)</div>";
-  if(!CAT_ITEMS.length){h+="<div style=\"color:#94A3B8;font-size:13px;padding:10px\">Catalogue vide. Importe les kits ou ajoute des articles.</div>";}
-  order.forEach(function(c){
+  h+="<div style=\"font-size:13px;font-weight:600;color:#334155;margin-bottom:3px\">Cat\u00e9gories du catalogue ("+CAT_ITEMS.length+" articles)</div>";
+  h+="<div style=\"font-size:11px;color:#94A3B8;margin-bottom:10px\"><i class=\"ti ti-arrows-sort\"></i> Utilise les fl\u00e8ches pour r\u00e9agencer l'ordre des cat\u00e9gories.</div>";
+  if(!CAT_ITEMS.length){h+="<div style=\"color:#94A3B8;font-size:13px;padding:10px\">Catalogue vide. Importe les kits, un Excel, ou ajoute des articles.</div>";}
+  Object.keys(byCat).forEach(function(c){if(CAT_ORDER.indexOf(c)<0)CAT_ORDER.push(c);});
+  h+="<div style=\"display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;align-items:start\">";
+  CAT_ORDER.forEach(function(c,ci){
     var list=byCat[c];if(!list||!list.length)return;
-    h+="<div style=\"border:1px solid #E2E8F0;border-radius:9px;margin-bottom:8px;overflow:hidden\"><div style=\"background:#F1F5F9;padding:8px 12px;font-size:13px;font-weight:700;color:#1E293B;display:flex;justify-content:space-between;align-items:center\"><span><i class=\"ti ti-folder\" style=\"color:#6D28D9\"></i> "+esc(c)+"</span><span style=\"font-size:11px;color:#64748B;font-weight:500\">"+list.length+" article"+(list.length>1?"s":"")+"</span></div><div style=\"padding:4px 0\">";
+    h+="<div style=\"border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;background:#fff\">";
+    h+="<div style=\"background:#F5F3FF;padding:7px 10px;font-size:13px;font-weight:700;color:#1E293B;display:flex;align-items:center;gap:5px\">";
+    h+="<i class=\"ti ti-folder\" style=\"color:#6D28D9\"></i><span style=\"flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap\">"+esc(c)+"</span>";
+    h+="<span style=\"font-size:10px;color:#64748B;font-weight:500;background:#fff;border-radius:8px;padding:1px 6px\">"+list.length+"</span>";
+    h+="<button onclick=\"moveCat("+ci+",-1)\" title=\"Monter\" style=\"background:none;border:none;color:"+(ci===0?"#CBD5E1":"#6D28D9")+";cursor:pointer;padding:2px 2px;font-size:14px\"><i class=\"ti ti-chevron-up\"></i></button>";
+    h+="<button onclick=\"moveCat("+ci+",1)\" title=\"Descendre\" style=\"background:none;border:none;color:"+(ci===CAT_ORDER.length-1?"#CBD5E1":"#6D28D9")+";cursor:pointer;padding:2px 2px;font-size:14px\"><i class=\"ti ti-chevron-down\"></i></button>";
+    h+="</div><div style=\"padding:3px 0;max-height:240px;overflow-y:auto\">";
     list.forEach(function(o){
-      h+="<div style=\"display:flex;align-items:center;gap:8px;padding:5px 12px;font-size:13px\"><span style=\"flex:1;color:#334155\">"+esc(o.it.n)+"</span><span style=\"font-size:10px;color:#94A3B8;background:#F1F5F9;padding:2px 7px;border-radius:10px\">"+(SEC_LABELS[o.it.sec]||o.it.sec)+"</span><button onclick=\"uiDelCatItem("+o.idx+")\" title=\"Supprimer\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:2px 5px\"><i class=\"ti ti-trash\"></i></button></div>";
+      h+="<div style=\"display:flex;align-items:center;gap:6px;padding:5px 10px;font-size:12.5px\"><span style=\"flex:1;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap\">"+esc(o.it.n)+"</span><span style=\"font-size:9px;color:#94A3B8;background:#F1F5F9;padding:2px 6px;border-radius:9px;white-space:nowrap\">"+(SEC_LABELS[o.it.sec]||o.it.sec)+"</span><button onclick=\"uiDelCatItem("+o.idx+")\" title=\"Supprimer\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:2px 4px\"><i class=\"ti ti-trash\" style=\"font-size:13px\"></i></button></div>";
     });
     h+="</div></div>";
   });
   h+="</div>";
 
-  // ---- TYPES ----
+  // ---- TYPES + CLIENTS (2 colonnes) ----
+  h+="<div style=\"display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;align-items:start\">";
   h+="<div class=\"ui-sec\"><div class=\"ui-sec-hd\"><i class=\"ti ti-tag\" style=\"color:#B45309\"></i> Types de chantier</div>";
   h+="<div style=\"display:flex;gap:8px;margin-bottom:10px\"><input id=\"ui-type-new\" placeholder=\"Nouveau type de travaux\" class=\"ui-in\" style=\"flex:1\"/><button onclick=\"uiAddType()\" style=\"background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 15px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> Ajouter</button></div>";
   h+="<div style=\"display:flex;flex-wrap:wrap;gap:7px\">";
@@ -2483,6 +2618,7 @@ function renderUISettings(){
   CLIENTS.forEach(function(c,i){h+="<span style=\"display:inline-flex;align-items:center;gap:6px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600\">"+esc(c)+"<i class=\"ti ti-x\" onclick=\"uiDelClient("+i+")\" style=\"cursor:pointer;font-size:14px;opacity:.6\"></i></span>";});
   if(!CLIENTS.length)h+="<span style=\"color:#94A3B8;font-size:13px\">Aucun client</span>";
   h+="</div></div>";
+  h+="</div>";
 
   h+="</div>";
   m.innerHTML=h;
@@ -2641,11 +2777,11 @@ function _colFinder(hdr){
 // ---- CAMIONS ----
 function downloadTruckTemplate(){
   _dlXlsx([
-    ["Team Leader","Type","Equipement","N\u00b0 serie","Quantite","Machine (oui/non)"],
-    ["Jean Dupont","Trafic","Corde 25m","","2","non"],
-    ["Jean Dupont","Trafic","Mousqueton","","20","non"],
-    ["Jean Dupont","Trafic","Perforateur","58297B","1","oui"],
-    ["Marie Martin","Master","Corde 50m","","2","non"]
+    ["Team Leader","Type","Plaque","Equipement","N\u00b0 serie","Quantite","Machine (oui/non)"],
+    ["Jean Dupont","Trafic","AB-123-CD","Corde 25m","","2","non"],
+    ["Jean Dupont","Trafic","AB-123-CD","Mousqueton","","20","non"],
+    ["Jean Dupont","Trafic","AB-123-CD","Perforateur","58297B","1","oui"],
+    ["Marie Martin","Master","EF-456-GH","Corde 50m","","2","non"]
   ],"Camions","modele_camions_JARNIAS.xlsx");
 }
 function importTrucksExcel(input){
@@ -2653,13 +2789,13 @@ function importTrucksExcel(input){
   _readSheet(file,function(rows){
     if(rows.length<2){toast("Fichier vide","ti-alert-circle");return;}
     var col=_colFinder(rows[0]);
-    var cTL=col(["team","leader","camion"]),cType=col(["type"]),cEq=col(["equip","article","materiel","mat\u00e9riel"]),cRef=col(["serie","s\u00e9rie","n\u00b0","num","ref"]),cQ=col(["quant","qte","qt\u00e9","qt"]),cM=col(["machine"]);
+    var cTL=col(["team","leader","camion"]),cType=col(["type"]),cPl=col(["plaque","immat"]),cEq=col(["equip","article","materiel","mat\u00e9riel"]),cRef=col(["serie","s\u00e9rie","n\u00b0","num","ref"]),cQ=col(["quant","qte","qt\u00e9","qt"]),cM=col(["machine"]);
     if(cTL<0||cEq<0){toast("Colonnes 'Team Leader' et 'Equipement' introuvables","ti-alert-circle");return;}
     var map={},order=[];
     rows.slice(1).forEach(function(r){
       var tl=(""+(r[cTL]||"")).trim(),eq=(""+(r[cEq]||"")).trim();
       if(!tl||!eq)return;
-      if(!map[tl]){map[tl]={tl:tl,type:cType>=0?(""+(r[cType]||"")).trim():"",items:[]};order.push(tl);}
+      if(!map[tl]){map[tl]={tl:tl,type:cType>=0?(""+(r[cType]||"")).trim():"",plaque:cPl>=0?(""+(r[cPl]||"")).trim().toUpperCase():"",items:[]};order.push(tl);}
       var it={n:eq,q:cQ>=0?(parseInt(r[cQ],10)||1):1};
       if(cRef>=0&&(""+(r[cRef]||"")).trim())it.ref=(""+r[cRef]).trim();
       if(cM>=0&&/oui|yes|1|x|vrai/i.test(""+(r[cM]||"")))it.m=1;
@@ -2712,8 +2848,8 @@ function importCatalogueExcel(input){
 }
 // ---- EXPORT (sauvegarde) ----
 function exportTrucksExcel(){
-  var rows=[["Team Leader","Type","Equipement","N\u00b0 serie","Quantite","Machine (oui/non)"]];
-  TRUCKS.forEach(function(t){(t.items||[]).forEach(function(it){rows.push([t.tl,t.type||"",it.n,it.ref||"",it.q,it.m?"oui":"non"]);});});
+  var rows=[["Team Leader","Type","Plaque","Equipement","N\u00b0 serie","Quantite","Machine (oui/non)"]];
+  TRUCKS.forEach(function(t){(t.items||[]).forEach(function(it){rows.push([t.tl,t.type||"",t.plaque||"",it.n,it.ref||"",it.q,it.m?"oui":"non"]);});});
   _dlXlsx(rows,"Camions","camions_JARNIAS_export.xlsx");
 }
 function exportCatalogueExcel(){
@@ -2738,6 +2874,7 @@ function renderTrucksSettings(){
   h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-truck\" style=\"font-size:24px;color:#A16207\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Gestion des camions</h2></div>";
   h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 20px\">Chaque camion est rattach\u00e9 \u00e0 un Team Leader. L'\u00e9quipement saisi ici permet de d\u00e9duire automatiquement le mat\u00e9riel d\u00e9j\u00e0 pr\u00e9sent dans le camion lors d'une appro.</p>";
   h+=loanedSummaryHTML();
+  h+=trucksSimpleView();
   h+="<div style=\"display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px\"><button onclick=\"downloadTruckTemplate()\" style=\"background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-file-download\"></i> Mod\u00e8le Excel</button><button onclick=\"pickExcel(importTrucksExcel)\" style=\"background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-file-import\"></i> Importer un Excel</button><button onclick=\"exportTrucksExcel()\" style=\"background:#fff;border:1px solid #E2E8F0;color:#64748B;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-download\"></i> Exporter</button></div>";
 
   if(!TRUCKS.length){
@@ -2751,7 +2888,7 @@ function renderTrucksSettings(){
     var tsel="<select onchange=\"setTruckType("+ti+",this.value)\" style=\"font-size:11px;padding:3px 7px;border:1px solid #FDE68A;border-radius:6px;background:#fff;color:#854D0E;font-family:inherit;cursor:pointer\"><option value=\"\">Type\u2026</option>"+_TT.map(function(x){return "<option value=\""+x+"\""+(t.type===x?" selected":"")+">"+x+"</option>";}).join("")+"</select>";
     h+="<div style=\"border:1px solid #E2E8F0;border-radius:11px;margin-bottom:12px;overflow:hidden\">";
     h+="<div style=\"background:#FEFCE8;padding:10px 14px;display:flex;justify-content:space-between;align-items:center\"><span style=\"font-weight:700;font-size:14px;color:#854D0E\"><i class=\"ti ti-truck\"></i> "+esc(t.tl)+"</span><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:11px;color:#A16207\">"+(t.items?t.items.length:0)+" \u00e9quipement"+((t.items&&t.items.length>1)?"s":"")+"</span><button onclick=\"delTruck("+ti+")\" title=\"Supprimer le camion\" style=\"background:none;border:none;color:#DC2626;cursor:pointer\"><i class=\"ti ti-trash\"></i></button></div></div>";
-    h+="<div style=\"padding:6px 14px;background:#FFFDF5;border-bottom:1px solid #FEF3C7;display:flex;align-items:center;gap:8px\"><span style=\"font-size:11px;color:#A16207;font-weight:600\">Type de v\u00e9hicule :</span>"+tsel+"</div>";
+    h+="<div style=\"padding:6px 14px;background:#FFFDF5;border-bottom:1px solid #FEF3C7;display:flex;align-items:center;gap:8px\"><span style=\"font-size:11px;color:#A16207;font-weight:600\">Type de v\u00e9hicule :</span>"+tsel+"<span style=\"font-size:11px;color:#A16207;font-weight:600;margin-left:10px\">Plaque :</span><input value=\""+esc(t.plaque||"")+"\" onchange=\"setTruckPlaque("+ti+",this.value)\" placeholder=\"AB-123-CD\" style=\"font-size:11px;padding:3px 7px;border:1px solid #FDE68A;border-radius:6px;background:#fff;color:#854D0E;font-family:inherit;width:112px;text-transform:uppercase\"/></div>";
     h+=pretRowHTML(t,ti);
     h+="<div style=\"padding:8px 14px\">";
     (t.items||[]).forEach(function(it,ii){
@@ -2775,6 +2912,21 @@ function importTrucks(){
 }
 
 // ═══ PRÊT DE CAMION ENTRE TL (traçabilité) ═══
+function trucksSimpleView(){
+  if(!TRUCKS.length)return "";
+  var h="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-list-details\" style=\"color:#A16207\"></i> Vue d'ensemble \u2014 camions &amp; attributions</div>";
+  h+="<div style=\"overflow-x:auto\"><table style=\"width:100%;border-collapse:collapse;font-size:13px\">";
+  h+="<thead><tr style=\"background:#FFFDF5;color:#854D0E\"><th style=\"text-align:left;padding:8px 12px\">Camion</th><th style=\"text-align:left;padding:8px 12px\">Type</th><th style=\"text-align:left;padding:8px 12px\">Plaque</th><th style=\"text-align:left;padding:8px 12px\">Attribu\u00e9 \u00e0</th></tr></thead><tbody>";
+  TRUCKS.forEach(function(t){
+    var loaned=t.pret&&t.pret.to;var holder=loaned?t.pret.to:t.tl;
+    h+="<tr style=\"border-top:1px solid #F1F5F9\"><td style=\"padding:8px 12px;font-weight:600\"><i class=\"ti ti-truck\" style=\"color:#A16207;font-size:13px\"></i> "+esc(t.tl)+"</td>";
+    h+="<td style=\"padding:8px 12px;color:#64748B\">"+(t.type?esc(t.type):"\u2014")+"</td>";
+    h+="<td style=\"padding:8px 12px\"><span style=\"background:#0F172A;color:#fff;border-radius:5px;padding:2px 8px;font-family:monospace;font-size:12px;letter-spacing:1px\">"+(t.plaque?esc(t.plaque):"\u2014")+"</span></td>";
+    h+="<td style=\"padding:8px 12px\">"+(loaned?"<span style=\"color:#C2410C;font-weight:600\"><i class=\"ti ti-arrows-exchange\" style=\"font-size:12px\"></i> "+esc(holder)+"</span>":"<span style=\"color:#15803D\">"+esc(holder)+"</span>")+"</td></tr>";
+  });
+  h+="</tbody></table></div></div>";
+  return h;
+}
 function loanedSummaryHTML(){
   var loaned=TRUCKS.filter(function(t){return t.pret&&t.pret.to;});
   if(!loaned.length)return "";
@@ -2834,6 +2986,7 @@ function endPret(ti){
 }
 
 function setTruckType(ti,v){var t=TRUCKS[ti];if(!t)return;t.type=v;saveTrucks(function(){renderTrucksSettings();});}
+function setTruckPlaque(ti,v){var t=TRUCKS[ti];if(!t)return;t.plaque=(v||"").toUpperCase().trim();saveTrucks(function(){});}
 function updTruckItem(ti,ii,field,val){
   var t=TRUCKS[ti];if(!t||!t.items||!t.items[ii])return;
   if(field==="q"){var q=parseInt(val,10);if(isNaN(q)||q<1)q=1;t.items[ii].q=q;}
@@ -2878,6 +3031,19 @@ function saveCommandes(cb){
     if(d&&d.data)COMMANDES=d.data.slice();
     if(cb)cb();
   }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function _cmdRowBadge(r){
+  var st=null;
+  if(r.commandeId&&typeof cmdStatutById==="function")st=cmdStatutById(r.commandeId);
+  if(!st&&typeof cur!=="undefined"&&cur&&r.designation&&typeof COMMANDES!=="undefined"){
+    var na=_normEq(cur.noAffaire||""),dn=_normEq(r.designation);
+    for(var i=0;i<COMMANDES.length;i++){var c=COMMANDES[i];if(_normEq(c.produit||"")!==dn)continue;if((c.approId&&c.approId===cur._id)||(na&&_normEq(c.noAffaire||"")===na)){st=c.statut||"en_attente";break;}}
+  }
+  if(!st&&r.commandeStatut)st=r.commandeStatut;
+  if(!st&&r.disponibilite==="En commande")st="en_attente";
+  if(!st)return "";
+  var rc=st==="recu";
+  return "<div style=\"font-size:10px;font-weight:600;margin-top:3px;display:inline-flex;align-items:center;gap:3px;color:"+(rc?"#065F46":"#92400E")+"\"><i class=\"ti ti-clipboard-"+(rc?"check":"list")+"\" style=\"font-size:11px\"></i> Commande : "+(rc?"re\u00e7ue":"en attente")+"</div>";
 }
 function cmdStatutById(id){
   for(var i=0;i<COMMANDES.length;i++){if(COMMANDES[i].id===id)return COMMANDES[i].statut;}
@@ -3016,13 +3182,15 @@ function renderAnnonces(){
   if(typeof closeSidebar==="function")closeSidebar();
   if(!canManage()){toast("Acc\u00e8s admin ou d\u00e9p\u00f4t","ti-lock");return;}
   cur=null;currentTab="annonces";
+  annEnsureUsers();
   var m=document.getElementById("main-area");
   var h="<div style=\"max-width:820px;margin:0 auto;padding:22px 18px\">";
   h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-speakerphone\" style=\"font-size:24px;color:#BE123C\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Annonces</h2></div>";
   h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 18px\">Publie un message qui s'affichera en pop-up. <b>G\u00e9n\u00e9rale</b> : vue par les conducteurs, le d\u00e9p\u00f4t et les admins. <b>Team Leaders</b> : vue uniquement par les TL (ex. mat\u00e9riel perdu).</p>";
   // Formulaire
   h+="<div style=\"background:#FFF1F2;border:1px solid #FECDD3;border-radius:11px;padding:14px;margin-bottom:18px\">";
-  h+="<div style=\"display:flex;gap:8px;margin-bottom:10px\"><button id=\"an-t-general\" onclick=\"setAnnonceType('general')\" style=\"flex:1;border:1px solid "+(_anType==="general"?"#BE123C":"#FECDD3")+";background:"+(_anType==="general"?"#BE123C":"#fff")+";color:"+(_anType==="general"?"#fff":"#BE123C")+";border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-users\"></i> G\u00e9n\u00e9rale</button><button id=\"an-t-tl\" onclick=\"setAnnonceType('tl')\" style=\"flex:1;border:1px solid "+(_anType==="tl"?"#BE123C":"#FECDD3")+";background:"+(_anType==="tl"?"#BE123C":"#fff")+";color:"+(_anType==="tl"?"#fff":"#BE123C")+";border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-hard-hat\"></i> Team Leaders</button></div>";
+  h+="<div style=\"display:flex;gap:8px;margin-bottom:10px\"><button id=\"an-t-general\" onclick=\"setAnnonceType('general')\" style=\"flex:1;border:1px solid "+(_anType==="general"?"#BE123C":"#FECDD3")+";background:"+(_anType==="general"?"#BE123C":"#fff")+";color:"+(_anType==="general"?"#fff":"#BE123C")+";border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-users\"></i> G\u00e9n\u00e9rale</button><button id=\"an-t-tl\" onclick=\"setAnnonceType('tl')\" style=\"flex:1;border:1px solid "+(_anType==="tl"?"#BE123C":"#FECDD3")+";background:"+(_anType==="tl"?"#BE123C":"#fff")+";color:"+(_anType==="tl"?"#fff":"#BE123C")+";border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-hard-hat\"></i> Team Leaders</button>"+annPersonButton()+"</div>";
+  h+=annUserPicker();
   h+="<input id=\"an-titre\" placeholder=\"Titre (optionnel)\" class=\"ui-in\" style=\"width:100%;margin-bottom:8px\"/>";
   h+="<textarea id=\"an-msg\" placeholder=\"Message de l'annonce...\" class=\"ui-in\" style=\"width:100%;min-height:70px;resize:vertical;font-family:inherit\"></textarea>";
   h+="<button onclick=\"addAnnonce()\" style=\"margin-top:10px;background:#BE123C;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-send\"></i> Publier l'annonce</button>";
@@ -3035,7 +3203,7 @@ function renderAnnonces(){
     sorted.forEach(function(a){
       var tl=a.type==="tl";
       h+="<div style=\"border:1px solid "+(a.active?"#E2E8F0":"#F1F5F9")+";border-radius:10px;padding:12px 14px;margin-bottom:9px;opacity:"+(a.active?"1":".55")+"\">";
-      h+="<div style=\"display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px\"><span style=\"font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:"+(tl?"#FEF3C7":"#DBEAFE")+";color:"+(tl?"#92400E":"#1D4ED8")+"\">"+(tl?"Team Leaders":"G\u00e9n\u00e9rale")+"</span><div style=\"display:flex;gap:6px\"><button onclick=\"toggleAnnonceActive('"+a.id+"')\" style=\"background:"+(a.active?"#F1F5F9":"#DCFCE7")+";color:"+(a.active?"#64748B":"#15803D")+";border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit\">"+(a.active?"D\u00e9sactiver":"R\u00e9activer")+"</button><button onclick=\"delAnnonce('"+a.id+"')\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:3px\"><i class=\"ti ti-trash\"></i></button></div></div>";
+      h+="<div style=\"display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px\">"+annBadge(a)+"<div style=\"display:flex;gap:6px\"><button onclick=\"toggleAnnonceActive('"+a.id+"')\" style=\"background:"+(a.active?"#F1F5F9":"#DCFCE7")+";color:"+(a.active?"#64748B":"#15803D")+";border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit\">"+(a.active?"D\u00e9sactiver":"R\u00e9activer")+"</button><button onclick=\"delAnnonce('"+a.id+"')\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:3px\"><i class=\"ti ti-trash\"></i></button></div></div>";
       if(a.titre)h+="<div style=\"font-size:14px;font-weight:700;color:#0F172A;margin-bottom:2px\">"+esc(a.titre)+"</div>";
       h+="<div style=\"font-size:13px;color:#334155;white-space:pre-wrap\">"+esc(a.message)+"</div>";
       h+="<div style=\"font-size:11px;color:#94A3B8;margin-top:6px\">"+esc(a.auteur||"")+(a.createdAt?" \u00b7 "+fd(a.createdAt.slice(0,10)):"")+"</div>";
@@ -3045,14 +3213,65 @@ function renderAnnonces(){
   h+="</div>";
   m.innerHTML=h;
 }
+
+// ═══ ANNONCES CIBLÉES (par personne) ═══
+var _anTarget="",_anTargetName="",_annUsers=null,_annUserSearch="";
+function annEnsureUsers(){
+  if(!isAdmin())return;
+  if(_annUsers!==null)return;
+  _annUsers=[];
+  apiCall("GET","/users").then(function(d){_annUsers=(d||[]).slice();if(currentTab==="annonces")renderAnnonces();}).catch(function(){});
+}
+function annPersonButton(){
+  if(!isAdmin())return "";
+  var on=_anType==="user";
+  return "<button id=\"an-t-user\" onclick=\"setAnnonceType('user')\" style=\"flex:1;border:1px solid "+(on?"#BE123C":"#FECDD3")+";background:"+(on?"#BE123C":"#fff")+";color:"+(on?"#fff":"#BE123C")+";border-radius:8px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-user\"></i> Une personne</button>";
+}
+function annUserPicker(){
+  if(_anType!=="user")return "";
+  var h="<div style=\"background:#fff;border:1px solid #FECDD3;border-radius:8px;padding:8px;margin-bottom:8px\">";
+  if(_anTarget){
+    h+="<div style=\"display:flex;align-items:center;gap:8px;font-size:13px;color:#0F172A\"><i class=\"ti ti-user-check\" style=\"color:#15803D\"></i> Destinataire : <b>"+esc(_anTargetName)+"</b><button onclick=\"clearAnnonceTarget()\" style=\"margin-left:auto;background:none;border:none;color:#94A3B8;cursor:pointer\"><i class=\"ti ti-x\"></i></button></div>";
+  } else {
+    h+="<input id=\"an-user-search\" placeholder=\"Rechercher une personne...\" class=\"ui-in\" style=\"width:100%;margin-bottom:6px\" oninput=\"filterAnnUsers(this.value)\" value=\""+esc(_annUserSearch)+"\"/>";
+    if(_annUsers===null||!_annUsers.length){
+      h+="<div style=\"font-size:12px;color:#94A3B8;padding:6px\">"+(_annUsers===null?"Chargement...":"Aucun utilisateur")+"</div>";
+    } else {
+      var q=_annUserSearch.toLowerCase();
+      var list=_annUsers.filter(function(u){return !q||((u.name||"")+" "+(u.username||"")).toLowerCase().indexOf(q)>=0;}).slice(0,8);
+      if(!list.length)h+="<div style=\"font-size:12px;color:#94A3B8;padding:6px\">Aucun r\u00e9sultat</div>";
+      list.forEach(function(u){
+        var nm=(u.name||u.username||"").replace(/'/g,"\u2019");
+        h+="<div onclick=\"setAnnonceTarget('"+u.id+"','"+esc(nm)+"')\" style=\"padding:7px 10px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px\" onmouseover=\"this.style.background='#FFF1F2'\" onmouseout=\"this.style.background='transparent'\"><i class=\"ti ti-user\" style=\"color:#BE123C;font-size:14px\"></i> "+esc(u.name||"")+" <span style=\"color:#94A3B8;font-size:11px\">@"+esc(u.username||"")+"</span></div>";
+      });
+    }
+  }
+  h+="</div>";
+  return h;
+}
+function setAnnonceTarget(id,name){_anTarget=id;_anTargetName=name;renderAnnonces();}
+function clearAnnonceTarget(){_anTarget="";_anTargetName="";_annUserSearch="";renderAnnonces();}
+function filterAnnUsers(v){
+  _annUserSearch=v;renderAnnonces();
+  setTimeout(function(){var e=document.getElementById("an-user-search");if(e){e.focus();try{e.setSelectionRange(e.value.length,e.value.length);}catch(x){}}},0);
+}
+function annBadge(a){
+  if(a.type==="user")return "<span style=\"font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:#F3E8FF;color:#7E22CE\"><i class=\"ti ti-user\" style=\"font-size:11px\"></i> "+esc(a.targetName||"Personne")+"</span>";
+  var tl=a.type==="tl";
+  return "<span style=\"font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:"+(tl?"#FEF3C7":"#DBEAFE")+";color:"+(tl?"#92400E":"#1D4ED8")+"\">"+(tl?"Team Leaders":"G\u00e9n\u00e9rale")+"</span>";
+}
+
 var _anType="general";
 function setAnnonceType(t){_anType=t;renderAnnonces();}
 function addAnnonce(){
   var msg=((document.getElementById("an-msg")||{}).value||"").trim();
   if(!msg){toast("\u00c9cris un message","ti-alert-circle");return;}
   var titre=((document.getElementById("an-titre")||{}).value||"").trim();
-  ANNONCES.push({id:uid(),type:_anType,titre:titre,message:msg,auteur:(currentUser&&currentUser.name)||"",createdAt:new Date().toISOString(),active:true});
-  saveAnnonces(function(){toast("Annonce publi\u00e9e","ti-check");renderAnnonces();});
+  if(_anType==="user"&&!_anTarget){toast("Choisis une personne","ti-alert-circle");return;}
+  var _an={id:uid(),type:_anType,titre:titre,message:msg,auteur:(currentUser&&currentUser.name)||"",createdAt:new Date().toISOString(),active:true};
+  if(_anType==="user"){_an.target=_anTarget;_an.targetName=_anTargetName;}
+  ANNONCES.push(_an);
+  saveAnnonces(function(){toast("Annonce publi\u00e9e","ti-check");_anTarget="";_anTargetName="";_annUserSearch="";_anType="general";renderAnnonces();});
 }
 function toggleAnnonceActive(id){
   var a=ANNONCES.filter(function(x){return x.id===id;})[0];if(!a)return;
@@ -3069,7 +3288,7 @@ function showAnnoncePopups(){
   var isTL=currentUser.role==="team_leader";
   var wanted=isTL?"tl":"general";
   var seen={};try{seen=JSON.parse(localStorage.getItem("annonce_seen")||"{}");}catch(e){}
-  var todo=ANNONCES.filter(function(a){return a.active&&a.type===wanted&&!seen[a.id];});
+  var todo=ANNONCES.filter(function(a){if(!a.active||seen[a.id])return false;if(a.type==="user")return a.target&&currentUser&&a.target===currentUser.id;return a.type===wanted;});
   if(!todo.length)return;
   var ov=document.createElement("div");
   ov.id="annonce-ov";
@@ -3221,6 +3440,7 @@ function applyConfig(){
     var nm=CONFIG.appName||"AppROVISIO";
     var els=document.querySelectorAll(".sb-brand-name,.mtop-title");for(var i=0;i<els.length;i++)els[i].textContent=nm;
     fillLogos();
+    if(typeof applyCatOrder==="function"){applyCatOrder();if(currentTab==="ui")renderUISettings();}
   }catch(e){}
 }
 function saveConfig(cb){
@@ -3536,6 +3756,36 @@ function dashBars(items,color,unit){
     return "<div style=\"margin-bottom:9px\"><div style=\"display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px\"><span style=\"color:#334155;font-weight:500\">"+esc(it.name)+"</span><span style=\"color:#64748B;font-weight:700\">"+it.count+(unit?" "+unit:"")+"</span></div><div style=\"background:#F1F5F9;border-radius:5px;height:9px;overflow:hidden\"><div style=\"width:"+pct+"%;height:100%;background:"+color+";border-radius:5px\"></div></div></div>";
   }).join("");
 }
+
+// ═══ TABLEAU DE BORD — indicateurs "à traiter" (calcul direct) ═══
+function dashLiveKPIs(){
+  var S=(typeof sheets!=="undefined"&&sheets)?sheets:[];
+  function cnt(fn){return S.filter(fn).length;}
+  var aPreparer=cnt(function(s){return !s.draft&&(s.statut==="en_attente"||(s.statut==="prete"&&s.modifPrep)||(s.statut==="sur_chantier"&&s.addToPrepare));});
+  var surCh=cnt(function(s){return !s.draft&&s.statut==="sur_chantier";});
+  var rendus=cnt(function(s){return !s.draft&&s.statut==="rendu";});
+  var tick=(typeof ticketsPendingCount==="function")?ticketsPendingCount():0;
+  var cmd=(typeof COMMANDES!=="undefined")?COMMANDES.filter(function(c){return c.statut!=="recu";}).length:0;
+  var pretes=(typeof TRUCKS!=="undefined")?TRUCKS.filter(function(t){return t.pret&&t.pret.to;}).length:0;
+  var urgent=cnt(function(s){return !s.draft&&s.statut!=="sortie"&&(s.priorite==="urgente"||s.priorite==="tres_urgente");});
+  var brouillons=cnt(function(s){return s.draft;});
+  function card(val,label,color,bg,ic,action){
+    return "<div onclick=\""+action+"\" style=\"cursor:pointer;background:"+bg+";border:1px solid "+color+"33;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:3px\" onmouseover=\"this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(0,0,0,.08)'\" onmouseout=\"this.style.transform='none';this.style.boxShadow='none'\"><div style=\"display:flex;align-items:center;justify-content:space-between\"><span style=\"font-size:26px;font-weight:800;color:"+color+"\">"+val+"</span><i class=\"ti "+ic+"\" style=\"font-size:20px;color:"+color+";opacity:.6\"></i></div><div style=\"font-size:12px;color:#64748B;font-weight:600\">"+label+"</div></div>";
+  }
+  var h="<h3 style=\"margin:0 0 12px;font-size:15px;color:#0F172A;display:flex;align-items:center;gap:7px\"><i class=\"ti ti-bolt\" style=\"color:#D97706\"></i> \u00c0 traiter maintenant</h3>";
+  h+="<div style=\"display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:24px\">";
+  h+=card(aPreparer,"\u00c0 pr\u00e9parer","#1D4ED8","#EFF6FF","ti-clipboard-list","renderDepot()");
+  h+=card(rendus,"Rendus \u00e0 traiter","#0891B2","#ECFEFF","ti-package-import","renderDepot()");
+  h+=card(surCh,"Sur chantier","#15803D","#F0FDF4","ti-tools","renderDepot()");
+  h+=card(cmd,"Commandes en attente","#B45309","#FFFBEB","ti-truck-delivery","renderCommandes()");
+  h+=card(tick,"Demandes d\u00e9p\u00f4t","#BE123C","#FFF1F2","ti-ticket","renderTickets()");
+  h+=card(pretes,"Camions pr\u00eat\u00e9s","#C2410C","#FFF7ED","ti-arrows-exchange","renderTrucksSettings()");
+  h+=card(urgent,"Priorit\u00e9 urgente","#B91C1C","#FEF2F2","ti-flame","renderList()");
+  h+=card(brouillons,"Brouillons","#6D28D9","#F5F3FF","ti-file-pencil","window._draftView=true;renderList()");
+  h+="</div>";
+  return h;
+}
+
 function renderDashboard(){
   if(typeof closeSidebar==="function")closeSidebar();
   cur=null;currentTab="dashboard";
@@ -3550,6 +3800,7 @@ function renderDashboard(){
     h+="<div style=\"flex:1;min-width:130px;background:#EFF6FF;border:1px solid #DBEAFE;border-radius:12px;padding:16px\"><div style=\"font-size:30px;font-weight:800;color:#1D4ED8\">"+(d.totalAppros||0)+"</div><div style=\"font-size:13px;color:#64748B;font-weight:600\">Appros au total</div></div>";
     h+="<div style=\"flex:1;min-width:130px;background:#F0FDF4;border:1px solid #DCFCE7;border-radius:12px;padding:16px\"><div style=\"font-size:30px;font-weight:800;color:#15803D\">"+(d.totalArticles||0)+"</div><div style=\"font-size:13px;color:#64748B;font-weight:600\">Articles demand\u00e9s</div></div>";
     h+="</div>";
+    h+=dashLiveKPIs();
     // 3 sections
     h+="<div style=\"background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:18px;margin-bottom:16px\"><h3 style=\"margin:0 0 14px;font-size:15px;color:#0F172A;display:flex;align-items:center;gap:7px\"><i class=\"ti ti-users\" style=\"color:#1D4ED8\"></i> Activit\u00e9 par conducteur</h3>"+dashBars(d.byConductor,"#3B82F6","appros")+"</div>";
     h+="<div style=\"background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:18px;margin-bottom:16px\"><h3 style=\"margin:0 0 14px;font-size:15px;color:#0F172A;display:flex;align-items:center;gap:7px\"><i class=\"ti ti-package\" style=\"color:#15803D\"></i> Mat\u00e9riel le plus demand\u00e9</h3>"+dashBars(d.topMaterials,"#22C55E","fois")+"</div>";
