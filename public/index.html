@@ -1313,7 +1313,7 @@ function renderDepot(){
   var auDepot=sheets.filter(function(s){return !s.draft&&s.statut==="prete"&&!s.modifPrep;});
   auDepot.sort(function(a,b){return (b.preparedAt||"").localeCompare(a.preparedAt||"");});
 
-  var h="";
+  var h=(typeof dashLiveKPIs==="function"?dashLiveKPIs():"");
   h+="<div class=\"depot-wrap\">";
 
   // COLUMN 1 - A PREPARER
@@ -1581,15 +1581,16 @@ function openFromLib(id){
 }
 
 // SIDEBAR
+function _stripAccents(x){try{return (""+x).normalize("NFD").replace(/[\u0300-\u036f]/g,"");}catch(e){return ""+x;}}
 function _approSearchText(s){
   var parts=[s.nomChantier,getTypes(s).join(" "),s.clientSite,s.noAffaire,s.chargeAffaires,s.conducteur,s.adresseChantier,s.coordClient,s.reference];
   ["consommables","fournitures","outillage"].forEach(function(k){(s[k]||[]).forEach(function(r){if(r){parts.push(r.designation);parts.push(r.commentaire);}});});
-  return parts.filter(Boolean).join(" ").toLowerCase();
+  return _stripAccents(parts.filter(Boolean).join(" ").toLowerCase());
 }
 function onLibSearch(v){var sb=document.getElementById("srch");if(sb)sb.value=v;renderList();setTimeout(function(){var e=document.getElementById("srch-lib");if(e){e.focus();try{e.setSelectionRange(e.value.length,e.value.length);}catch(x){}}},0);}
 function renderList(){
   if(typeof renderDeadlineBanner==="function")renderDeadlineBanner();
-  var _sl=document.getElementById("srch-lib");var q=((_sl?_sl.value:(document.getElementById("srch")||{}).value)||"").toLowerCase().trim();
+  var _sl=document.getElementById("srch-lib");var q=_stripAccents(((_sl?_sl.value:(document.getElementById("srch")||{}).value)||"").toLowerCase().trim());
   var filtered=sheets.filter(function(s){
     if(s.statut==="sortie"&&!q)return false;
     if(window._draftView){if(!s.draft)return false;}else{if(s.draft)return false;}
@@ -1700,9 +1701,9 @@ function _truckAssignInfo(t){
 }
 function truckSelectorHTML(){
   if(!TRUCKS.length)return "";
-  var opts="<option value=\"\">\u2014 Aucun camion \u2014</option>";
-  TRUCKS.forEach(function(t){opts+="<option value=\""+esc(t.tl)+"\""+(cur.tlCamion===t.tl?" selected":"")+">"+esc(t.tl)+"</option>";});
-  var h="<div class=\"fg fg-full\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-truck\" style=\"font-size:12px;color:#A16207\"></i> Team Leader / Camion</label><select class=\"fin\" onchange=\"setTlCamion(this.value)\">"+opts+"</select></div>";
+  var dlOpts="";
+  TRUCKS.forEach(function(t){dlOpts+="<option value=\""+esc(t.tl)+"\"></option>";});
+  var h="<div class=\"fg fg-full\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-truck\" style=\"font-size:12px;color:#A16207\"></i> Team Leader / Camion <span style=\"font-size:10px;color:#94A3B8;font-weight:400\">(camion enregistr\u00e9 ou nom libre)</span></label><input class=\"fin\" list=\"tl-camion-list\" value=\""+esc(cur.tlCamion||"")+"\" placeholder=\"Choisir un camion ou saisir un nom\u2026\" onchange=\"setTlCamion(this.value)\"/><datalist id=\"tl-camion-list\">"+dlOpts+"</datalist></div>";
   h+="<div class=\"fg fg-full\"><button onclick=\"toggleCamionSujet()\" style=\"background:"+(cur.camionSujet?"#B91C1C":"#fff")+";color:"+(cur.camionSujet?"#fff":"#B91C1C")+";border:1px solid #FCA5A5;border-radius:8px;padding:8px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-alert-triangle\"></i> "+(cur.camionSujet?"Sujet camion signal\u00e9 \u00b7 cliquer pour retirer":"Sujet camion (technicien sans camion ?)")+"</button>"+(cur.camionSujet?"<div style=\"margin-top:7px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:#B91C1C\"><i class=\"ti ti-alert-triangle\"></i> <b>Sujet camion :</b> le technicien en charge n'a peut-\u00eatre pas de camion \u2014 solution \u00e0 trouver.</div>":"")+"</div>";
   var t=truckByTL(cur.tlCamion);
   if(t){
@@ -2287,6 +2288,16 @@ function doPDF(){
 // ═══════════════ NOTIFICATIONS ═══════════════
 // ═══════════════ NOUVEAUT\u00c9S ═══════════════
 var NEWS=[
+  {v:39,date:"3 juillet 2026",items:[
+    "Catalogue : les articles se modifient directement (nom + section) sans devoir supprimer/recr\u00e9er, et chaque cat\u00e9gorie peut \u00eatre renomm\u00e9e (crayon) \u2014 admin et chef d\u00e9p\u00f4t",
+    "Chef d\u00e9p\u00f4t : sa page d'accueil affiche d\u00e9sormais le panneau \u00ab \u00c0 traiter maintenant \u00bb (charge de travail en un coup d'\u0153il) au-dessus de ses colonnes"
+  ]},
+  {v:38,date:"3 juillet 2026",items:[
+    "Recherche biblioth\u00e8que corrig\u00e9e : d\u00e9sormais insensible aux accents (\u00ab eglise \u00bb trouve \u00ab \u00c9glise \u00bb, \u00ab 8eme \u00bb trouve \u00ab 8\u00c8ME \u00bb) \u2014 la recherche par adresse fonctionne enfin bien",
+    "Feuille d'appro : le champ Team Leader / Camion accepte maintenant un nom libre (technicien sans camion enregistr\u00e9)",
+    "Gestion des camions : tout se modifie directement dans la vue d'ensemble (titulaire, type, plaque, \u00e9tat, pr\u00eat) \u2014 plus besoin de descendre",
+    "Camion type : d\u00e9finis un \u00e9quipement de base, chaque nouveau camion d\u00e9marre avec (puis on ajuste) \u2014 cr\u00e9ation bien plus rapide"
+  ]},
   {v:37,date:"2 juillet 2026",items:[
     "Feuille d'appro relook\u00e9e facon \u00ab app moderne \u00bb : les informations sont regroup\u00e9es en 4 cartes th\u00e9matiques (Identification, Chantier, Intervenants, Planning & camion) \u2014 bien plus lisible et a\u00e9r\u00e9",
     "PDF assorti : bandeaux de section \u00e0 la couleur d'accent (Informations chantier, Planning) pour un rendu coh\u00e9rent avec l'appli",
@@ -2586,6 +2597,21 @@ function tradePresetButtons(){
   return h;
 }
 
+function uiEditCatItem(idx,field,value){
+  if(!CAT_ITEMS[idx])return;
+  if(field==="n"){value=(value||"").trim();if(!value)return;}
+  CAT_ITEMS[idx][field]=value;
+  apiCall("POST","/lists/catalogue/set",{data:CAT_ITEMS}).then(function(d){if(d&&d.data){CAT_ITEMS=d.data.slice();rebuildCatOrder();}if(field==="sec"&&currentTab==="ui")renderUISettings();}).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function renameCat(ci){
+  var oldName=CAT_ORDER[ci];if(!oldName)return;
+  var nn=prompt("Nouveau nom de la cat\u00e9gorie :",oldName);
+  if(nn===null)return;nn=nn.trim();if(!nn||nn===oldName)return;
+  CAT_ITEMS.forEach(function(it){if(it.cat===oldName)it.cat=nn;});
+  var i=CAT_ORDER.indexOf(oldName);if(i>=0)CAT_ORDER[i]=nn;
+  if(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.catOrder){var j=CONFIG.catOrder.indexOf(oldName);if(j>=0){CONFIG.catOrder[j]=nn;saveConfig(function(){});}}
+  apiCall("POST","/lists/catalogue/set",{data:CAT_ITEMS}).then(function(d){if(d&&d.data){CAT_ITEMS=d.data.slice();rebuildCatOrder();}toast("Cat\u00e9gorie renomm\u00e9e","ti-check");renderUISettings();}).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
 function rebuildCatOrder(){
   CAT_ITEMS.forEach(function(it){
     if(it.cat&&CAT_ORDER.indexOf(it.cat)<0){CAT_ORDER.push(it.cat);}
@@ -2634,11 +2660,13 @@ function renderUISettings(){
     h+="<div style=\"background:#F5F3FF;padding:7px 10px;font-size:13px;font-weight:700;color:#1E293B;display:flex;align-items:center;gap:5px\">";
     h+="<i class=\"ti ti-folder\" style=\"color:#6D28D9\"></i><span style=\"flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap\">"+esc(c)+"</span>";
     h+="<span style=\"font-size:10px;color:#64748B;font-weight:500;background:#fff;border-radius:8px;padding:1px 6px\">"+list.length+"</span>";
+    h+="<button onclick=\"renameCat("+ci+")\" title=\"Renommer la cat\u00e9gorie\" style=\"background:none;border:none;color:#6D28D9;cursor:pointer;padding:2px 2px;font-size:13px\"><i class=\"ti ti-pencil\"></i></button>";
     h+="<button onclick=\"moveCat("+ci+",-1)\" title=\"Monter\" style=\"background:none;border:none;color:"+(ci===0?"#CBD5E1":"#6D28D9")+";cursor:pointer;padding:2px 2px;font-size:14px\"><i class=\"ti ti-chevron-up\"></i></button>";
     h+="<button onclick=\"moveCat("+ci+",1)\" title=\"Descendre\" style=\"background:none;border:none;color:"+(ci===CAT_ORDER.length-1?"#CBD5E1":"#6D28D9")+";cursor:pointer;padding:2px 2px;font-size:14px\"><i class=\"ti ti-chevron-down\"></i></button>";
     h+="</div><div style=\"padding:3px 0;max-height:240px;overflow-y:auto\">";
     list.forEach(function(o){
-      h+="<div style=\"display:flex;align-items:center;gap:6px;padding:5px 10px;font-size:12.5px\"><span style=\"flex:1;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap\">"+esc(o.it.n)+"</span><span style=\"font-size:9px;color:#94A3B8;background:#F1F5F9;padding:2px 6px;border-radius:9px;white-space:nowrap\">"+(SEC_LABELS[o.it.sec]||o.it.sec)+"</span><button onclick=\"uiDelCatItem("+o.idx+")\" title=\"Supprimer\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:2px 4px\"><i class=\"ti ti-trash\" style=\"font-size:13px\"></i></button></div>";
+      var _so="";["consommables","fournitures","outillage"].forEach(function(sk){_so+="<option value=\""+sk+"\""+(o.it.sec===sk?" selected":"")+">"+(SEC_LABELS[sk]||sk)+"</option>";});
+      h+="<div style=\"display:flex;align-items:center;gap:4px;padding:4px 8px\"><input value=\""+esc(o.it.n)+"\" onchange=\"uiEditCatItem("+o.idx+",'n',this.value)\" style=\"flex:1;min-width:60px;font-size:12px;padding:3px 5px;border:1px solid transparent;border-radius:5px;font-family:inherit;color:#334155\" onfocus=\"this.style.borderColor='#DDD6FE';this.style.background='#FaFaFF'\" onblur=\"this.style.borderColor='transparent';this.style.background='none'\"/><select onchange=\"uiEditCatItem("+o.idx+",'sec',this.value)\" style=\"font-size:10px;padding:2px 3px;border:1px solid #E2E8F0;border-radius:5px;color:#64748B;font-family:inherit;cursor:pointer\">"+_so+"</select><button onclick=\"uiDelCatItem("+o.idx+")\" title=\"Supprimer\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:2px 4px\"><i class=\"ti ti-trash\" style=\"font-size:13px\"></i></button></div>";
     });
     h+="</div></div>";
   });
@@ -2917,6 +2945,7 @@ function renderTrucksSettings(){
   h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 20px\">Chaque camion est rattach\u00e9 \u00e0 un Team Leader. L'\u00e9quipement saisi ici permet de d\u00e9duire automatiquement le mat\u00e9riel d\u00e9j\u00e0 pr\u00e9sent dans le camion lors d'une appro.</p>";
   h+=loanedSummaryHTML();
   h+=trucksSimpleView();
+  h+=truckBaseBar();
   h+="<div style=\"display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px\"><button onclick=\"downloadTruckTemplate()\" style=\"background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-file-download\"></i> Mod\u00e8le Excel</button><button onclick=\"pickExcel(importTrucksExcel)\" style=\"background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-file-import\"></i> Importer un Excel</button><button onclick=\"exportTrucksExcel()\" style=\"background:#fff;border:1px solid #E2E8F0;color:#64748B;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-download\"></i> Exporter</button></div>";
 
   if(!TRUCKS.length){
@@ -2954,32 +2983,53 @@ function importTrucks(){
 }
 
 // ═══ PRÊT DE CAMION ENTRE TL (traçabilité) ═══
+
+// ═══ CAMIONS — édition inline dans la vue d'ensemble + camion type ═══
+function _truckStateCompact(t,ti){
+  var d=t.etat==="depot",r=t.etat==="revision";
+  return "<button onclick=\"setTruckEtat("+ti+",'depot')\" title=\"Au d\u00e9p\u00f4t\" style=\"padding:4px 7px;border-radius:6px;cursor:pointer;border:1px solid "+(d?"#1D4ED8":"#E2E8F0")+";background:"+(d?"#1D4ED8":"#fff")+";color:"+(d?"#fff":"#64748B")+"\"><i class=\"ti ti-building-warehouse\" style=\"font-size:13px\"></i></button> <button onclick=\"setTruckEtat("+ti+",'revision')\" title=\"En r\u00e9vision\" style=\"padding:4px 7px;border-radius:6px;cursor:pointer;border:1px solid "+(r?"#B91C1C":"#E2E8F0")+";background:"+(r?"#B91C1C":"#fff")+";color:"+(r?"#fff":"#64748B")+"\"><i class=\"ti ti-tool\" style=\"font-size:13px\"></i></button>";
+}
+function setTruckTl(ti,v){var t=TRUCKS[ti];if(!t)return;v=(v||"").trim();if(!v)return;t.tl=v;saveTrucks(function(){renderTrucksSettings();});}
 function trucksSimpleView(){
   if(!TRUCKS.length)return "";
   var names=[];TRUCKS.forEach(function(x){if(x.tl&&names.indexOf(x.tl)<0)names.push(x.tl);});names.sort();
-  var h="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-list-details\" style=\"color:#A16207\"></i> Vue d'ensemble \u2014 camions &amp; attributions</div>";
+  var _TT=["Camionnette","Trafic","Master"];
+  var h="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-list-details\" style=\"color:#A16207\"></i> Vue d'ensemble \u2014 tout se modifie ici</div>";
   h+="<div style=\"overflow-x:auto\"><table style=\"width:100%;border-collapse:collapse;font-size:13px\">";
-  h+="<thead><tr style=\"background:#FFFDF5;color:#854D0E\"><th style=\"text-align:left;padding:8px 10px\">Camion</th><th style=\"text-align:left;padding:8px 10px\">Type</th><th style=\"text-align:left;padding:8px 10px\">Plaque</th><th style=\"text-align:left;padding:8px 10px\">\u00c9tat</th><th style=\"text-align:left;padding:8px 10px\">Attribu\u00e9 \u00e0</th><th style=\"text-align:left;padding:8px 10px\">Action</th></tr></thead><tbody>";
+  h+="<thead><tr style=\"background:#FFFDF5;color:#854D0E\"><th style=\"text-align:left;padding:8px 8px\">Titulaire</th><th style=\"text-align:left;padding:8px 8px\">Type</th><th style=\"text-align:left;padding:8px 8px\">Plaque</th><th style=\"text-align:left;padding:8px 8px\">\u00c9tat</th><th style=\"text-align:left;padding:8px 8px\">Attribu\u00e9 \u00e0 / pr\u00eat</th></tr></thead><tbody>";
   TRUCKS.forEach(function(t,ti){
     var loaned=t.pret&&t.pret.to;var holder=loaned?t.pret.to:t.tl;
+    var topts="<option value=\"\">Type\u2026</option>";_TT.forEach(function(x){topts+="<option value=\""+x+"\""+(t.type===x?" selected":"")+">"+x+"</option>";});
     h+="<tr style=\"border-top:1px solid #F1F5F9\">";
-    h+="<td style=\"padding:7px 10px;font-weight:600\"><i class=\"ti ti-truck\" style=\"color:#A16207;font-size:13px\"></i> "+esc(t.tl)+"</td>";
-    h+="<td style=\"padding:7px 10px;color:#64748B\">"+(t.type?esc(t.type):"\u2014")+"</td>";
-    h+="<td style=\"padding:7px 10px\"><span style=\"background:#0F172A;color:#fff;border-radius:5px;padding:2px 8px;font-family:monospace;font-size:12px;letter-spacing:1px\">"+(t.plaque?esc(t.plaque):"\u2014")+"</span></td>";
-    h+="<td style=\"padding:7px 10px\">"+truckEtatBadge(t)+"</td>";
-    h+="<td style=\"padding:7px 10px\">"+(loaned?"<span style=\"color:#C2410C;font-weight:600\"><i class=\"ti ti-arrows-exchange\" style=\"font-size:12px\"></i> "+esc(holder)+"</span>":"<span style=\"color:#15803D\">"+esc(holder)+"</span>")+"</td>";
+    h+="<td style=\"padding:6px 8px\"><input value=\""+esc(t.tl||"")+"\" onchange=\"setTruckTl("+ti+",this.value)\" style=\"width:132px;font-size:12px;font-weight:600;padding:5px 7px;border:1px solid #E2E8F0;border-radius:6px;font-family:inherit\"/></td>";
+    h+="<td style=\"padding:6px 8px\"><select onchange=\"setTruckType("+ti+",this.value)\" style=\"font-size:12px;padding:5px 7px;border:1px solid #E2E8F0;border-radius:6px;font-family:inherit;cursor:pointer\">"+topts+"</select></td>";
+    h+="<td style=\"padding:6px 8px\"><input value=\""+esc(t.plaque||"")+"\" onchange=\"setTruckPlaque("+ti+",this.value)\" placeholder=\"AB-123-CD\" style=\"width:104px;font-size:12px;padding:5px 7px;border:1px solid #E2E8F0;border-radius:6px;font-family:monospace;text-transform:uppercase\"/></td>";
+    h+="<td style=\"padding:6px 8px;white-space:nowrap\">"+_truckStateCompact(t,ti)+"</td>";
     if(loaned){
-      h+="<td style=\"padding:7px 10px\"><button onclick=\"endPret("+ti+")\" style=\"background:#15803D;color:#fff;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-arrow-back-up\"></i> R\u00e9cup\u00e9rer</button></td>";
+      h+="<td style=\"padding:6px 8px;white-space:nowrap\"><span style=\"color:#C2410C;font-weight:600;font-size:12px\"><i class=\"ti ti-arrows-exchange\" style=\"font-size:12px\"></i> "+esc(holder)+"</span> <button onclick=\"endPret("+ti+")\" style=\"background:#15803D;color:#fff;border:none;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:4px\">R\u00e9cup\u00e9rer</button></td>";
     } else {
-      var opts="<option value=\"\">Pr\u00eater \u00e0\u2026</option>";
-      names.forEach(function(nm){if(nm!==t.tl)opts+="<option value=\""+esc(nm)+"\">"+esc(nm)+"</option>";});
-      h+="<td style=\"padding:7px 10px\"><select onchange=\"quickLend("+ti+",this.value)\" style=\"font-size:12px;padding:4px 7px;border:1px solid #FDBA74;border-radius:7px;background:#fff;color:#C2410C;font-family:inherit;cursor:pointer\">"+opts+"</select></td>";
+      var opts="<option value=\"\">Pr\u00eater \u00e0\u2026</option>";names.forEach(function(nm){if(nm!==t.tl)opts+="<option value=\""+esc(nm)+"\">"+esc(nm)+"</option>";});
+      h+="<td style=\"padding:6px 8px;white-space:nowrap\"><span style=\"color:#15803D;font-size:12px\">Titulaire</span> <select onchange=\"quickLend("+ti+",this.value)\" style=\"font-size:11px;padding:4px 6px;border:1px solid #FDBA74;border-radius:6px;color:#C2410C;font-family:inherit;cursor:pointer\">"+opts+"</select></td>";
     }
     h+="</tr>";
   });
   h+="</tbody></table></div></div>";
   return h;
 }
+function truckBaseBar(){
+  var base=(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.truckBase)||[];
+  var opts="<option value=\"\">D\u00e9finir depuis un camion\u2026</option>";
+  TRUCKS.forEach(function(t,i){opts+="<option value=\""+i+"\">"+esc(t.tl)+" ("+(t.items||[]).length+")</option>";});
+  return "<div style=\"background:#F5F3FF;border:1px solid #DDD6FE;border-radius:10px;padding:11px 14px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap\"><div style=\"font-size:13px;color:#6D28D9;font-weight:700;white-space:nowrap\"><i class=\"ti ti-template\"></i> Camion type</div><div style=\"font-size:12px;color:#64748B\">"+base.length+" \u00e9quipement(s) de base \u2014 chaque nouveau camion d\u00e9marre avec, puis on ajuste.</div><select onchange=\"setBaseFromTruck(this.value)\" style=\"font-size:12px;padding:6px 9px;border:1px solid #DDD6FE;border-radius:7px;font-family:inherit;cursor:pointer;margin-left:auto\">"+opts+"</select>"+(base.length?"<button onclick=\"clearTruckBase()\" style=\"background:none;border:none;color:#94A3B8;font-size:12px;cursor:pointer;font-family:inherit\">Vider</button>":"")+"</div>";
+}
+function setBaseFromTruck(i){
+  if(i===""||i==null)return;var t=TRUCKS[i|0];if(!t)return;
+  if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};
+  CONFIG.truckBase=(t.items||[]).map(function(x){var o={n:x.n,q:x.q};if(x.ref)o.ref=x.ref;if(x.m)o.m=x.m;return o;});
+  saveConfig(function(){toast("Camion type d\u00e9fini ("+CONFIG.truckBase.length+" \u00e9quipements)","ti-template");renderTrucksSettings();});
+}
+function clearTruckBase(){if(typeof CONFIG!=="undefined"&&CONFIG)CONFIG.truckBase=[];saveConfig(function(){toast("Camion type vid\u00e9","ti-check");renderTrucksSettings();});}
+
 function loanedSummaryHTML(){
   var loaned=TRUCKS.filter(function(t){return t.pret&&t.pret.to;});
   if(!loaned.length)return "";
@@ -3068,7 +3118,8 @@ function addTruck(){
   var n=(document.getElementById("truck-new-tl")||{}).value||"";n=n.trim();
   if(!n)return;
   if(truckByTL(n)){toast("Ce camion existe d\u00e9j\u00e0","ti-alert-circle");return;}
-  TRUCKS.push({tl:n,items:[]});
+  var _base=(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.truckBase)?CONFIG.truckBase.map(function(x){var o={n:x.n,q:x.q};if(x.ref)o.ref=x.ref;if(x.m)o.m=x.m;return o;}):[];
+  TRUCKS.push({tl:n,items:_base});
   saveTrucks(function(){toast("Camion ajout\u00e9","ti-check");renderTrucksSettings();});
 }
 function delTruck(ti){
