@@ -1744,7 +1744,7 @@ function truckSelectorHTML(){
   var dlOpts="";
   _allAssignNames().forEach(function(nm){dlOpts+="<option value=\""+esc(nm)+"\"></option>";});
   var h="<div class=\"fg fg-full\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-truck\" style=\"font-size:12px;color:#A16207\"></i> Team Leader / Camion <span style=\"font-size:10px;color:#94A3B8;font-weight:400\">(camion enregistr\u00e9 ou nom libre)</span></label><input class=\"fin\" list=\"tl-camion-list\" value=\""+esc(cur.tlCamion||"")+"\" placeholder=\"Choisir un camion ou saisir un nom\u2026\" onchange=\"setTlCamion(this.value)\"/><datalist id=\"tl-camion-list\">"+dlOpts+"</datalist></div>";
-  h+="<div class=\"fg fg-full\"><button onclick=\"toggleCamionSujet()\" style=\"background:"+(cur.camionSujet?"#B91C1C":"#fff")+";color:"+(cur.camionSujet?"#fff":"#B91C1C")+";border:1px solid #FCA5A5;border-radius:8px;padding:8px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-alert-triangle\"></i> "+(cur.camionSujet?"Sujet camion signal\u00e9 \u00b7 cliquer pour retirer":"Sujet camion (technicien sans camion ?)")+"</button>"+(cur.camionSujet?"<div style=\"margin-top:7px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:#B91C1C\"><i class=\"ti ti-alert-triangle\"></i> <b>Sujet camion :</b> le technicien en charge n'a peut-\u00eatre pas de camion \u2014 solution \u00e0 trouver.</div>":"")+"</div>";
+  h+="<div class=\"fg fg-full\"><button onclick=\"toggleCamionSujet()\" style=\"background:"+(cur.camionSujet?"#B91C1C":"#fff")+";color:"+(cur.camionSujet?"#fff":"#B91C1C")+";border:1px solid #FCA5A5;border-radius:8px;padding:8px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-alert-triangle\"></i> "+(cur.camionSujet?"Sujet camion signal\u00e9 \u00b7 cliquer pour retirer":"Sujet camion (technicien sans camion ?)")+"</button>"+(cur.camionSujet?"<div style=\"margin-top:7px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:#B91C1C\"><i class=\"ti ti-alert-triangle\"></i> <b>Sujet camion :</b> "+(cur.camionSujetNote?esc(cur.camionSujetNote):"le technicien en charge n'a peut-\u00eatre pas de camion \u2014 solution \u00e0 trouver.")+"</div>":"")+"</div>";
   var t=truckByTL(cur.tlCamion);
   if(t){
     h+="<div class=\"fg fg-full\" style=\"background:#FEFCE8;border:1px solid #FEF08A;border-radius:10px;padding:12px\">";
@@ -1940,6 +1940,7 @@ h+="<div class=\"fg\"><label>&#9889; Priorit\u00e9</label><select class=\"fin\" 
   h+="<div class=\"card info-sec\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class=\"ti ti-calendar-clock\" style=\"font-size:16px;color:#6D28D9\"></i> Planning &amp; camion</div></div><div class=\"card-fields\">";
   h+="<div class=\"fg\"><label><i class=\"ti ti-calendar-due\" style=\"font-size:12px;vertical-align:-1px\"></i> Date limite d&#39;appro</label><input class=\"fin\" type=\"date\" value=\""+esc(cur.dateAppro)+"\" oninput=\"upF('dateAppro',this.value)\"/></div>";
   h+="<div class=\"fg\"><label><i class=\"ti ti-calendar-event\" style=\"font-size:12px;vertical-align:-1px\"></i> Date d&#233;but de chantier</label><input class=\"fin\" type=\"date\" value=\""+esc(cur.dateChantier)+"\" oninput=\"upF('dateChantier',this.value)\"/></div>";
+  _autoSujetCheck();
   h+=truckSelectorHTML();
   h+="</div></div>";
   h+="<div class=\"card\" style=\"border-left:4px solid \"+((STATUT[cur.statut]||STATUT.en_attente).color)+\"\"><div style=\"padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap\"><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:12px;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.5px\">Statut :</span>"+statutBadge(cur.statut)+(cur.preparedAt?"<span style=\"font-size:11px;color:#94A3B8\">pr\u00e9par\u00e9e le "+cur.preparedAt+"</span>":"")+"</div><div style=\"display:flex;gap:6px\">"+statutButtons()+"</div></div></div>";
@@ -2330,6 +2331,14 @@ function doPDF(){
 // ═══════════════ NOTIFICATIONS ═══════════════
 // ═══════════════ NOUVEAUT\u00c9S ═══════════════
 var NEWS=[
+  {v:47,date:"6 juillet 2026",items:[
+    "Camions : nouvel \u00e9tat de base \u00ab Chantier \u00bb (ic\u00f4ne cône) en plus de \u00ab Au d\u00e9p\u00f4t \u00bb et \u00ab En r\u00e9vision \u00bb",
+    "Bouton rouage sur chaque camion : ouvre sa fiche \u00ab situation \u00bb (\u00e2ge/mise en circulation, prochaine r\u00e9vision, p\u00e9riode de r\u00e9vision, journal des \u00e9v\u00e9nements)",
+    "Prochaine r\u00e9vision cod\u00e9e en couleur : rouge si d\u00e9pass\u00e9e, orange si proche, vert si \u00e0 jour",
+    "Journal d'\u00e9v\u00e9nements par camion : accident, casse/panne, entretien\u2026",
+    "Cliquer sur \u00ab R\u00e9vision \u00bb ouvre la fiche pour saisir la p\u00e9riode (du\u2026 au\u2026)",
+    "Sujet camion automatique : si le camion du technicien de l'appro est en r\u00e9vision et qu'aucun autre camion ne lui est pr\u00eat\u00e9, l'appro passe en \u00ab sujet camion \u00bb avec le motif"
+  ]},
   {v:46,date:"3 juillet 2026",items:[
     "Catalogue cordiste modulable : 3 agencements d'affichage au choix \u2014 Liste, Compact et Grille (tuiles) \u2014 s\u00e9lectionnables en haut du panneau et m\u00e9moris\u00e9s. Le d\u00e9tachement de fen\u00eatre reste disponible en plus"
   ]},
@@ -3027,6 +3036,94 @@ function saveTrucks(cb){
     if(cb)cb();
   }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
 }
+
+// ═══ CAMIONS — état Chantier, page situation, révisions, événements ═══
+function _daysTo(dateStr){if(!dateStr)return null;var d=new Date(dateStr+"T00:00:00");if(isNaN(d.getTime()))return null;var t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/86400000);}
+function _revStatus(dateStr){
+  var dd=_daysTo(dateStr);
+  if(dd===null)return {c:"#64748B",bg:"#F1F5F9",label:"Non planifi\u00e9e",ic:"ti-calendar-off"};
+  if(dd<0)return {c:"#B91C1C",bg:"#FEE2E2",label:"En retard de "+(-dd)+" j",ic:"ti-alert-triangle"};
+  if(dd<=30)return {c:"#C2410C",bg:"#FFEDD5",label:"Bient\u00f4t \u2014 dans "+dd+" j",ic:"ti-clock"};
+  return {c:"#15803D",bg:"#DCFCE7",label:"\u00c0 jour ("+dd+" j)",ic:"ti-circle-check"};
+}
+function _truckAge(dateStr){var dd=_daysTo(dateStr);if(dd===null)return "";var yrs=Math.abs(dd)/365.25;if(yrs<1)return Math.round(Math.abs(dd)/30.4)+" mois";return (Math.floor(yrs*10)/10)+" ans";}
+var _EV_LABELS={accident:"Accident",casse:"Casse / panne",entretien:"Entretien",autre:"Autre"};
+function openTruckSituation(ti){renderTruckSituation(ti);}
+function openTruckRevision(ti){renderTruckSituation(ti,true);}
+function renderTruckSituation(ti,focusRev){
+  if(typeof closeSidebar==="function")closeSidebar();
+  var t=TRUCKS[ti];if(!t){renderTrucksSettings();return;}
+  cur=null;currentTab="truck-sit";
+  var m=document.getElementById("main-area");
+  var rs=_revStatus(t.nextRevision);
+  var h="<div style=\"max-width:760px;margin:0 auto;padding:20px 18px\">";
+  h+="<button onclick=\"renderTrucksSettings()\" style=\"background:none;border:none;color:#6D28D9;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;margin-bottom:10px\"><i class=\"ti ti-arrow-left\"></i> Retour aux camions</button>";
+  h+="<div style=\"display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap\"><div style=\"width:48px;height:48px;border-radius:13px;background:#FFFDF5;border:1px solid #FDE68A;display:flex;align-items:center;justify-content:center\"><i class=\"ti ti-truck\" style=\"font-size:24px;color:#A16207\"></i></div><div style=\"flex:1;min-width:150px\"><h2 style=\"margin:0;font-size:20px;color:#0F172A\">"+esc(t.tl)+"</h2><div style=\"font-size:13px;color:#64748B\">"+(t.type?esc(t.type):"Type non d\u00e9fini")+" \u00b7 "+(t.plaque?esc(t.plaque):"sans plaque")+"</div></div>"+truckEtatBadge(t)+"</div>";
+  // État
+  h+="<div class=\"ui-sec\" style=\"margin-bottom:14px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-adjustments\" style=\"color:#A16207\"></i> \u00c9tat du camion</div><div style=\"padding:12px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center\">"+truckEtatButtons(t,ti)+"</div></div>";
+  // Âge / mise en service
+  var age=_truckAge(t.dateService);
+  h+="<div class=\"ui-sec\" style=\"margin-bottom:14px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-calendar\" style=\"color:#A16207\"></i> \u00c2ge du v\u00e9hicule</div><div style=\"padding:12px 14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap\"><div><div style=\"font-size:12px;color:#64748B;font-weight:600;margin-bottom:3px\">Mise en circulation</div><input type=\"date\" value=\""+(t.dateService||"")+"\" onchange=\"setTruckField("+ti+",'dateService',this.value)\" style=\"padding:7px 10px;border:1px solid #E2E8F0;border-radius:8px;font-family:inherit\"/></div>"+(age?"<div style=\"background:#F1F5F9;border-radius:10px;padding:8px 16px\"><div style=\"font-size:11px;color:#94A3B8\">\u00c2ge</div><div style=\"font-size:18px;font-weight:800;color:#0F172A\">"+age+"</div></div>":"")+"</div></div>";
+  // Prochaine révision (code couleur)
+  h+="<div class=\"ui-sec\" style=\"margin-bottom:14px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-tool\" style=\"color:#A16207\"></i> Prochaine r\u00e9vision</div><div style=\"padding:12px 14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap\"><div><div style=\"font-size:12px;color:#64748B;font-weight:600;margin-bottom:3px\">Date pr\u00e9vue</div><input type=\"date\" value=\""+(t.nextRevision||"")+"\" onchange=\"setTruckField("+ti+",'nextRevision',this.value)\" style=\"padding:7px 10px;border:1px solid #E2E8F0;border-radius:8px;font-family:inherit\"/></div><div style=\"background:"+rs.bg+";color:"+rs.c+";border-radius:10px;padding:9px 16px;font-weight:700;font-size:14px;display:flex;align-items:center;gap:7px\"><i class=\"ti "+rs.ic+"\" style=\"font-size:17px\"></i> "+rs.label+"</div></div></div>";
+  // Révision en cours (période)
+  var inRev=t.etat==="revision";
+  h+="<div class=\"ui-sec\" style=\"margin-bottom:14px;"+(focusRev?"border:2px solid #FCA5A5":"")+"\"><div class=\"ui-sec-hd\"><i class=\"ti ti-progress-alert\" style=\"color:#B91C1C\"></i> Mise en r\u00e9vision (p\u00e9riode)</div><div style=\"padding:12px 14px\">";
+  h+="<div style=\"display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end\"><div><div style=\"font-size:12px;color:#64748B;font-weight:600;margin-bottom:3px\">Du</div><input type=\"date\" id=\"rev-from\" value=\""+((t.revision&&t.revision.from)||"")+"\" style=\"padding:7px 10px;border:1px solid #E2E8F0;border-radius:8px;font-family:inherit\"/></div><div><div style=\"font-size:12px;color:#64748B;font-weight:600;margin-bottom:3px\">Au</div><input type=\"date\" id=\"rev-to\" value=\""+((t.revision&&t.revision.to)||"")+"\" style=\"padding:7px 10px;border:1px solid #E2E8F0;border-radius:8px;font-family:inherit\"/></div><input id=\"rev-note\" placeholder=\"Motif (option)\" value=\""+esc((t.revision&&t.revision.note)||"")+"\" style=\"flex:1;min-width:130px;padding:8px 10px;border:1px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:13px\"/></div>";
+  h+="<div style=\"margin-top:10px;display:flex;gap:8px\"><button onclick=\"setTruckRevision("+ti+")\" style=\"background:#B91C1C;color:#fff;border:none;border-radius:8px;padding:9px 15px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-tool\"></i> "+(inRev?"Mettre \u00e0 jour la r\u00e9vision":"Mettre en r\u00e9vision")+"</button>"+(inRev?"<button onclick=\"endTruckRevision("+ti+")\" style=\"background:#15803D;color:#fff;border:none;border-radius:8px;padding:9px 15px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-circle-check\"></i> Terminer la r\u00e9vision</button>":"")+"</div></div></div>";
+  // Journal d'événements
+  h+="<div class=\"ui-sec\" style=\"margin-bottom:14px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-alert-hexagon\" style=\"color:#A16207\"></i> \u00c9v\u00e9nements (accidents, casse\u2026)</div><div style=\"padding:12px 14px\">";
+  h+="<div style=\"display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px\"><div><div style=\"font-size:11px;color:#64748B;font-weight:600;margin-bottom:3px\">Type</div><select id=\"ev-type\" style=\"padding:7px 9px;border:1px solid #E2E8F0;border-radius:8px;font-family:inherit\"><option value=\"accident\">Accident</option><option value=\"casse\">Casse / panne</option><option value=\"entretien\">Entretien</option><option value=\"autre\">Autre</option></select></div><div><div style=\"font-size:11px;color:#64748B;font-weight:600;margin-bottom:3px\">Date</div><input type=\"date\" id=\"ev-date\" style=\"padding:7px 9px;border:1px solid #E2E8F0;border-radius:8px;font-family:inherit\"/></div><input id=\"ev-note\" placeholder=\"Description...\" style=\"flex:1;min-width:140px;padding:8px 10px;border:1px solid #E2E8F0;border-radius:8px;font-family:inherit;font-size:13px\"/><button onclick=\"addTruckEvent("+ti+")\" style=\"background:#A16207;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> Ajouter</button></div>";
+  var evs=(t.events||[]);
+  if(evs.length){
+    h+="<div style=\"display:flex;flex-direction:column;gap:7px\">";
+    evs.slice().reverse().forEach(function(e,ri){
+      var idx=evs.length-1-ri;
+      var evc=e.type==="accident"?"#B91C1C":(e.type==="casse"?"#C2410C":"#64748B");
+      h+="<div style=\"display:flex;align-items:center;gap:9px;border:1px solid #E2E8F0;border-left:3px solid "+evc+";border-radius:8px;padding:8px 11px\"><span style=\"font-size:11px;font-weight:700;color:"+evc+";background:"+evc+"18;padding:2px 8px;border-radius:20px;white-space:nowrap\">"+(_EV_LABELS[e.type]||e.type)+"</span><span style=\"flex:1;font-size:13px;color:#334155\">"+esc(e.note||"")+"</span>"+(e.date?"<span style=\"font-size:11px;color:#94A3B8;white-space:nowrap\">"+fd(e.date)+"</span>":"")+"<button onclick=\"delTruckEvent("+ti+","+idx+")\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:2px\"><i class=\"ti ti-trash\" style=\"font-size:13px\"></i></button></div>";
+    });
+    h+="</div>";
+  } else {
+    h+="<div style=\"font-size:12px;color:#94A3B8;padding:4px\">Aucun \u00e9v\u00e9nement enregistr\u00e9.</div>";
+  }
+  h+="</div></div>";
+  h+="</div>";
+  m.innerHTML=h;
+  if(focusRev){var el=document.getElementById("rev-from");if(el)el.focus();}
+}
+function setTruckField(ti,field,val){var t=TRUCKS[ti];if(!t)return;t[field]=val;saveTrucks(function(){renderTruckSituation(ti);});}
+function setTruckRevision(ti){
+  var t=TRUCKS[ti];if(!t)return;
+  var from=(document.getElementById("rev-from")||{}).value||"";
+  var to=(document.getElementById("rev-to")||{}).value||"";
+  var note=((document.getElementById("rev-note")||{}).value||"").trim();
+  t.revision={from:from,to:to,note:note};t.etat="revision";
+  saveTrucks(function(){toast("Camion mis en r\u00e9vision","ti-tool");renderTruckSituation(ti);});
+}
+function endTruckRevision(ti){var t=TRUCKS[ti];if(!t)return;t.revision=null;t.etat="chantier";saveTrucks(function(){toast("R\u00e9vision termin\u00e9e","ti-circle-check");renderTruckSituation(ti);});}
+function addTruckEvent(ti){
+  var t=TRUCKS[ti];if(!t)return;
+  var type=((document.getElementById("ev-type")||{}).value||"autre");
+  var date=((document.getElementById("ev-date")||{}).value||"");
+  var note=(((document.getElementById("ev-note")||{}).value)||"").trim();
+  if(!note){toast("D\u00e9cris l'\u00e9v\u00e9nement","ti-alert-circle");return;}
+  if(!t.events)t.events=[];t.events.push({date:date,type:type,note:note});
+  saveTrucks(function(){toast("\u00c9v\u00e9nement ajout\u00e9","ti-check");renderTruckSituation(ti);});
+}
+function delTruckEvent(ti,idx){var t=TRUCKS[ti];if(!t||!t.events)return;t.events.splice(idx,1);saveTrucks(function(){renderTruckSituation(ti);});}
+function _autoSujetCheck(){
+  if(!cur||!cur.tlCamion||typeof TRUCKS==="undefined")return;
+  var me=_stripAccents((cur.tlCamion||"").toLowerCase());
+  var own=null;TRUCKS.forEach(function(x){if(_stripAccents((x.tl||"").toLowerCase())===me)own=x;});
+  if(own&&own.etat==="revision"){
+    var hasLoan=TRUCKS.some(function(x){return x.pret&&x.pret.to&&_stripAccents((x.pret.to||"").toLowerCase())===me;});
+    if(!hasLoan){
+      cur.camionSujet=true;
+      cur.camionSujetNote="Camion de "+cur.tlCamion+" en r\u00e9vision"+((own.revision&&own.revision.to)?" (jusqu'au "+fd(own.revision.to)+")":"")+", aucun autre camion attribu\u00e9.";
+    }
+  }
+}
+
 function renderTrucksSettings(){
   if(typeof closeSidebar==="function")closeSidebar();
   if(!canManage()){toast("Acc\u00e8s admin ou d\u00e9p\u00f4t","ti-lock");return;}
@@ -3080,8 +3177,9 @@ function importTrucks(){
 
 // ═══ CAMIONS — édition inline dans la vue d'ensemble + camion type ═══
 function _truckStateCompact(t,ti){
-  var d=t.etat==="depot",r=t.etat==="revision";
-  return "<button onclick=\"setTruckEtat("+ti+",'depot')\" title=\"Au d\u00e9p\u00f4t\" style=\"padding:4px 7px;border-radius:6px;cursor:pointer;border:1px solid "+(d?"#1D4ED8":"#E2E8F0")+";background:"+(d?"#1D4ED8":"#fff")+";color:"+(d?"#fff":"#64748B")+"\"><i class=\"ti ti-building-warehouse\" style=\"font-size:13px\"></i></button> <button onclick=\"setTruckEtat("+ti+",'revision')\" title=\"En r\u00e9vision\" style=\"padding:4px 7px;border-radius:6px;cursor:pointer;border:1px solid "+(r?"#B91C1C":"#E2E8F0")+";background:"+(r?"#B91C1C":"#fff")+";color:"+(r?"#fff":"#64748B")+"\"><i class=\"ti ti-tool\" style=\"font-size:13px\"></i></button>";
+  var ch=(!t.etat||t.etat==="chantier"),d=t.etat==="depot",r=t.etat==="revision";
+  function b(et,ic,col,on,ti2){return "<button onclick=\"setTruckEtat("+ti2+",'"+et+"')\" style=\"padding:4px 6px;border-radius:6px;cursor:pointer;border:1px solid "+(on?col:"#E2E8F0")+";background:"+(on?col:"#fff")+";color:"+(on?"#fff":"#64748B")+"\"><i class=\"ti "+ic+"\" style=\"font-size:13px\"></i></button>";}
+  return b("chantier","ti-cone","#15803D",ch,ti)+" "+b("depot","ti-building-warehouse","#1D4ED8",d,ti)+" "+b("revision","ti-tool","#B91C1C",r,ti)+" <button onclick=\"openTruckSituation("+ti+")\" title=\"Situation du camion\" style=\"padding:4px 6px;border-radius:6px;cursor:pointer;border:1px solid #E2E8F0;background:#fff;color:#6D28D9\"><i class=\"ti ti-settings\" style=\"font-size:13px\"></i></button>";
 }
 function setTruckTl(ti,v){var t=TRUCKS[ti];if(!t)return;v=(v||"").trim();if(!v)return;t.tl=v;saveTrucks(function(){renderTrucksSettings();});}
 function _truckMatch(t){var q=_stripAccents((window._truckSearch||"").toLowerCase().trim());if(!q)return true;return _stripAccents(((t.tl||"")+" "+(t.plaque||"")+" "+(t.type||"")).toLowerCase()).indexOf(q)>=0;}
@@ -3170,15 +3268,14 @@ function pretRowHTML(t,ti){
 // ═══ CAMIONS — états (dépôt/révision), prêt rapide, sujet camion ═══
 function truckEtatBadge(t){
   if(t.etat==="depot")return "<span style=\"background:#DBEAFE;color:#1D4ED8;border-radius:9px;padding:2px 8px;font-size:11px;font-weight:600;white-space:nowrap\"><i class=\"ti ti-building-warehouse\" style=\"font-size:11px\"></i> Au d\u00e9p\u00f4t</span>";
-  if(t.etat==="revision")return "<span style=\"background:#FEE2E2;color:#B91C1C;border-radius:9px;padding:2px 8px;font-size:11px;font-weight:600;white-space:nowrap\"><i class=\"ti ti-tool\" style=\"font-size:11px\"></i> En r\u00e9vision</span>";
-  return "<span style=\"background:#DCFCE7;color:#15803D;border-radius:9px;padding:2px 8px;font-size:11px;font-weight:600\">Actif</span>";
+  if(t.etat==="revision")return "<span style=\"background:#FEE2E2;color:#B91C1C;border-radius:9px;padding:2px 8px;font-size:11px;font-weight:600;white-space:nowrap\"><i class=\"ti ti-tool\" style=\"font-size:11px\"></i> En r\u00e9vision"+((t.revision&&t.revision.to)?" \u2192 "+fd(t.revision.to):"")+"</span>";
+  return "<span style=\"background:#DCFCE7;color:#15803D;border-radius:9px;padding:2px 8px;font-size:11px;font-weight:600;white-space:nowrap\"><i class=\"ti ti-cone\" style=\"font-size:11px\"></i> Chantier</span>";
 }
-function setTruckEtat(ti,etat){var t=TRUCKS[ti];if(!t)return;t.etat=(t.etat===etat)?"":etat;saveTrucks(function(){renderTrucksSettings();});}
+function setTruckEtat(ti,etat){var t=TRUCKS[ti];if(!t)return;if(etat==="revision"){openTruckRevision(ti);return;}t.etat=(t.etat===etat)?"chantier":etat;if(t.etat!=="revision")t.revision=null;saveTrucks(function(){if(currentTab==="truck-sit")renderTruckSituation(ti);else renderTrucksSettings();});}
 function truckEtatButtons(t,ti){
-  var d=t.etat==="depot",r=t.etat==="revision";
-  return "<span style=\"font-size:11px;color:#A16207;font-weight:600;margin-left:10px\">\u00c9tat :</span>"
-    +"<button onclick=\"setTruckEtat("+ti+",'depot')\" style=\"font-size:11px;padding:3px 9px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:600;border:1px solid "+(d?"#1D4ED8":"#E2E8F0")+";background:"+(d?"#1D4ED8":"#fff")+";color:"+(d?"#fff":"#64748B")+"\"><i class=\"ti ti-building-warehouse\"></i> D\u00e9p\u00f4t</button>"
-    +"<button onclick=\"setTruckEtat("+ti+",'revision')\" style=\"font-size:11px;padding:3px 9px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:600;border:1px solid "+(r?"#B91C1C":"#E2E8F0")+";background:"+(r?"#B91C1C":"#fff")+";color:"+(r?"#fff":"#64748B")+"\"><i class=\"ti ti-tool\"></i> R\u00e9vision</button>";
+  var ch=(!t.etat||t.etat==="chantier"),d=t.etat==="depot",r=t.etat==="revision";
+  function b(et,ic,lbl,col,on){return "<button onclick=\"setTruckEtat("+ti+",'"+et+"')\" style=\"font-size:11px;padding:4px 11px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:600;border:1px solid "+(on?col:"#E2E8F0")+";background:"+(on?col:"#fff")+";color:"+(on?"#fff":"#64748B")+"\"><i class=\"ti "+ic+"\"></i> "+lbl+"</button>";}
+  return b("chantier","ti-cone","Chantier","#15803D",ch)+b("depot","ti-building-warehouse","D\u00e9p\u00f4t","#1D4ED8",d)+b("revision","ti-tool","R\u00e9vision","#B91C1C",r);
 }
 function quickLend(ti,to){if(!to)return;var t=TRUCKS[ti];if(!t)return;t.pret={to:to,since:new Date().toISOString(),note:""};saveTrucks(function(){toast("Camion pr\u00eat\u00e9 \u00e0 "+to,"ti-arrows-exchange");renderTrucksSettings();});}
 function toggleCamionSujet(){if(!cur)return;cur.camionSujet=!cur.camionSujet;saved=false;renderForm();}
