@@ -1233,7 +1233,7 @@ function renderCpItems(q){
   CAT_ORDER.forEach(function(cat){
     if(!groups[cat]||!groups[cat].length)return;
     var ic=CAT_CAT_I[cat]||"ti-box";
-    html+="<div class=\"cp-sec\"><div class=\"cp-sec-hd\"><div class=\"cp-sec-title\"><i class=\"ti "+ic+"\" style=\"font-size:14px\"></i> "+esc(cat)+"</div><button class=\"btn-all\" onclick=\"selAllCat(this.getAttribute(\u0027data-c\u0027))\" data-c=\""+esc(cat)+"\">Tout cocher</button></div>";
+    html+="<div class=\"cp-sec\"><div class=\"cp-sec-hd\"><div class=\"cp-sec-title\"><i class=\"ti "+ic+"\" style=\"font-size:14px\"></i> "+esc(cat)+"</div><button class=\"btn-all\" onclick=\"addKit(this.getAttribute(\u0027data-c\u0027))\" data-c=\""+esc(cat)+"\" style=\"background:#F5F3FF;color:#6D28D9\"><i class=\"ti ti-package\"></i> Ajouter le kit</button><button class=\"btn-all\" onclick=\"selAllCat(this.getAttribute(\u0027data-c\u0027))\" data-c=\""+esc(cat)+"\">Tout cocher</button></div>";
     if(typeof _cpLayout!=="undefined"&&_cpLayout==="grid"){
       html+="<div class=\"cp-grid\">";
       groups[cat].forEach(function(o){var item=o.item,i=o.i;
@@ -1271,6 +1271,23 @@ function updN(){
   var n=document.querySelectorAll(".ccb:checked").length;
   document.getElementById("cp-n").textContent=n;
   document.getElementById("cp-info").textContent=n===0?"S&#233;lectionnez des articles":n+" article"+(n>1?"s":"")+" s&#233;lectionn&#233;"+(n>1?"s":"");
+}
+function _kitBadge(r){if(!r||!r.kit)return "";return "<div style=\"display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;margin-top:3px;background:#F5F3FF;color:#6D28D9;padding:1px 8px;border-radius:20px\"><i class=\"ti ti-package\" style=\"font-size:10px\"></i> Kit "+esc(r.kit)+"</div>";}
+function addKit(cat){
+  if(!cur){toast("Ouvrez une appro","ti-alert-circle");return;}
+  var items=CAT_ITEMS.filter(function(it){return it.cat===cat;});
+  if(!items.length)return;
+  items.forEach(function(it){
+    var row=mkR(it.n,it.q||"1");row.kit=cat;
+    if(currentRole==="depot")row.depotAdded=true;
+    if(addMode&&addDate){row.addBatch=addDate;if(!cur.additionDates)cur.additionDates=[];if(cur.additionDates.indexOf(addDate)<0)cur.additionDates.push(addDate);}
+    if(cur[it.sec]&&cur[it.sec].length&&!cur[it.sec][cur[it.sec].length-1].designation)cur[it.sec].splice(cur[it.sec].length-1,1);
+    if(!cur[it.sec])cur[it.sec]=[];
+    cur[it.sec].push(row);
+  });
+  if(cur.statut==="prete")cur.modifPrep=true;else if(cur.statut==="sur_chantier")cur.addToPrepare=true;
+  saved=false;hideCp();renderForm();
+  toast("Kit "+cat+" ajout\u00e9 ("+items.length+" articles)","ti-circle-plus");
 }
 function insertCp(){
   var checked=document.querySelectorAll(".ccb:checked");
@@ -1813,7 +1830,7 @@ function tblH(sec,secColor){
     row+=" placeholder=\"D&#233;signation...\"";
     row+=" list=\"cat-datalist\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'designation',this.value)\"";
-    row+=" style=\""+st+"\"/>"+(r.truckQ?"<div style=\"font-size:10px;color:#A16207;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px\"><i class=\"ti ti-truck\" style=\"font-size:11px\"></i> "+r.truckQ+" d\u00e9j\u00e0 dans le camion"+(_qtyNum(r.quantite)>r.truckQ?" \u00b7 "+(_qtyNum(r.quantite)-r.truckQ)+" \u00e0 pr\u00e9parer":" \u00b7 rien \u00e0 pr\u00e9parer")+"</div>":"")+_cmdRowBadge(r)+"</td>";
+    row+=" style=\""+st+"\"/>"+(r.truckQ?"<div style=\"font-size:10px;color:#A16207;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px\"><i class=\"ti ti-truck\" style=\"font-size:11px\"></i> "+r.truckQ+" d\u00e9j\u00e0 dans le camion"+(_qtyNum(r.quantite)>r.truckQ?" \u00b7 "+(_qtyNum(r.quantite)-r.truckQ)+" \u00e0 pr\u00e9parer":" \u00b7 rien \u00e0 pr\u00e9parer")+"</div>":"")+_kitBadge(r)+_cmdRowBadge(r)+"</td>";
     row+="<td data-label=\"Qt&#233;\" class=\"td-q\"><input class=\"cin\" value=\""+esc(r.quantite)+"\"";
     row+=" placeholder=\"0\" style=\"text-align:center;"+st+"\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'quantite',this.value)\"/></td>";
@@ -2281,7 +2298,7 @@ function buildPZ(s){
       var dt=r.disponibilite?"<span style=\"background:"+(DB[r.disponibilite]||"#F1F5F9")+";color:"+(DC[r.disponibilite]||"#64748B")+";padding:2px 6px;border-radius:8px;font-size:10px;font-weight:600\">"+esc(r.disponibilite)+"</span>":"—";
       var qd=(esc(r.quantite)||"—");
       if(r.truckQ){var qn=_qtyNum(r.quantite),net=Math.max(0,qn-r.truckQ);qd="<strong style=\"color:#15803D\">"+net+"</strong> &#224; pr&#233;parer<div style=\"font-size:8px;color:#A16207;margin-top:1px;font-weight:600\">&#128666; "+r.truckQ+" d&#233;j&#224; au camion</div>";}
-      rH+="<tr style=\""+rs+"\"><td style=\"padding:5px 8px\">"+esc(r.designation)+al+"</td><td style=\"text-align:center;padding:5px 8px\">"+qd+"</td><td style=\"padding:5px 8px\">"+dt+"</td><td style=\"padding:5px 8px;font-size:10px;color:#475569\">"+(esc(r.commentaire||"")||"—")+"</td></tr>";
+      rH+="<tr style=\""+rs+"\"><td style=\"padding:5px 8px\">"+esc(r.designation)+al+_kitBadge(r)+"</td><td style=\"text-align:center;padding:5px 8px\">"+qd+"</td><td style=\"padding:5px 8px\">"+dt+"</td><td style=\"padding:5px 8px;font-size:10px;color:#475569\">"+(esc(r.commentaire||"")||"—")+"</td></tr>";
     });
     if(!shown)return;
     secH+="<div class=\"pz-sec\" style=\"border-color:"+sec.c+"66\"><div class=\"pz-sec-t\" style=\"background:"+sec.c+";display:flex;align-items:center;gap:7px;padding:7px 12px;font-size:12px\"><span style=\"font-size:13px\">"+sec.ic+"</span> "+sec.l+"<span style=\"margin-left:auto;font-size:10px;font-weight:500;background:rgba(255,255,255,.22);padding:1px 8px;border-radius:10px\">"+shown+" article"+(shown>1?"s":"")+"</span></div><table class=\"pz-tbl\" style=\"border-color:"+sec.c+"55;border-top:none\"><thead><tr><th style=\"width:38%;background:"+sec.c+"14;color:"+sec.c+"\">D&#233;signation</th><th style=\"width:12%;text-align:center;background:"+sec.c+"14;color:"+sec.c+"\">Quantit&#233;</th><th style=\"width:22%;background:"+sec.c+"14;color:"+sec.c+"\">Disponibilit&#233;</th><th style=\"width:28%;background:"+sec.c+"14;color:"+sec.c+"\">Commentaire</th></tr></thead><tbody>"+rH+"</tbody></table></div>";
@@ -2331,6 +2348,10 @@ function doPDF(){
 // ═══════════════ NOTIFICATIONS ═══════════════
 // ═══════════════ NOUVEAUT\u00c9S ═══════════════
 var NEWS=[
+  {v:48,date:"6 juillet 2026",items:[
+    "Catalogue : bouton \u00ab Ajouter le kit \u00bb sur chaque cat\u00e9gorie \u2014 ajoute tous les articles du kit d'un coup ET les marque comme appartenant \u00e0 ce kit",
+    "Les articles ajout\u00e9s via un kit affichent un badge \u00ab Kit Ma\u00e7onnerie \u00bb (etc.) dans l'appro ET sur le PDF \u2014 le d\u00e9p\u00f4t voit tout de suite d'o\u00f9 vient chaque article (fini l'illisible quand on cumule plusieurs kits)"
+  ]},
   {v:47,date:"6 juillet 2026",items:[
     "Camions : nouvel \u00e9tat de base \u00ab Chantier \u00bb (ic\u00f4ne cône) en plus de \u00ab Au d\u00e9p\u00f4t \u00bb et \u00ab En r\u00e9vision \u00bb",
     "Bouton rouage sur chaque camion : ouvre sa fiche \u00ab situation \u00bb (\u00e2ge/mise en circulation, prochaine r\u00e9vision, p\u00e9riode de r\u00e9vision, journal des \u00e9v\u00e9nements)",
