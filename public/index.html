@@ -218,6 +218,20 @@ table.at td{padding:0}
 .cp-qty-l{font-size:10px;color:#94A3B8;text-align:center;margin-top:2px}
 .cp-search{width:100%;border:1px solid #E2E8F0;border-radius:9px;padding:10px 12px 10px 36px;font-size:14px;font-family:inherit;outline:none;background:#F8FAFC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 12px center}
 .cp-search:focus{border-color:#6D28D9;background-color:#fff}
+.cp-lay-compact .cp-row{padding:4px 9px;gap:7px}
+.cp-lay-compact .cp-row-n{font-size:12px}
+.cp-lay-compact .cp-qty{width:42px;padding:2px}
+.cp-lay-compact .cp-qty-l{display:none}
+.cp-lay-compact .cp-sec{margin-bottom:8px}
+.cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(126px,1fr));gap:8px;padding:2px 0}
+.cp-tile{border:1px solid #E2E8F0;border-radius:10px;padding:9px;cursor:pointer;display:flex;flex-direction:column;gap:7px;transition:border-color .12s,background .12s;background:#fff}
+.cp-tile:hover{border-color:#CBD5E1}
+.cp-tile:has(.ccb:checked){border-color:var(--accent,#6D28D9);background:#F5F3FF}
+.cp-tile-n{font-size:12.5px;font-weight:600;color:#334155;line-height:1.25}
+.cp-tile-b{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:auto}
+.cp-tile .cp-qty{width:46px;padding:3px;border:1px solid #E2E8F0;border-radius:6px;text-align:center;font-size:12px}
+.cp-tile-check{width:20px;height:20px;border-radius:50%;border:1.5px solid #CBD5E1;display:flex;align-items:center;justify-content:center;color:transparent;font-size:12px;flex-shrink:0}
+.cp-tile:has(.ccb:checked) .cp-tile-check{background:var(--accent,#6D28D9);border-color:var(--accent,#6D28D9);color:#fff}
 .cp-empty{padding:30px 14px;text-align:center;color:#CBD5E1;font-size:13px}
 .type-ms{position:relative}
 .ms-dd{position:relative}
@@ -1084,11 +1098,22 @@ function toast(msg,ico){
 }
 
 // CATALOGUE
+var _cpLayout="list";
+function _cpLayoutBar(){
+  var modes=[["list","ti-list","Liste"],["compact","ti-layout-rows","Compact"],["grid","ti-layout-grid","Grille"]];
+  var h="<div style=\"display:flex;gap:5px;margin:0 0 10px\">";
+  modes.forEach(function(m){var on=_cpLayout===m[0];h+="<button type=\"button\" onclick=\"setCpLayout('"+m[0]+"')\" style=\"flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:600;padding:6px;border-radius:8px;cursor:pointer;font-family:inherit;border:1px solid "+(on?"#6D28D9":"#E2E8F0")+";background:"+(on?"#F5F3FF":"#fff")+";color:"+(on?"#6D28D9":"#64748B")+"\"><i class=\"ti "+m[1]+"\"></i> "+m[2]+"</button>";});
+  h+="</div>";return h;
+}
+function setCpLayout(m){_cpLayout=m;try{localStorage.setItem("cp_layout",m);}catch(e){}var bar=document.getElementById("cp-layout-bar");if(bar)bar.innerHTML=_cpLayoutBar();var sc=document.getElementById("cp-search");renderCpItems(sc?sc.value:"");}
+function _cpTileToggle(e,i){var cb=document.getElementById("ci_"+i);if(!cb)return;if(e&&e.target&&e.target.tagName==="INPUT"&&e.target.type==="number")return;cb.checked=!cb.checked;updN();}
 function showCp(){
   if(!cur){toast("Ouvrez une appro d&#39;abord","ti-alert-circle");return;}
   var body=document.getElementById("cp-body");
   var html="<input type=\"text\" id=\"cp-search\" class=\"cp-search\" placeholder=\"Rechercher un article (ex : \u00e9tanch\u00e9it\u00e9, corde...)\" oninput=\"filterCp(this.value)\"/>";
   html+="<button type=\"button\" onclick=\"addNewCatItem()\" style=\"width:100%;margin:8px 0;background:#F0FDF4;border:1px dashed #86EFAC;color:#15803D;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> Ajouter un article au catalogue</button>";
+  try{_cpLayout=localStorage.getItem("cp_layout")||"list";}catch(e){}
+  html+="<div id=\"cp-layout-bar\">"+_cpLayoutBar()+"</div>";
   html+="<div id=\"cp-results\"></div>";
   body.innerHTML=html;
   renderCpItems("");
@@ -1209,14 +1234,23 @@ function renderCpItems(q){
     if(!groups[cat]||!groups[cat].length)return;
     var ic=CAT_CAT_I[cat]||"ti-box";
     html+="<div class=\"cp-sec\"><div class=\"cp-sec-hd\"><div class=\"cp-sec-title\"><i class=\"ti "+ic+"\" style=\"font-size:14px\"></i> "+esc(cat)+"</div><button class=\"btn-all\" onclick=\"selAllCat(this.getAttribute(\u0027data-c\u0027))\" data-c=\""+esc(cat)+"\">Tout cocher</button></div>";
+    if(typeof _cpLayout!=="undefined"&&_cpLayout==="grid"){
+      html+="<div class=\"cp-grid\">";
+      groups[cat].forEach(function(o){var item=o.item,i=o.i;
+        html+="<div class=\"cp-tile\" onclick=\"_cpTileToggle(event,"+i+")\"><input type=\"checkbox\" id=\"ci_"+i+"\" class=\"ccb\" data-sec=\""+item.sec+"\" data-n=\""+esc(item.n)+"\" data-cat=\""+esc(item.cat)+"\" data-i=\""+i+"\" style=\"display:none\" onchange=\"updN()\"/><div class=\"cp-tile-n\">"+esc(item.n)+"</div><div class=\"cp-tile-b\"><input type=\"number\" id=\"cq_"+i+"\" class=\"cp-qty\" value=\""+item.q+"\" min=\"1\" onclick=\"event.stopPropagation()\"/><span class=\"cp-tile-check\"><i class=\"ti ti-check\"></i></span></div></div>";
+      });
+      html+="</div>";
+    } else {
     groups[cat].forEach(function(o){
       var item=o.item,i=o.i;
       var del=isAdmin()?"<button onclick=\"event.stopPropagation();delCatItem("+i+")\" title=\"Supprimer du catalogue\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:0 4px;font-size:13px;flex-shrink:0\"><i class=\"ti ti-trash\"></i></button>":"";
       html+="<div class=\"cp-row\"><input type=\"checkbox\" id=\"ci_"+i+"\" class=\"ccb\" data-sec=\""+item.sec+"\" data-n=\""+esc(item.n)+"\" data-cat=\""+esc(item.cat)+"\" data-i=\""+i+"\" onchange=\"updN()\"/><label for=\"ci_"+i+"\" class=\"cp-row-n\" style=\"cursor:pointer\">"+esc(item.n)+"</label><div style=\"display:flex;flex-direction:column;align-items:center\"><input type=\"number\" id=\"cq_"+i+"\" class=\"cp-qty\" value=\""+item.q+"\" min=\"1\"/><div class=\"cp-qty-l\">qt&#233;</div></div>"+del+"</div>";
     });
+    }
     html+="</div>";
   });
   if(!html)html="<div class=\"cp-empty\"><i class=\"ti ti-search-off\" style=\"font-size:26px\"></i><div style=\"margin-top:8px\">Aucun article trouv\u00e9</div></div>";
+  container.className="cp-lay-"+(typeof _cpLayout!=="undefined"?_cpLayout:"list");
   container.innerHTML=html;
   updN();
 }
@@ -2271,7 +2305,7 @@ function doPrint(){
   var old=document.getElementById("dynprint");if(old)old.parentNode.removeChild(old);
   if(long){
     var st=document.createElement("style");st.id="dynprint";
-    st.textContent="@media print{@page{size:A3 landscape;margin:11mm}#pz .pz-cols{column-count:2;column-gap:16mm;column-fill:auto}#pz .pz-cols>div{-webkit-column-break-inside:avoid;break-inside:avoid;page-break-inside:avoid}#pz .fold-line{position:fixed;left:50%;top:0;bottom:0;border-left:1.5px dashed #CBD5E1}#pz .fold-tag{position:fixed;left:50%;top:2mm;transform:translateX(-50%);font-size:9px;color:#94A3B8;background:#fff;padding:1px 7px;border:1px solid #E2E8F0;border-radius:10px}}";
+    st.textContent="@media print{@page{size:A3 landscape;margin:11mm}#pz .pz-cols{column-count:2;column-gap:14mm}#pz .pz-cols>*{-webkit-column-span:all;column-span:all}#pz .pz-cols>.pz-sec{-webkit-column-span:none;column-span:none}#pz .pz-cols .pz-tbl tr{-webkit-column-break-inside:avoid;break-inside:avoid;page-break-inside:avoid}}";
     document.head.appendChild(st);
   }
   window.print();
@@ -2281,7 +2315,7 @@ function doPDF(){
   var inner=buildPZ(cur);
   var long=isLongAppro(cur);
   var pageStyle=long
-    ?"@media print{@page{size:A3 landscape;margin:11mm}}.pz-cols{column-count:2;column-gap:16mm;column-fill:auto}.pz-cols>div{-webkit-column-break-inside:avoid;break-inside:avoid;page-break-inside:avoid}.fold-line{position:fixed;left:50%;top:0;bottom:0;border-left:1.5px dashed #CBD5E1}.fold-tag{position:fixed;left:50%;top:2mm;transform:translateX(-50%);font-size:9px;color:#94A3B8;background:#fff;padding:1px 7px;border:1px solid #E2E8F0;border-radius:10px}"
+    ?"@media print{@page{size:A3 landscape;margin:11mm}}.pz-cols{column-count:2;column-gap:14mm}.pz-cols>*{-webkit-column-span:all;column-span:all}.pz-cols>.pz-sec{-webkit-column-span:none;column-span:none}.pz-cols .pz-tbl tr{-webkit-column-break-inside:avoid;break-inside:avoid;page-break-inside:avoid}"
     :"@media print{@page{size:A4;margin:10mm 12mm}}";
   var body=long?("<div class=\"pz-cols\">"+inner+"</div>"):inner;
   var h="<!DOCTYPE html><html lang=\"fr\"><head><meta charset=\"UTF-8\"><title>"+(cur.nomChantier||"Appro")+" &#8212; JARNIAS</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1E293B;font-size:11px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}.pz-hd{background:"+_accentCol()+";padding:12px 16px;display:flex;align-items:center;justify-content:space-between}.pz-hd img{width:90px;border-radius:7px}.pz-hd-l{display:flex;align-items:center;gap:9px}.pz-hd-c{flex:1;text-align:center;padding:0 12px}.pz-hd-flag{flex-shrink:0}.pz-hd-r{text-align:right}.pz-hd-title{font-size:14px;font-weight:700;color:#F1F5F9}.pz-hd-sub{font-size:10px;color:#64748B;margin-top:2px}.pz-ref{background:#1E293B;padding:7px 16px;display:flex;gap:20px;margin-bottom:10px}.pz-ri{display:flex;flex-direction:column}.pz-rl{font-size:9px;color:#64748B;text-transform:uppercase}.pz-rv{font-size:11px;color:#E2E8F0;font-weight:600}.pz-bt{padding:4px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#fff;background:var(--accent,#0F172A);border-radius:6px 6px 0 0;margin-top:10px}.pz-info{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;background:#F8FAFC;border:1px solid #E2E8F0;border-top:none;border-radius:0 0 6px 6px;padding:10px 14px}.pz-dates{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;border:1px solid #FDE68A;border-top:none;background:#FFFBEB;border-radius:0 0 6px 6px;padding:8px 14px}.pz-fi label{font-size:9px;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:1px}.pz-fi span{font-size:12px;font-weight:600;color:#0F172A}.pz-sec{margin-bottom:14px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden}.pz-sec-t{background:#1E293B;color:#fff;padding:6px 11px;font-size:11px;font-weight:600;text-transform:uppercase}.pz-tbl{width:100%;border-collapse:collapse}.pz-tbl th{background:#F1F5F9;padding:5px 8px;font-size:10px;text-transform:uppercase;color:#475569;text-align:left;border-bottom:1px solid #E2E8F0;font-weight:600}.pz-tbl td{padding:5px 8px;font-size:11px;border-bottom:1px solid #F1F5F9}.pz-tbl tr:last-child td{border-bottom:none}.pz-obs{border:1px solid #E2E8F0;padding:8px 10px;font-size:11px;min-height:36px;white-space:pre-wrap;border-radius:0 0 4px 4px}.pz-foot{margin-top:16px;display:flex;justify-content:flex-end;gap:36px;border-top:1px solid #E2E8F0;padding-top:10px}.pz-sign label{font-size:9px;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:20px;text-align:center}.pz-sign-line{border-top:1px solid #CBD5E1;width:120px;margin:0 auto}"+pageStyle+"</style></head><body>"+body+"<script>window.onload=function(){window.print();}<\/script></body></html>";
@@ -2296,6 +2330,14 @@ function doPDF(){
 // ═══════════════ NOTIFICATIONS ═══════════════
 // ═══════════════ NOUVEAUT\u00c9S ═══════════════
 var NEWS=[
+  {v:46,date:"3 juillet 2026",items:[
+    "Catalogue cordiste modulable : 3 agencements d'affichage au choix \u2014 Liste, Compact et Grille (tuiles) \u2014 s\u00e9lectionnables en haut du panneau et m\u00e9moris\u00e9s. Le d\u00e9tachement de fen\u00eatre reste disponible en plus"
+  ]},
+  {v:45,date:"3 juillet 2026",items:[
+    "Correction : l'export/impression A3 des grandes appros refonctionne (en-t\u00eate pleine largeur, mat\u00e9riel r\u00e9parti proprement sur 2 colonnes \u00e9quilibr\u00e9es)",
+    "Administration : les comptes sont tri\u00e9s par ordre alphab\u00e9tique, avec une barre de recherche et des filtres par r\u00f4le (Admin, Conducteur, D\u00e9p\u00f4t, Technicien\u2026)",
+    "Gestion des camions : barre de recherche (nom, plaque, type) pour trouver un camion sans scroller"
+  ]},
   {v:44,date:"3 juillet 2026",items:[
     "Le technicien remplace le Team Leader sur le terrain : il peut prendre l'appro (\u00ab sur chantier \u00bb), ajouter du mat\u00e9riel qui fait remonter l'appro pour le d\u00e9p\u00f4t, et rendre le mat\u00e9riel \u2014 comme un TL",
     "Les personnes inscrites (techniciens compris) apparaissent automatiquement dans les listes de noms : attribution du camion de l'appro, pr\u00eat d'un camion \u00e0 un autre, etc. (fusionn\u00e9es avec les titulaires de camions, sans doublon)"
@@ -2994,6 +3036,7 @@ function renderTrucksSettings(){
   h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-truck\" style=\"font-size:24px;color:#A16207\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Gestion des camions</h2></div>";
   h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 20px\">Chaque camion est rattach\u00e9 \u00e0 un Team Leader. L'\u00e9quipement saisi ici permet de d\u00e9duire automatiquement le mat\u00e9riel d\u00e9j\u00e0 pr\u00e9sent dans le camion lors d'une appro.</p>";
   h+=loanedSummaryHTML();
+  h+=_truckSearchBar();
   h+=trucksSimpleView();
   h+=truckBaseBar();
   h+="<div style=\"display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px\"><button onclick=\"downloadTruckTemplate()\" style=\"background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-file-download\"></i> Mod\u00e8le Excel</button><button onclick=\"pickExcel(importTrucksExcel)\" style=\"background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-file-import\"></i> Importer un Excel</button><button onclick=\"exportTrucksExcel()\" style=\"background:#fff;border:1px solid #E2E8F0;color:#64748B;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-download\"></i> Exporter</button></div>";
@@ -3005,6 +3048,7 @@ function renderTrucksSettings(){
   }
 
   TRUCKS.forEach(function(t,ti){
+    if(!_truckMatch(t))return;
     var _TT=["Camionnette","Trafic","Master"];
     var tsel="<select onchange=\"setTruckType("+ti+",this.value)\" style=\"font-size:11px;padding:3px 7px;border:1px solid #FDE68A;border-radius:6px;background:#fff;color:#854D0E;font-family:inherit;cursor:pointer\"><option value=\"\">Type\u2026</option>"+_TT.map(function(x){return "<option value=\""+x+"\""+(t.type===x?" selected":"")+">"+x+"</option>";}).join("")+"</select>";
     h+="<div style=\"border:1px solid #E2E8F0;border-radius:11px;margin-bottom:12px;overflow:hidden\">";
@@ -3040,6 +3084,9 @@ function _truckStateCompact(t,ti){
   return "<button onclick=\"setTruckEtat("+ti+",'depot')\" title=\"Au d\u00e9p\u00f4t\" style=\"padding:4px 7px;border-radius:6px;cursor:pointer;border:1px solid "+(d?"#1D4ED8":"#E2E8F0")+";background:"+(d?"#1D4ED8":"#fff")+";color:"+(d?"#fff":"#64748B")+"\"><i class=\"ti ti-building-warehouse\" style=\"font-size:13px\"></i></button> <button onclick=\"setTruckEtat("+ti+",'revision')\" title=\"En r\u00e9vision\" style=\"padding:4px 7px;border-radius:6px;cursor:pointer;border:1px solid "+(r?"#B91C1C":"#E2E8F0")+";background:"+(r?"#B91C1C":"#fff")+";color:"+(r?"#fff":"#64748B")+"\"><i class=\"ti ti-tool\" style=\"font-size:13px\"></i></button>";
 }
 function setTruckTl(ti,v){var t=TRUCKS[ti];if(!t)return;v=(v||"").trim();if(!v)return;t.tl=v;saveTrucks(function(){renderTrucksSettings();});}
+function _truckMatch(t){var q=_stripAccents((window._truckSearch||"").toLowerCase().trim());if(!q)return true;return _stripAccents(((t.tl||"")+" "+(t.plaque||"")+" "+(t.type||"")).toLowerCase()).indexOf(q)>=0;}
+function _truckSearchBar(){return "<div style=\"position:relative;margin-bottom:14px\"><i class=\"ti ti-search\" style=\"position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:15px\"></i><input id=\"truck-search\" value=\""+esc(window._truckSearch||"")+"\" oninput=\"setTruckSearch(this.value)\" placeholder=\"Rechercher un camion (nom, plaque, type)...\" style=\"width:100%;box-sizing:border-box;padding:9px 12px 9px 33px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;font-family:inherit\"/></div>";}
+function setTruckSearch(v){window._truckSearch=v;renderTrucksSettings();setTimeout(function(){var e=document.getElementById("truck-search");if(e){e.focus();try{e.setSelectionRange(e.value.length,e.value.length);}catch(x){}}},0);}
 function trucksSimpleView(){
   if(!TRUCKS.length)return "";
   var names=_allAssignNames();
@@ -3048,6 +3095,7 @@ function trucksSimpleView(){
   h+="<div style=\"overflow-x:auto\"><table style=\"width:100%;border-collapse:collapse;font-size:13px\">";
   h+="<thead><tr style=\"background:#FFFDF5;color:#854D0E\"><th style=\"text-align:left;padding:8px 8px\">Titulaire</th><th style=\"text-align:left;padding:8px 8px\">Type</th><th style=\"text-align:left;padding:8px 8px\">Plaque</th><th style=\"text-align:left;padding:8px 8px\">\u00c9tat</th><th style=\"text-align:left;padding:8px 8px\">Attribu\u00e9 \u00e0 / pr\u00eat</th></tr></thead><tbody>";
   TRUCKS.forEach(function(t,ti){
+    if(!_truckMatch(t))return;
     var loaned=t.pret&&t.pret.to;var holder=loaned?t.pret.to:t.tl;
     var topts="<option value=\"\">Type\u2026</option>";_TT.forEach(function(x){topts+="<option value=\""+x+"\""+(t.type===x?" selected":"")+">"+x+"</option>";});
     h+="<tr style=\"border-top:1px solid #F1F5F9\">";
@@ -4482,30 +4530,55 @@ function renderAdmin(){
       h+="</div>";
     }
     h+="</div>";
-    // USERS
-    h+="<div><div class=\"adm-sec-t\">Utilisateurs ("+users.length+")</div><div style=\"display:flex;flex-direction:column;gap:8px\">";
-    users.forEach(function(u){
+    // USERS (tri alphabétique + recherche + filtres par rôle)
+    users.sort(function(a,b){return (a.name||"").localeCompare(b.name||"");});
+    window._admUsers=users;
+    h+="<div><div class=\"adm-sec-t\">Utilisateurs ("+users.length+")</div>";
+    h+="<input id=\"adm-user-search\" placeholder=\"Rechercher un nom, identifiant, email...\" oninput=\"_admRenderUsers()\" style=\"width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;font-family:inherit;margin-bottom:8px\"/>";
+    h+="<div id=\"adm-role-filters\" style=\"display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px\">"+_admRoleFilterBtns()+"</div>";
+    h+="<div id=\"adm-users-list\" style=\"display:flex;flex-direction:column;gap:8px\"></div>";
+    h+="</div>";
+    body.innerHTML=h;
+    _admRenderUsers();
+  }).catch(function(e){body.innerHTML="<div style=\"color:#DC2626;padding:20px\">Erreur: "+e.message+"</div>";});
+}
+var _admRole="";
+function _admRoleFilterBtns(){
+  var roles=[["","Tous"],["admin","Admin"],["conducteur","Conducteur"],["depot","Chef d\u00e9p\u00f4t"],["team_leader","Team Leader"],["technicien","Technicien"]];
+  return roles.map(function(r){var on=_admRole===r[0];return "<button onclick=\"_admSetRole('"+r[0]+"')\" style=\"font-size:12px;padding:5px 11px;border-radius:20px;cursor:pointer;font-family:inherit;font-weight:600;border:1px solid "+(on?"#6D28D9":"#E2E8F0")+";background:"+(on?"#6D28D9":"#fff")+";color:"+(on?"#fff":"#64748B")+"\">"+r[1]+"</button>";}).join("");
+}
+function _admSetRole(r){_admRole=r;var fb=document.getElementById("adm-role-filters");if(fb)fb.innerHTML=_admRoleFilterBtns();_admRenderUsers();}
+function _admUserRowHTML(u){
+  var rw="";
       var ri=ROLE_INFO[u.role]||ROLE_INFO.conducteur;
       var ini=u.name.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();
       var isSelf=currentUser&&u.id===currentUser.id;
       var emailLine=u.email
         ? "<span style=\"color:#64748B\"><i class=\"ti ti-mail\" style=\"font-size:11px\"></i> "+esc(u.email)+"</span>"
         : "<span style=\"color:#C2410C;font-weight:600\"><i class=\"ti ti-mail-off\" style=\"font-size:11px\"></i> email manquant</span>";
-      h+="<div class=\"user-row2\">";
-      h+="<div class=\"uav\" style=\"background:"+ri.bg+";color:"+ri.color+"\">"+ini+"</div>";
-      h+="<div style=\"flex:1;min-width:0\">";
-      h+="<div style=\"font-size:13px;font-weight:600;color:#0F172A\">"+esc(u.name)+(isSelf?" (vous)":"")+"</div>";
-      h+="<div style=\"font-size:11px;color:#64748B\">@"+esc(u.username)+" \u00b7 <span style=\"color:"+ri.color+";font-weight:600\">"+ri.label+"</span></div>";
-      h+="<div style=\"font-size:11px;margin-top:2px\">"+emailLine+"</div>";
-      h+="</div>";
-      h+="<button onclick=\"admSetEmail('"+u.id+"','"+esc(u.email||"")+"')\" title=\"Modifier l'email\" style=\"background:none;border:1px solid #E2E8F0;border-radius:6px;padding:4px 9px;cursor:pointer;color:#64748B;font-family:inherit;font-size:12px\"><i class=\"ti ti-mail-cog\"></i></button>";
-      h+="<button onclick=\"admResetPwd('"+u.id+"')\" title=\"R\u00e9initialiser le mot de passe\" style=\"background:none;border:1px solid #E2E8F0;border-radius:6px;padding:4px 9px;cursor:pointer;color:#64748B;font-family:inherit;font-size:12px\"><i class=\"ti ti-key\"></i></button>";
-      if(!isSelf)h+="<button onclick=\"admDelUser('"+u.id+"')\" title=\"Supprimer\" style=\"background:none;border:1px solid #FECACA;border-radius:6px;padding:4px 9px;cursor:pointer;color:#DC2626;font-family:inherit;font-size:12px\"><i class=\"ti ti-trash\"></i></button>";
-      h+="</div>";
-    });
-    h+="</div></div>";
-    body.innerHTML=h;
-  }).catch(function(e){body.innerHTML="<div style=\"color:#DC2626;padding:20px\">Erreur: "+e.message+"</div>";});
+      rw+="<div class=\"user-row2\">";
+      rw+="<div class=\"uav\" style=\"background:"+ri.bg+";color:"+ri.color+"\">"+ini+"</div>";
+      rw+="<div style=\"flex:1;min-width:0\">";
+      rw+="<div style=\"font-size:13px;font-weight:600;color:#0F172A\">"+esc(u.name)+(isSelf?" (vous)":"")+"</div>";
+      rw+="<div style=\"font-size:11px;color:#64748B\">@"+esc(u.username)+" \u00b7 <span style=\"color:"+ri.color+";font-weight:600\">"+ri.label+"</span></div>";
+      rw+="<div style=\"font-size:11px;margin-top:2px\">"+emailLine+"</div>";
+      rw+="</div>";
+      rw+="<button onclick=\"admSetEmail('"+u.id+"','"+esc(u.email||"")+"')\" title=\"Modifier l'email\" style=\"background:none;border:1px solid #E2E8F0;border-radius:6px;padding:4px 9px;cursor:pointer;color:#64748B;font-family:inherit;font-size:12px\"><i class=\"ti ti-mail-cog\"></i></button>";
+      rw+="<button onclick=\"admResetPwd('"+u.id+"')\" title=\"R\u00e9initialiser le mot de passe\" style=\"background:none;border:1px solid #E2E8F0;border-radius:6px;padding:4px 9px;cursor:pointer;color:#64748B;font-family:inherit;font-size:12px\"><i class=\"ti ti-key\"></i></button>";
+      if(!isSelf)rw+="<button onclick=\"admDelUser('"+u.id+"')\" title=\"Supprimer\" style=\"background:none;border:1px solid #FECACA;border-radius:6px;padding:4px 9px;cursor:pointer;color:#DC2626;font-family:inherit;font-size:12px\"><i class=\"ti ti-trash\"></i></button>";
+      rw+="</div>";
+  return rw;
+}
+function _admRenderUsers(){
+  var box=document.getElementById("adm-users-list");if(!box)return;
+  var q=_stripAccents(((document.getElementById("adm-user-search")||{}).value||"").toLowerCase().trim());
+  var list=(window._admUsers||[]).filter(function(u){
+    if(_admRole&&u.role!==_admRole)return false;
+    if(!q)return true;
+    return _stripAccents(((u.name||"")+" "+(u.username||"")+" "+(u.email||"")).toLowerCase()).indexOf(q)>=0;
+  });
+  if(!list.length){box.innerHTML="<div style=\"color:#94A3B8;font-size:13px;padding:12px;text-align:center\">Aucun compte trouv\u00e9</div>";return;}
+  box.innerHTML=list.map(_admUserRowHTML).join("");
 }
 function genCode(role){
   apiCall("POST","/invites",{role:role}).then(function(r){
