@@ -170,6 +170,14 @@ table.at th{padding:8px 10px;font-size:11px;text-transform:uppercase;letter-spac
 table.at tr.tr{border-bottom:1px solid #F1F5F9}
 table.at tr.tr:last-child{border-bottom:none}
 table.at td{padding:0}
+table.at tr.kit-hd td{padding:0;border:none;background:none}
+table.at tr.kit-hd td::before{display:none}
+table.at tr.kit-row td.td-d{position:relative}
+@media(max-width:768px){
+  .at tr.kit-hd{display:block!important;width:100%;margin:2px 0 -4px;padding:0!important;border:none!important;box-shadow:none!important;background:none!important;border-radius:0!important}
+  .at tr.kit-hd td{display:block;width:100%}
+  .at tr.kit-hd td .kit-band{border-radius:10px 10px 0 0}
+}
 .cin{width:100%;background:none;border:none;padding:8px 10px;font-size:13px;color:#1E293B;font-family:inherit;outline:none}
 .cin::placeholder{color:#CBD5E1}
 .csel{width:100%;background:none;border:none;padding:8px 10px;font-size:13px;color:#1E293B;font-family:inherit;outline:none;cursor:pointer}
@@ -1805,9 +1813,20 @@ function clearTruckDeduction(){
   cur.truckApplied=false;saved=false;renderForm();
   toast("D\u00e9duction annul\u00e9e","ti-rotate");
 }
+var KIT_PAL=[
+  {spine:"#7C3AED",tint:"#FAF5FF",band:"#F3E8FF",text:"#6D28D9"},
+  {spine:"#0D9488",tint:"#F0FDFA",band:"#CCFBF1",text:"#0F766E"},
+  {spine:"#2563EB",tint:"#EFF6FF",band:"#DBEAFE",text:"#1D4ED8"},
+  {spine:"#DB2777",tint:"#FDF2F8",band:"#FCE7F3",text:"#BE185D"},
+  {spine:"#16A34A",tint:"#F0FDF4",band:"#DCFCE7",text:"#15803D"},
+  {spine:"#EA580C",tint:"#FFF7ED",band:"#FFEDD5",text:"#C2410C"}
+];
+function _kitStyle(kit){var s=0;kit=String(kit||"");for(var i=0;i<kit.length;i++)s=(s+kit.charCodeAt(i))%99991;return KIT_PAL[s%KIT_PAL.length];}
 function tblH(sec,secColor){
   secColor=secColor||"#E2E8F0";
   var rows=cur[sec], html="";
+  var kitRun={};
+  (function(){var i=0;while(i<rows.length){var k=rows[i].kit||null;if(k){var j=i;while(j<rows.length&&(rows[j].kit||null)===k)j++;kitRun[i]=j-i;i=j;}else i++;}})();
   rows.forEach(function(r,i){
     var ai=r.addBatch?(cur.additionDates||[]).indexOf(r.addBatch):-1;
     var ac=ai>=0?AP[ai%AP.length]:null;
@@ -1817,6 +1836,11 @@ function tblH(sec,secColor){
     var retCol=isR?"#EF4444":(isRTL?"#EA580C":"");
     var bg=isR?"#FFF5F5":(isRTL?"#FFF7ED":(isDep?DEPOT_C.bg:(ac?ac.bg:"")));
     var lb=retCol?("3px solid "+retCol):(isDep?"3px solid "+DEPOT_C.left:(ac?"3px solid "+ac.left:"none"));
+    var isKit=!!r.kit;var ks=isKit?_kitStyle(r.kit):null;
+    if(isKit&&!bg)bg=ks.tint;
+    var dLeft=(lb!=="none")?lb:(isKit?("3px solid "+ks.spine):"none");
+    var trSec=(isKit&&lb==="none")?ks.spine:secColor;
+    if(isKit&&kitRun[i]){var _kc=kitRun[i];html+="<tr class=\"kit-hd\"><td colspan=\"7\"><div class=\"kit-band\" style=\"display:flex;align-items:center;gap:8px;margin:14px 0 0;padding:8px 12px;background:"+ks.band+";border:1px solid "+ks.spine+"33;border-left:3px solid "+ks.spine+";border-radius:9px 9px 0 0;font-weight:700;font-size:12px;color:"+ks.text+"\"><i class=\"ti ti-package\" style=\"font-size:15px\"></i><span>"+esc(r.kit)+"</span><span style=\"margin-left:auto;font-weight:600;font-size:10px;background:"+ks.spine+";color:#fff;padding:1px 8px;border-radius:20px\">"+_kc+" article"+(_kc>1?"s":"")+"</span></div></td></tr>";}
     var st=retCol?("text-decoration:line-through;color:"+retCol+";"):"";
     var hasCmt=!!(r.commentaire&&r.commentaire.trim());
     var dOpts="<option value=\"\">-</option>";
@@ -1824,13 +1848,13 @@ function tblH(sec,secColor){
       dOpts+="<option value=\""+d+"\""+(r.disponibilite===d?" selected":"")+">"+d+"</option>";
     });
     var row="";
-    row+="<tr class=\"tr\" id=\"tr_"+sec+"_"+i+"\" style=\"background:"+bg+";--sec:"+secColor+"\">";
-    row+="<td data-label=\"D&#233;signation\" class=\"td-d\" style=\"border-left:"+lb+"\">";
+    row+="<tr class=\"tr"+(isKit?" kit-row":"")+"\" id=\"tr_"+sec+"_"+i+"\" style=\"background:"+bg+";--sec:"+trSec+"\">";
+    row+="<td data-label=\"D&#233;signation\" class=\"td-d\" style=\"border-left:"+dLeft+"\">";
     row+="<input class=\"cin cin-d\" value=\""+esc(r.designation)+"\"";
     row+=" placeholder=\"D&#233;signation...\"";
     row+=" list=\"cat-datalist\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'designation',this.value)\"";
-    row+=" style=\""+st+"\"/>"+(r.truckQ?"<div style=\"font-size:10px;color:#A16207;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px\"><i class=\"ti ti-truck\" style=\"font-size:11px\"></i> "+r.truckQ+" d\u00e9j\u00e0 dans le camion"+(_qtyNum(r.quantite)>r.truckQ?" \u00b7 "+(_qtyNum(r.quantite)-r.truckQ)+" \u00e0 pr\u00e9parer":" \u00b7 rien \u00e0 pr\u00e9parer")+"</div>":"")+_kitBadge(r)+_cmdRowBadge(r)+"</td>";
+    row+=" style=\""+st+"\"/>"+(r.truckQ?"<div style=\"font-size:10px;color:#A16207;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px\"><i class=\"ti ti-truck\" style=\"font-size:11px\"></i> "+r.truckQ+" d\u00e9j\u00e0 dans le camion"+(_qtyNum(r.quantite)>r.truckQ?" \u00b7 "+(_qtyNum(r.quantite)-r.truckQ)+" \u00e0 pr\u00e9parer":" \u00b7 rien \u00e0 pr\u00e9parer")+"</div>":"")+_cmdRowBadge(r)+"</td>";
     row+="<td data-label=\"Qt&#233;\" class=\"td-q\"><input class=\"cin\" value=\""+esc(r.quantite)+"\"";
     row+=" placeholder=\"0\" style=\"text-align:center;"+st+"\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'quantite',this.value)\"/></td>";
@@ -2308,7 +2332,8 @@ function buildPZ(s){
   var pTag=prioBadge(s.priorite||"normale");var _pr=PRIO[s.priorite||"normale"];var prioFlag="<div style=\"background:"+_pr.color+";color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 2px 6px "+_pr.color+"55\"><span style=\"font-size:15px\">&#9873;</span>"+_pr.label+"</div>";var dRow=(s.dateAppro||s.dateChantier)?"<div class=\"pz-bt\">Planning</div><div class=\"pz-dates\"><div class=\"pz-fi\"><label>&#128197; Date limite d&#39;appro</label><span style=\"color:#C2410C\">"+(s.dateAppro?fd(s.dateAppro):"Non d&#233;finie")+"</span></div><div class=\"pz-fi\"><label>&#127959; D&#233;but de chantier</label><span style=\"color:#1D4ED8\">"+(s.dateChantier?fd(s.dateChantier):"Non d&#233;fini")+"</span></div></div>":"";
   var legH=dates.length?"<div style=\"margin-bottom:8px;padding:6px 10px;border:1px solid #E2E8F0;border-radius:6px;font-size:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap\"><strong>L&#233;gende :</strong>"+dates.map(function(d,i){var c=AP[i%AP.length];return"<span style=\"display:inline-flex;align-items:center;gap:4px\"><span style=\"display:inline-block;width:10px;height:10px;background:"+c.bg+";border:1px solid "+c.left+";border-radius:2px\"></span> Ajout "+fdB(d)+" ("+c.label+")</span>";}).join("")+"<span style=\"display:inline-flex;align-items:center;gap:4px\"><span style=\"display:inline-block;width:10px;height:10px;background:#FEE2E2;border:1px solid #FECACA;border-radius:2px\"></span> Retourn&#233; d&#233;p&#244;t</span></div>":"";
   var obsH=s.observation?"<div class=\"pz-sec\"><div class=\"pz-sec-t\">Observation</div><div class=\"pz-obs\">"+esc(s.observation)+"</div></div>":"";
-  var _qr=s._id?qrDataURL(window.location.origin+"/?appro="+s._id):"";var _qrB=_qr?"<img src=\""+_qr+"\" style=\"width:82px;height:82px;background:#fff;border-radius:8px;padding:3px\" alt=\"QR\"/>":"";return "<div class=\"pz-hd\"><div class=\"pz-hd-l\"><img src=\"data:image/png;base64,"+LB64+"\" alt=\"JARNIAS\"/>"+_qrB+"</div><div class=\"pz-hd-c\"><div class=\"pz-hd-title\">Feuille d&#39;approvisionnement</div><div class=\"pz-hd-sub\">"+(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.tagline?esc(CONFIG.tagline):"Les experts de la hauteur")+"</div><div style=\"margin-top:5px;display:flex;gap:5px;justify-content:center;flex-wrap:wrap\">"+tTag+"</div></div><div class=\"pz-hd-flag\">"+prioFlag+"</div></div><div class=\"pz-ref\"><div class=\"pz-ri\"><div class=\"pz-rl\">R&#233;f&#233;rence</div><div class=\"pz-rv\">"+esc(s.reference)+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Cr&#233;&#233; le</div><div class=\"pz-rv\">"+s.dateCreation+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Mis &#224; jour</div><div class=\"pz-rv\">"+s.dateMiseAJour+"</div></div></div><div class=\"pz-bt\">Informations chantier</div><div class=\"pz-info\"><div class=\"pz-fi\"><label>N&#176; Affaire</label><span>"+(esc(s.noAffaire)||"—")+"</span></div><div class=\"pz-fi\"><label>Charg&#233; d&#39;affaires</label><span>"+(esc(s.chargeAffaires)||"—")+"</span></div><div class=\"pz-fi\" style=\"grid-column:1/-1\"><label>Nom du chantier</label><span>"+(esc(s.nomChantier)||"—")+"</span></div>"+(s.conducteur?"<div class=\"pz-fi\"><label>Conducteur de travaux</label><span>"+esc(s.conducteur)+"</span></div>":"")+(s.clientSite?"<div class=\"pz-fi\"><label>Client / Site</label><span>"+esc(s.clientSite)+"</span></div>":"")+(s.adresseChantier?"<div class=\"pz-fi\" style=\"grid-column:1/-1\"><label>Adresse du chantier</label><span style=\"white-space:pre-wrap\">"+esc(s.adresseChantier)+"</span></div>":"")+(s.coordClient?"<div class=\"pz-fi\"><label>Coordonn&#233;es client</label><span style=\"white-space:pre-wrap\">"+esc(s.coordClient)+"</span></div>":"")+"</div>"+dRow+legH+secH+obsH+"<div class=\"pz-foot\"><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Charg&#233; d&#39;affaires</label></div><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Visa client</label></div></div>";
+  var camH=s.camionSujet?"<div style=\"margin-bottom:10px;border:1px solid #FCA5A5;background:#FEF2F2;border-radius:8px;padding:9px 13px;font-size:11px;color:#B91C1C;display:flex;align-items:center;gap:8px\"><span style=\"font-size:15px\">&#9888;</span><span><b>Sujet camion</b> &#8212; "+(s.camionSujetNote?esc(s.camionSujetNote):"le technicien en charge n'a peut-\u00eatre pas de camion, solution \u00e0 trouver.")+"</span></div>":"";
+  var _qr=s._id?qrDataURL(window.location.origin+"/?appro="+s._id):"";var _qrB=_qr?"<img src=\""+_qr+"\" style=\"width:82px;height:82px;background:#fff;border-radius:8px;padding:3px\" alt=\"QR\"/>":"";return "<div class=\"pz-hd\"><div class=\"pz-hd-l\"><img src=\"data:image/png;base64,"+LB64+"\" alt=\"JARNIAS\"/>"+_qrB+"</div><div class=\"pz-hd-c\"><div class=\"pz-hd-title\">Feuille d&#39;approvisionnement</div><div class=\"pz-hd-sub\">"+(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.tagline?esc(CONFIG.tagline):"Les experts de la hauteur")+"</div><div style=\"margin-top:5px;display:flex;gap:5px;justify-content:center;flex-wrap:wrap\">"+tTag+"</div></div><div class=\"pz-hd-flag\">"+prioFlag+"</div></div><div class=\"pz-ref\"><div class=\"pz-ri\"><div class=\"pz-rl\">R&#233;f&#233;rence</div><div class=\"pz-rv\">"+esc(s.reference)+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Cr&#233;&#233; le</div><div class=\"pz-rv\">"+s.dateCreation+"</div></div><div class=\"pz-ri\"><div class=\"pz-rl\">Mis &#224; jour</div><div class=\"pz-rv\">"+s.dateMiseAJour+"</div></div></div><div class=\"pz-bt\">Informations chantier</div><div class=\"pz-info\"><div class=\"pz-fi\"><label>N&#176; Affaire</label><span>"+(esc(s.noAffaire)||"—")+"</span></div><div class=\"pz-fi\"><label>Charg&#233; d&#39;affaires</label><span>"+(esc(s.chargeAffaires)||"—")+"</span></div><div class=\"pz-fi\" style=\"grid-column:1/-1\"><label>Nom du chantier</label><span>"+(esc(s.nomChantier)||"—")+"</span></div>"+(s.tlCamion?"<div class=\"pz-fi\"><label>Team Leader / Camion</label><span>"+esc(s.tlCamion)+"</span></div>":"")+(s.conducteur?"<div class=\"pz-fi\"><label>Conducteur de travaux</label><span>"+esc(s.conducteur)+"</span></div>":"")+(s.clientSite?"<div class=\"pz-fi\"><label>Client / Site</label><span>"+esc(s.clientSite)+"</span></div>":"")+(s.adresseChantier?"<div class=\"pz-fi\" style=\"grid-column:1/-1\"><label>Adresse du chantier</label><span style=\"white-space:pre-wrap\">"+esc(s.adresseChantier)+"</span></div>":"")+(s.coordClient?"<div class=\"pz-fi\"><label>Coordonn&#233;es client</label><span style=\"white-space:pre-wrap\">"+esc(s.coordClient)+"</span></div>":"")+"</div>"+camH+dRow+legH+secH+obsH+"<div class=\"pz-foot\"><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Charg&#233; d&#39;affaires</label></div><div class=\"pz-sign\"><div class=\"pz-sign-line\"></div><label>Visa client</label></div></div>";
 }
 function isLongAppro(s){
   var n=0;["consommables","fournitures","outillage"].forEach(function(k){(s[k]||[]).forEach(function(r){if(r.designation&&(""+r.designation).trim())n++;});});
@@ -3212,7 +3237,7 @@ function trucksSimpleView(){
   var _TT=["Camionnette","Trafic","Master"];
   var h="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-list-details\" style=\"color:#A16207\"></i> Vue d'ensemble \u2014 tout se modifie ici</div>";
   h+="<div style=\"overflow-x:auto\"><table style=\"width:100%;border-collapse:collapse;font-size:13px\">";
-  h+="<thead><tr style=\"background:#FFFDF5;color:#854D0E\"><th style=\"text-align:left;padding:8px 8px\">Titulaire</th><th style=\"text-align:left;padding:8px 8px\">Type</th><th style=\"text-align:left;padding:8px 8px\">Plaque</th><th style=\"text-align:left;padding:8px 8px\">\u00c9tat</th><th style=\"text-align:left;padding:8px 8px\">Attribu\u00e9 \u00e0 / pr\u00eat</th></tr></thead><tbody>";
+  h+="<thead><tr style=\"background:#FFFDF5;color:#854D0E\"><th style=\"text-align:left;padding:8px 8px\">Titulaire</th><th style=\"text-align:left;padding:8px 8px\">Type</th><th style=\"text-align:left;padding:8px 8px\">Plaque</th><th style=\"text-align:left;padding:8px 8px\">\u00c9tat</th><th style=\"text-align:left;padding:8px 8px\">R\u00e9vision</th><th style=\"text-align:left;padding:8px 8px\">Attribu\u00e9 \u00e0 / pr\u00eat</th></tr></thead><tbody>";
   TRUCKS.forEach(function(t,ti){
     if(!_truckMatch(t))return;
     var loaned=t.pret&&t.pret.to;var holder=loaned?t.pret.to:t.tl;
@@ -3222,6 +3247,8 @@ function trucksSimpleView(){
     h+="<td style=\"padding:6px 8px\"><select onchange=\"setTruckType("+ti+",this.value)\" style=\"font-size:12px;padding:5px 7px;border:1px solid #E2E8F0;border-radius:6px;font-family:inherit;cursor:pointer\">"+topts+"</select></td>";
     h+="<td style=\"padding:6px 8px\"><input value=\""+esc(t.plaque||"")+"\" onchange=\"setTruckPlaque("+ti+",this.value)\" placeholder=\"AB-123-CD\" style=\"width:104px;font-size:12px;padding:5px 7px;border:1px solid #E2E8F0;border-radius:6px;font-family:monospace;text-transform:uppercase\"/></td>";
     h+="<td style=\"padding:6px 8px;white-space:nowrap\">"+_truckStateCompact(t,ti)+"</td>";
+    var _rvs=_revStatus(t.nextRevision);
+    h+="<td style=\"padding:6px 8px;white-space:nowrap\"><button onclick=\"openTruckRevision("+ti+")\" title=\"Planifier / modifier la r\u00e9vision\" style=\"background:"+_rvs.bg+";color:"+_rvs.c+";border:1px solid "+_rvs.c+"44;border-radius:9px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px\"><i class=\"ti "+_rvs.ic+"\" style=\"font-size:13px\"></i> "+_rvs.label+"</button></td>";
     if(loaned){
       h+="<td style=\"padding:6px 8px;white-space:nowrap\"><span style=\"color:#C2410C;font-weight:600;font-size:12px\"><i class=\"ti ti-arrows-exchange\" style=\"font-size:12px\"></i> "+esc(holder)+"</span> <button onclick=\"endPret("+ti+")\" style=\"background:#15803D;color:#fff;border:none;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:4px\">R\u00e9cup\u00e9rer</button></td>";
     } else {
