@@ -61,7 +61,7 @@ html[data-amb="teinte"] .home-hero::before{inset:0;background:linear-gradient(11
 html[data-amb] .home-hero .amb-glass{background:rgba(255,255,255,.15);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-color:rgba(255,255,255,.18)}
 
 /* sélecteur d'ambiance (palette) */
-.amb-pop{position:absolute;top:46px;right:0;z-index:120;background:#fff;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 14px 40px rgba(15,23,42,.16);padding:12px;width:230px;animation:jCardIn .22s var(--ease)}
+.amb-pop{position:absolute;top:46px;left:0;z-index:1200;background:#fff;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 14px 40px rgba(15,23,42,.16);padding:12px;width:230px;animation:jCardIn .22s var(--ease)}
 html.dark .amb-pop{background:#1E293B}
 .amb-pop h4{font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px;padding:0 2px}
 .amb-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
@@ -70,7 +70,7 @@ html.dark .amb-pop{background:#1E293B}
 .amb-opt:active{transform:scale(.96)}
 .amb-opt.sel{border-color:#0F172A}
 html.dark .amb-opt.sel{border-color:#fff}
-.amb-opt.sel::after{content:"\\2713";position:absolute;top:5px;right:6px;font-size:12px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.amb-opt.sel::after{content:"\2713";position:absolute;top:5px;right:6px;font-size:12px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
 .amb-none{grid-column:span 2;height:38px;background:#F1F5F9;color:#475569;text-shadow:none;border:1px solid #E2E8F0}
 html.dark .amb-none{background:#0F172A;color:#CBD5E1}
 .amb-sw-aurore{background:linear-gradient(120deg,#6D28D9,#8B5CF6,#DB2777)}
@@ -343,6 +343,69 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
   .home-actions{grid-template-columns:1fr 1fr;gap:9px}
   .qa{padding:14px;border-radius:14px}
   .tbr-lbl{width:110px;font-size:12px}
+}
+
+/* ============================================================
+   TABLEAU DE BORD — refonte (cartes tonales, hero teinté, responsive)
+   ============================================================ */
+.dash-wrap{max-width:940px;margin:0 auto;padding:24px 20px 70px;width:100%}
+.dash-hero{position:relative;overflow:hidden;border-radius:18px;padding:22px 24px;margin-bottom:22px;background:linear-gradient(135deg,var(--accent,#0F172A),var(--accent-2,#1E293B));color:#fff}
+.dash-hero>*{position:relative;z-index:2}
+html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.14) 50%,transparent 80%);background-size:250% 100%;animation:ambSheen 9s ease-in-out infinite}
+.dash-hero-t{font-size:23px;font-weight:800;letter-spacing:-.5px}
+.dash-hero-s{font-size:13.5px;opacity:.85;margin-top:3px}
+.dash-sec-t{font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.7px;margin:22px 2px 12px;display:flex;align-items:center;gap:7px}
+.dash-sec-t i{font-size:15px;color:var(--accent,#6D28D9)}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px}
+.dstat{position:relative;overflow:hidden;background:#fff;border:1px solid #E8EDF4;border-radius:15px;padding:15px 16px;transition:transform .18s var(--ease),box-shadow .2s var(--ease),border-color .16s}
+.dstat-click{cursor:pointer}
+.dstat-click:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(15,23,42,.09);border-color:#DDE4EE}
+.dstat-click:active{transform:scale(.98)}
+.dstat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.dstat-ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.dstat-arw{color:#CBD5E1;font-size:17px;transition:transform .16s var(--ease)}
+.dstat-click:hover .dstat-arw{transform:translateX(3px)}
+.dstat-num{font-size:30px;font-weight:800;line-height:1;letter-spacing:-1px;color:#0F172A}
+.dstat-lbl{font-size:12px;color:#64748B;font-weight:600;margin-top:5px}
+/* tons */
+.tone-blue .dstat-ic{background:#EFF6FF;color:#2563EB}
+.tone-green .dstat-ic{background:#ECFDF5;color:#059669}
+.tone-cyan .dstat-ic{background:#ECFEFF;color:#0891B2}
+.tone-indigo .dstat-ic{background:#EEF2FF;color:#4F46E5}
+.tone-amber .dstat-ic{background:#FFFBEB;color:#D97706}
+.tone-orange .dstat-ic{background:#FFF7ED;color:#EA580C}
+.tone-red .dstat-ic{background:#FEF2F2;color:#DC2626}
+.tone-pink .dstat-ic{background:#FDF2F8;color:#DB2777}
+.tone-purple .dstat-ic{background:#F5F3FF;color:#7C3AED}
+.tone-slate .dstat-ic{background:#F1F5F9;color:#475569}
+.dash-panel{background:#fff;border:1px solid #E8EDF4;border-radius:15px;padding:18px 20px;margin-top:16px}
+.dash-panel-hd{display:flex;align-items:center;gap:9px;margin-bottom:15px}
+.dash-panel-hd i{font-size:18px;color:var(--accent,#6D28D9)}
+.dash-panel-hd h3{font-size:15px;font-weight:700;color:#0F172A}
+.dash-empty-in{font-size:13px;color:#64748B;padding:14px;background:#F8FAFC;border-radius:11px;display:flex;align-items:center;gap:8px}
+.dash-empty-in i{font-size:17px}
+.dash-loading{text-align:center;padding:44px;color:#94A3B8;font-size:14px}
+.dash-loading i{font-size:26px}
+.dash-due-list{display:flex;flex-direction:column;gap:8px}
+.dash-due{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid #E8EDF4;border-radius:12px;cursor:pointer;transition:transform .14s var(--ease),box-shadow .16s var(--ease),border-color .15s}
+.dash-due:hover{transform:translateX(2px);border-color:#DDE4EE;box-shadow:0 4px 14px rgba(15,23,42,.06)}
+.dash-due-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dash-due-n{font-size:14px;font-weight:700;color:#0F172A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-due-sub{font-size:11.5px;color:#94A3B8;margin-top:1px}
+.dash-due-badge{font-size:11px;font-weight:700;padding:4px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.dash-truck{display:flex;align-items:center;gap:12px;padding:4px 0}
+.dash-truck-ava{width:44px;height:44px;border-radius:12px;background:color-mix(in srgb,var(--accent,#6D28D9) 12%,transparent);color:var(--accent,#6D28D9);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dash-truck-ava i{font-size:22px}
+.dash-truck-n{font-size:15px;font-weight:700;color:#0F172A}
+.dash-truck-s{font-size:12px;color:#94A3B8;margin-top:1px}
+.dash-truck-badge{font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:20px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
+.dash-alert{margin-top:12px;font-size:12.5px;color:#9A3412;background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px}
+@media(max-width:640px){
+  .dash-wrap{padding:18px 13px 90px}
+  .dash-hero-t{font-size:20px}
+  .dash-grid{grid-template-columns:1fr 1fr;gap:9px}
+  .dstat{padding:13px 14px;border-radius:13px}
+  .dstat-num{font-size:26px}
 }
 
 /* anciennes classes conservées pour compat (autres écrans) */
@@ -5071,46 +5134,185 @@ function dashLiveKPIs(){
   var pretes=(typeof TRUCKS!=="undefined")?TRUCKS.filter(function(t){return t.pret&&t.pret.to;}).length:0;
   var urgent=cnt(function(s){return !s.draft&&s.statut!=="sortie"&&(s.priorite==="urgente"||s.priorite==="tres_urgente");});
   var brouillons=cnt(function(s){return s.draft;});
-  function card(val,label,color,bg,ic,action){
-    return "<div onclick=\""+action+"\" style=\"cursor:pointer;background:"+bg+";border:1px solid "+color+"33;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:3px\" onmouseover=\"this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(0,0,0,.08)'\" onmouseout=\"this.style.transform='none';this.style.boxShadow='none'\"><div style=\"display:flex;align-items:center;justify-content:space-between\"><span style=\"font-size:26px;font-weight:800;color:"+color+"\">"+val+"</span><i class=\"ti "+ic+"\" style=\"font-size:20px;color:"+color+";opacity:.6\"></i></div><div style=\"font-size:12px;color:#64748B;font-weight:600\">"+label+"</div></div>";
-  }
-  var h="<h3 style=\"margin:0 0 12px;font-size:15px;color:#0F172A;display:flex;align-items:center;gap:7px\"><i class=\"ti ti-bolt\" style=\"color:#D97706\"></i> \u00c0 traiter maintenant</h3>";
-  h+="<div style=\"display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:24px\">";
-  h+=card(aPreparer,"\u00c0 pr\u00e9parer","#1D4ED8","#EFF6FF","ti-clipboard-list","renderDepot()");
-  h+=card(rendus,"Rendus \u00e0 traiter","#0891B2","#ECFEFF","ti-package-import","renderDepot()");
-  h+=card(surCh,"Sur chantier","#15803D","#F0FDF4","ti-tools","renderDepot()");
-  h+=card(cmd,"Commandes en attente","#B45309","#FFFBEB","ti-truck-delivery","renderCommandes()");
-  h+=card(tick,"Demandes d\u00e9p\u00f4t","#BE123C","#FFF1F2","ti-ticket","renderTickets()");
-  h+=card(pretes,"Camions pr\u00eat\u00e9s","#C2410C","#FFF7ED","ti-arrows-exchange","renderTrucksSettings()");
-  h+=card(urgent,"Priorit\u00e9 urgente","#B91C1C","#FEF2F2","ti-flame","renderList()");
-  h+=card(brouillons,"Brouillons","#6D28D9","#F5F3FF","ti-file-pencil","window._draftView=true;renderList()");
+  var h="<div class=\"dash-sec-t\"><i class=\"ti ti-bolt\"></i> \u00c0 traiter maintenant</div>";
+  h+="<div class=\"dash-grid stagger\">";
+  h+=_dashStat(aPreparer,"\u00c0 pr\u00e9parer","ti-clipboard-list","blue","renderDepot()");
+  h+=_dashStat(rendus,"Rendus \u00e0 traiter","ti-package-import","cyan","renderDepot()");
+  h+=_dashStat(surCh,"Sur chantier","ti-tools","green","renderDepot()");
+  h+=_dashStat(cmd,"Commandes en attente","ti-truck-delivery","amber","renderCommandes()");
+  h+=_dashStat(tick,"Demandes d\u00e9p\u00f4t","ti-ticket","pink","renderTickets()");
+  h+=_dashStat(pretes,"Camions pr\u00eat\u00e9s","ti-arrows-exchange","orange","renderTrucksSettings()");
+  h+=_dashStat(urgent,"Priorit\u00e9 urgente","ti-flame","red","renderList()");
+  h+=_dashStat(brouillons,"Brouillons","ti-file-pencil","purple","window._draftView=true;renderList()");
   h+="</div>";
   return h;
 }
 
+// ═══ TABLEAU DE BORD — vues spécifiques par rôle ═══
+function _dashHeader(title,sub){
+  return "<div class=\"dash-hero\"><div class=\"dash-hero-t\">"+esc(title)+"</div>"+(sub?"<div class=\"dash-hero-s\">"+esc(sub)+"</div>":"")+"</div>";
+}
+function _dashStat(val,label,ic,tone,action){
+  var click=action?(" onclick=\""+action+"\" role=\"button\" tabindex=\"0\""):"";
+  return "<div class=\"dstat liv"+(action?" dstat-click":"")+" tone-"+tone+"\""+click+"><div class=\"dstat-top\"><div class=\"dstat-ic\"><i class=\"ti "+ic+"\"></i></div>"+(action?"<i class=\"ti ti-chevron-right dstat-arw\"></i>":"")+"</div><div class=\"dstat-num\" data-count=\""+val+"\">0</div><div class=\"dstat-lbl\">"+esc(label)+"</div></div>";
+}
+function _sheetsMine(){
+  var S=(typeof sheets!=="undefined"&&sheets)?sheets:[];
+  if(!currentUser)return S;
+  var me=_stripAccents((currentUser.name||"").toLowerCase());
+  if(currentUser.role==="conducteur"&&me){
+    return S.filter(function(s){return _stripAccents(((s.conducteur||s.chargeAffaires)||"").toLowerCase())===me||s._createdBy===currentUser.id;});
+  }
+  return S;
+}
+function _dashDueSoon(list){
+  var out=[];
+  (list||[]).forEach(function(s){
+    if(s.draft||s.statut==="sortie"||!s.dateAppro)return;
+    var dd=_daysTo(s.dateAppro);
+    if(dd!==null&&dd<=7)out.push({s:s,dd:dd});
+  });
+  out.sort(function(a,b){return a.dd-b.dd;});
+  return out;
+}
 function renderDashboard(){try{setActiveNav('btn-dash');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   cur=null;currentTab="dashboard";
   var m=document.getElementById("main-area");
-  m.innerHTML="<div style=\"max-width:900px;margin:0 auto;padding:24px 20px\"><div style=\"text-align:center;padding:50px;color:#94A3B8\"><i class=\"ti ti-loader-2\" style=\"font-size:30px\"></i><div style=\"margin-top:10px\">Chargement des statistiques...</div></div></div>";
+  var role=(currentUser&&currentUser.role)||"conducteur";
+  var h="<div class=\"dash-wrap\">";
+  if(role==="depot"){h+=_dashDepot();}
+  else if(isField()){h+=_dashField();}
+  else if(role==="conducteur"){h+=_dashConducteur();}
+  else{h+="<div id=\"dash-admin-slot\">"+_dashHeader("Tableau de bord","Vue d'ensemble de l'activit\u00e9")+"<div class=\"dash-loading\"><i class=\"ti ti-loader-2\"></i> Chargement des statistiques\u2026</div></div>";}
+  h+="</div>";
+  m.innerHTML=h;
+  setTimeout(function(){animateCounters(m);animateBars(m);},240);
+  if(role!=="depot"&&!isField()&&role!=="conducteur"){_dashLoadAdmin();}
+}
+function _dashConducteur(){
+  var mine=_sheetsMine();
+  var actifs=mine.filter(function(s){return !s.draft&&s.statut!=="sortie";});
+  var brouillons=mine.filter(function(s){return s.draft;}).length;
+  var prete=actifs.filter(function(s){return s.statut==="prete";}).length;
+  var surCh=actifs.filter(function(s){return s.statut==="sur_chantier";}).length;
+  var rendu=actifs.filter(function(s){return s.statut==="rendu";}).length;
+  var attente=actifs.filter(function(s){return s.statut==="en_attente";}).length;
+  var urgent=actifs.filter(function(s){return s.priorite==="urgente"||s.priorite==="tres_urgente";}).length;
+  var due=_dashDueSoon(mine);
+  var prenom=(currentUser&&currentUser.name)?(" "+esc((""+currentUser.name).split(" ")[0])):"";
+  var h=_dashHeader("Mes chantiers"+prenom,"Suivi de vos approvisionnements en cours");
+  h+="<div class=\"dash-grid stagger\">";
+  h+=_dashStat(actifs.length,"Appros actives","ti-clipboard-list","blue","switchTab('mes')");
+  h+=_dashStat(attente,"En attente","ti-clock","amber","switchTab('mes')");
+  h+=_dashStat(prete,"Pr\u00eates au d\u00e9p\u00f4t","ti-package","green","switchTab('mes')");
+  h+=_dashStat(surCh,"Sur chantier","ti-tools","indigo","switchTab('mes')");
+  h+="</div>";
+  h+="<div class=\"dash-grid stagger\" style=\"margin-top:12px\">";
+  h+=_dashStat(rendu,"Rendues","ti-package-export","cyan","switchTab('mes')");
+  h+=_dashStat(urgent,"Urgentes","ti-flame","red","switchTab('mes')");
+  h+=_dashStat(brouillons,"Brouillons","ti-file-pencil","purple","window._draftView=true;switchTab('mes')");
+  h+=_dashStat(mine.length,"Total cr\u00e9\u00e9es","ti-folders","slate","switchTab('mes')");
+  h+="</div>";
+  // Échéances proches
+  h+="<div class=\"dash-panel\"><div class=\"dash-panel-hd\"><i class=\"ti ti-calendar-due\"></i><h3>\u00c9ch\u00e9ances proches</h3></div>";
+  if(!due.length){h+="<div class=\"dash-empty-in\"><i class=\"ti ti-circle-check\" style=\"color:#16A34A\"></i> Aucune \u00e9ch\u00e9ance dans les 7 jours. Tout est sous contr\u00f4le.</div>";}
+  else{h+="<div class=\"dash-due-list\">"+due.slice(0,6).map(function(o){
+    var late=o.dd<0,soon=o.dd<=2;
+    var col=late?"#B91C1C":(soon?"#C2410C":"#B45309");
+    var txt=late?("En retard de "+(-o.dd)+" j"):(o.dd===0?"Aujourd'hui":(o.dd===1?"Demain":"Dans "+o.dd+" j"));
+    return "<div class=\"dash-due liv\" onclick=\"openFromLib('"+o.s.id+"')\"><span class=\"dash-due-dot\" style=\"background:"+col+"\"></span><div style=\"flex:1;min-width:0\"><div class=\"dash-due-n\">"+esc(o.s.nomChantier||"Sans titre")+"</div><div class=\"dash-due-sub\">"+esc(o.s.reference||"")+(o.s.clientSite?" \u00b7 "+esc(o.s.clientSite):"")+"</div></div><span class=\"dash-due-badge\" style=\"color:"+col+";background:"+col+"18\">"+txt+"</span></div>";
+  }).join("")+"</div>";}
+  h+="</div>";
+  return h;
+}
+function _dashDepot(){
+  var S=(typeof sheets!=="undefined"&&sheets)?sheets:[];
+  function cnt(fn){return S.filter(fn).length;}
+  var aPreparer=cnt(function(s){return !s.draft&&(s.statut==="en_attente"||(s.statut==="prete"&&s.modifPrep)||(s.statut==="sur_chantier"&&s.addToPrepare));});
+  var prete=cnt(function(s){return !s.draft&&s.statut==="prete"&&!s.modifPrep;});
+  var surCh=cnt(function(s){return !s.draft&&s.statut==="sur_chantier";});
+  var rendus=cnt(function(s){return !s.draft&&s.statut==="rendu";});
+  var tick=(typeof ticketsPendingCount==="function")?ticketsPendingCount():0;
+  var cmd=(typeof COMMANDES!=="undefined")?COMMANDES.filter(function(c){return c.statut!=="recu";}).length:0;
+  var urgent=cnt(function(s){return !s.draft&&s.statut!=="sortie"&&(s.priorite==="urgente"||s.priorite==="tres_urgente");});
+  var TK=(typeof TRUCKS!=="undefined")?TRUCKS:[];
+  var pretes=TK.filter(function(t){return t.pret&&t.pret.to;}).length;
+  var enRev=TK.filter(function(t){return t.etat==="revision";}).length;
+  var revRetard=TK.filter(function(t){var dd=_daysTo(t.nextRevision);return dd!==null&&dd<0;}).length;
+  var h=_dashHeader("Poste de pilotage \u2014 D\u00e9p\u00f4t","Ce qu'il y a \u00e0 traiter aujourd'hui");
+  h+="<div class=\"dash-sec-t\"><i class=\"ti ti-bolt\"></i> \u00c0 traiter maintenant</div>";
+  h+="<div class=\"dash-grid stagger\">";
+  h+=_dashStat(aPreparer,"\u00c0 pr\u00e9parer","ti-clipboard-list","blue","renderDepot()");
+  h+=_dashStat(rendus,"Rendus \u00e0 contr\u00f4ler","ti-package-import","cyan","renderDepot()");
+  h+=_dashStat(prete,"Pr\u00eates","ti-package","green","renderDepot()");
+  h+=_dashStat(urgent,"Priorit\u00e9 urgente","ti-flame","red","renderList()");
+  h+="</div>";
+  h+="<div class=\"dash-sec-t\"><i class=\"ti ti-inbox\"></i> Demandes &amp; commandes</div>";
+  h+="<div class=\"dash-grid stagger\">";
+  h+=_dashStat(tick,"Demandes terrain","ti-ticket","pink","renderTickets()");
+  h+=_dashStat(cmd,"Commandes en attente","ti-truck-delivery","amber","renderCommandes()");
+  h+=_dashStat(surCh,"Sur chantier","ti-tools","indigo","renderDepot()");
+  h+="</div>";
+  h+="<div class=\"dash-sec-t\"><i class=\"ti ti-truck\"></i> Parc camions</div>";
+  h+="<div class=\"dash-grid stagger\">";
+  h+=_dashStat(TK.length,"Camions","ti-truck","slate","renderTrucksSettings()");
+  h+=_dashStat(pretes,"Pr\u00eat\u00e9s","ti-arrows-exchange","orange","renderTrucksSettings()");
+  h+=_dashStat(enRev,"En r\u00e9vision","ti-tool","red","renderTrucksSettings()");
+  h+=_dashStat(revRetard,"R\u00e9visions en retard","ti-alert-triangle","red","renderTrucksSettings()");
+  h+="</div>";
+  return h;
+}
+function _dashField(){
+  var S=(typeof sheets!=="undefined"&&sheets)?sheets:[];
+  var me=_stripAccents((currentUser&&currentUser.name||"").toLowerCase());
+  function mine(s){return _stripAccents((s.tlName||"").toLowerCase())===me||_stripAccents((s.conducteur||"").toLowerCase())===me;}
+  var aPrendre=S.filter(function(s){return !s.draft&&s.statut==="prete";}).length;
+  var surCh=S.filter(function(s){return !s.draft&&s.statut==="sur_chantier"&&mine(s);}).length;
+  var aRendre=S.filter(function(s){return !s.draft&&s.statut==="sur_chantier"&&mine(s);}).length;
+  var TK=(typeof TRUCKS!=="undefined")?TRUCKS:[];
+  var monCamion=null;TK.forEach(function(t){if(_stripAccents((t.tl||"").toLowerCase())===me)monCamion=t;});
+  var camionPrete=null;TK.forEach(function(t){if(t.pret&&_stripAccents((t.pret.to||"").toLowerCase())===me)camionPrete=t;});
+  var prenom=(currentUser&&currentUser.name)?(" "+esc((""+currentUser.name).split(" ")[0])):"";
+  var h=_dashHeader("Bonjour"+prenom,"Votre activit\u00e9 sur le terrain");
+  h+="<div class=\"dash-grid stagger\">";
+  h+=_dashStat(aPrendre,"Appros \u00e0 prendre","ti-package","green","switchTab('mes')");
+  h+=_dashStat(surCh,"Sur chantier","ti-tools","indigo","switchTab('mes')");
+  h+=_dashStat(aRendre,"\u00c0 rendre","ti-package-export","cyan","switchTab('mes')");
+  h+="</div>";
+  // Mon camion
+  h+="<div class=\"dash-panel\"><div class=\"dash-panel-hd\"><i class=\"ti ti-truck\"></i><h3>Mon camion</h3></div>";
+  if(monCamion){
+    var et=monCamion.etat==="revision"?{c:"#B91C1C",l:"En r\u00e9vision",i:"ti-tool"}:(monCamion.etat==="depot"?{c:"#1D4ED8",l:"Au d\u00e9p\u00f4t",i:"ti-building-warehouse"}:{c:"#15803D",l:"Disponible",i:"ti-circle-check"});
+    h+="<div class=\"dash-truck\"><div class=\"dash-truck-ava\"><i class=\"ti ti-truck\"></i></div><div style=\"flex:1;min-width:0\"><div class=\"dash-truck-n\">"+esc(monCamion.tl)+(monCamion.plaque?" \u00b7 "+esc(monCamion.plaque):"")+"</div><div class=\"dash-truck-s\">"+(monCamion.type?esc(monCamion.type):"Type non d\u00e9fini")+" \u00b7 "+((monCamion.items&&monCamion.items.length)||0)+" \u00e9quipement(s)</div></div><span class=\"dash-truck-badge\" style=\"color:"+et.c+";background:"+et.c+"18\"><i class=\"ti "+et.i+"\"></i> "+et.l+"</span></div>";
+    if(monCamion.etat==="revision")h+="<div class=\"dash-alert\"><i class=\"ti ti-alert-triangle\"></i> Votre camion est en r\u00e9vision"+(camionPrete?" \u2014 un autre camion vous a \u00e9t\u00e9 pr\u00eat\u00e9.":". Rapprochez-vous du d\u00e9p\u00f4t.")+"</div>";
+  } else if(camionPrete){
+    h+="<div class=\"dash-truck\"><div class=\"dash-truck-ava\" style=\"background:#FFF7ED;color:#C2410C\"><i class=\"ti ti-arrows-exchange\"></i></div><div style=\"flex:1\"><div class=\"dash-truck-n\">Camion pr\u00eat\u00e9 : "+esc(camionPrete.tl)+"</div><div class=\"dash-truck-s\">"+(camionPrete.plaque?esc(camionPrete.plaque):"")+"</div></div></div>";
+  } else {
+    h+="<div class=\"dash-empty-in\"><i class=\"ti ti-truck-off\"></i> Aucun camion ne vous est rattach\u00e9 pour le moment.</div>";
+  }
+  h+="</div>";
+  return h;
+}
+function _dashLoadAdmin(){
+  var m=document.getElementById("main-area");
   apiCall("GET","/stats").then(function(d){
     d=d||{};
-    var h="<div style=\"max-width:900px;margin:0 auto;padding:22px 18px\">";
-    h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:20px\"><i class=\"ti ti-chart-bar\" style=\"font-size:24px;color:#1D4ED8\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Tableau de bord</h2></div>";
-    // Cartes résumé
-    h+="<div style=\"display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap\">";
-    h+="<div style=\"flex:1;min-width:130px;background:#EFF6FF;border:1px solid #DBEAFE;border-radius:12px;padding:16px\"><div style=\"font-size:30px;font-weight:800;color:#1D4ED8\">"+(d.totalAppros||0)+"</div><div style=\"font-size:13px;color:#64748B;font-weight:600\">Appros au total</div></div>";
-    h+="<div style=\"flex:1;min-width:130px;background:#F0FDF4;border:1px solid #DCFCE7;border-radius:12px;padding:16px\"><div style=\"font-size:30px;font-weight:800;color:#15803D\">"+(d.totalArticles||0)+"</div><div style=\"font-size:13px;color:#64748B;font-weight:600\">Articles demand\u00e9s</div></div>";
+    var slot=document.getElementById("dash-admin-slot");if(!slot)return;
+    var h=_dashHeader("Tableau de bord","Vue d'ensemble de l'activit\u00e9");
+    h+="<div class=\"dash-grid stagger\">";
+    h+=_dashStat(d.totalAppros||0,"Appros au total","ti-clipboard-list","blue",null);
+    h+=_dashStat(d.totalArticles||0,"Articles demand\u00e9s","ti-package","green",null);
     h+="</div>";
     h+=dashLiveKPIs();
-    // 3 sections
-    h+="<div style=\"background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:18px;margin-bottom:16px\"><h3 style=\"margin:0 0 14px;font-size:15px;color:#0F172A;display:flex;align-items:center;gap:7px\"><i class=\"ti ti-users\" style=\"color:#1D4ED8\"></i> Activit\u00e9 par conducteur</h3>"+dashBars(d.byConductor,"#3B82F6","appros")+"</div>";
-    h+="<div style=\"background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:18px;margin-bottom:16px\"><h3 style=\"margin:0 0 14px;font-size:15px;color:#0F172A;display:flex;align-items:center;gap:7px\"><i class=\"ti ti-package\" style=\"color:#15803D\"></i> Mat\u00e9riel le plus demand\u00e9</h3>"+dashBars(d.topMaterials,"#22C55E","fois")+"</div>";
-    h+="<div style=\"background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:18px;margin-bottom:16px\"><h3 style=\"margin:0 0 14px;font-size:15px;color:#0F172A;display:flex;align-items:center;gap:7px\"><i class=\"ti ti-category\" style=\"color:#7C3AED\"></i> R\u00e9partition par type de chantier</h3>"+dashBars(d.byType,"#A855F7","appros")+"</div>";
-    h+="</div>";
-    m.innerHTML=h;
+    h+="<div class=\"dash-panel\"><div class=\"dash-panel-hd\"><i class=\"ti ti-users\"></i><h3>Activit\u00e9 par conducteur</h3></div><div style=\"padding:4px 2px\">"+dashBars(d.byConductor,"var(--accent,#3B82F6)","appros")+"</div></div>";
+    h+="<div class=\"dash-panel\"><div class=\"dash-panel-hd\"><i class=\"ti ti-package\"></i><h3>Mat\u00e9riel le plus demand\u00e9</h3></div><div style=\"padding:4px 2px\">"+dashBars(d.topMaterials,"#22C55E","fois")+"</div></div>";
+    h+="<div class=\"dash-panel\"><div class=\"dash-panel-hd\"><i class=\"ti ti-category\"></i><h3>R\u00e9partition par type de chantier</h3></div><div style=\"padding:4px 2px\">"+dashBars(d.byType,"#A855F7","appros")+"</div></div>";
+    slot.innerHTML=h;
+    setTimeout(function(){animateCounters(slot);animateBars(slot);},60);
   }).catch(function(e){
-    m.innerHTML="<div style=\"max-width:900px;margin:0 auto;padding:24px;text-align:center;color:#DC2626\">Erreur de chargement : "+esc(e.message||"")+"</div>";
+    var slot=document.getElementById("dash-admin-slot");
+    if(slot)slot.innerHTML="<div style=\"padding:24px;text-align:center;color:#DC2626\">Erreur de chargement : "+esc(e.message||"")+"</div>";
   });
 }
 // --- TYPES ---
