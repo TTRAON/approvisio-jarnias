@@ -19,7 +19,65 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 :root{
   --ease:cubic-bezier(.22,1,.36,1);      /* ease-out doux, par défaut */
   --spring:cubic-bezier(.34,1.56,.64,1); /* léger rebond, micro-réactions */
+  --accent:#0F172A;                       /* accent par défaut (sobre) */
+  --accent-2:#1E293B;
 }
+
+/* ============================================================
+   AMBIANCES DE COULEUR — choix par utilisateur (localStorage)
+   data-amb sur <html> : aurore | halo | maille | teinte | frais
+   Chaque ambiance = dégradé animé du hero + accent propagé.
+   ============================================================ */
+@keyframes ambAurora{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes ambHalo{0%,100%{transform:scale(1) translate(0,0);opacity:.92}50%{transform:scale(1.15) translate(-3%,2%);opacity:1}}
+@keyframes ambMesh{0%{transform:rotate(0) scale(1.15)}100%{transform:rotate(360deg) scale(1.15)}}
+@keyframes ambSheen{0%{background-position:120% 0}100%{background-position:-40% 0}}
+
+/* accent propagé selon l'ambiance */
+html[data-amb="aurore"]{--accent:#6D28D9;--accent-2:#DB2777}
+html[data-amb="halo"]{--accent:#5B21B6;--accent-2:#7C3AED}
+html[data-amb="maille"]{--accent:#6D28D9;--accent-2:#2563EB}
+html[data-amb="teinte"]{--accent:#4338CA;--accent-2:#6D28D9}
+html[data-amb="frais"]{--accent:#0F766E;--accent-2:#1D4ED8}
+
+/* le hero devient un bandeau coloré quand une ambiance est choisie */
+.home-hero{position:relative;overflow:hidden;transition:padding .2s var(--ease)}
+html[data-amb] .home-hero{border-radius:20px;padding:24px 26px;color:#fff;margin-bottom:22px}
+html[data-amb] .home-hero .home-hello{color:rgba(255,255,255,.92)}
+html[data-amb] .home-hero .home-title{color:#fff}
+html[data-amb] .home-hero .home-sub{color:rgba(255,255,255,.82)}
+html[data-amb] .home-hero>*{position:relative;z-index:2}
+/* la nappe animée */
+html[data-amb] .home-hero::before{content:"";position:absolute;z-index:1;pointer-events:none}
+html[data-amb="aurore"] .home-hero::before,html[data-amb="frais"] .home-hero::before{inset:0;background:linear-gradient(120deg,var(--accent),#8B5CF6,var(--accent-2),var(--accent));background-size:300% 300%;animation:ambAurora 15s ease infinite}
+html[data-amb="frais"] .home-hero::before{background:linear-gradient(120deg,#0F766E,#0891B2,#1D4ED8,#0F766E);background-size:300% 300%}
+html[data-amb="halo"] .home-hero{background:#3B1E70}
+html[data-amb="halo"] .home-hero::before{inset:0;background:radial-gradient(500px 300px at 12% 8%,rgba(219,39,119,.55),transparent 60%),radial-gradient(520px 320px at 100% 18%,rgba(124,58,237,.6),transparent 55%),radial-gradient(440px 300px at 60% 125%,rgba(59,130,246,.4),transparent 60%);animation:ambHalo 12s ease-in-out infinite}
+html[data-amb="maille"] .home-hero{background:#2E0B57}
+html[data-amb="maille"] .home-hero::before{inset:-35%;background:radial-gradient(circle at 20% 30%,#7C3AED 0%,transparent 35%),radial-gradient(circle at 80% 20%,#DB2777 0%,transparent 33%),radial-gradient(circle at 65% 80%,#2563EB 0%,transparent 35%),radial-gradient(circle at 30% 75%,#8B5CF6 0%,transparent 33%);animation:ambMesh 20s linear infinite}
+html[data-amb="teinte"] .home-hero{background:linear-gradient(135deg,#0F172A,#1E293B)}
+html[data-amb="teinte"] .home-hero::before{inset:0;background:linear-gradient(115deg,transparent 20%,rgba(124,58,237,.4) 42%,rgba(219,39,119,.32) 56%,transparent 76%);background-size:250% 100%;animation:ambSheen 9s ease-in-out infinite}
+/* stat cards en verre sur le hero coloré */
+html[data-amb] .home-hero .amb-glass{background:rgba(255,255,255,.15);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-color:rgba(255,255,255,.18)}
+
+/* sélecteur d'ambiance (palette) */
+.amb-pop{position:absolute;top:46px;right:0;z-index:120;background:#fff;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 14px 40px rgba(15,23,42,.16);padding:12px;width:230px;animation:jCardIn .22s var(--ease)}
+html.dark .amb-pop{background:#1E293B}
+.amb-pop h4{font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px;padding:0 2px}
+.amb-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.amb-opt{position:relative;overflow:hidden;height:52px;border-radius:10px;border:2px solid transparent;cursor:pointer;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:flex-end;padding:6px 8px;font-family:inherit;text-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .12s var(--ease)}
+.amb-opt:hover{transform:translateY(-2px)}
+.amb-opt:active{transform:scale(.96)}
+.amb-opt.sel{border-color:#0F172A}
+html.dark .amb-opt.sel{border-color:#fff}
+.amb-opt.sel::after{content:"\\2713";position:absolute;top:5px;right:6px;font-size:12px;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.amb-none{grid-column:span 2;height:38px;background:#F1F5F9;color:#475569;text-shadow:none;border:1px solid #E2E8F0}
+html.dark .amb-none{background:#0F172A;color:#CBD5E1}
+.amb-sw-aurore{background:linear-gradient(120deg,#6D28D9,#8B5CF6,#DB2777)}
+.amb-sw-halo{background:radial-gradient(circle at 30% 30%,#DB2777,#3B1E70)}
+.amb-sw-maille{background:conic-gradient(from 45deg,#7C3AED,#DB2777,#2563EB,#7C3AED)}
+.amb-sw-teinte{background:linear-gradient(135deg,#0F172A,#6D28D9)}
+.amb-sw-frais{background:linear-gradient(120deg,#0F766E,#0891B2,#1D4ED8)}
 /* --- keyframes de base --- */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
 @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.4)}100%{transform:scale(1)}}
@@ -118,10 +176,23 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .sb-brand img{width:72px;border-radius:8px}
 .sb-brand-name{font-size:13px;font-weight:700;color:#F1F5F9}
 .sb-brand-tag{font-size:10px;color:#64748B;margin-top:1px}
-.sb-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.sb-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:6px}
+.sb-body>.sb-search,.sb-body>.btn-admin,.sb-body>.btn-new-sb{opacity:0;animation:fadeUp .4s var(--ease) both}
+.sb-body>*:nth-child(1){animation-delay:.02s}
+.sb-body>*:nth-child(2){animation-delay:.05s}
+.sb-body>*:nth-child(3){animation-delay:.08s}
+.sb-body>*:nth-child(4){animation-delay:.11s}
+.sb-body>*:nth-child(5){animation-delay:.14s}
+.sb-body>*:nth-child(6){animation-delay:.17s}
+.sb-body>*:nth-child(7){animation-delay:.20s}
+.sb-body>*:nth-child(8){animation-delay:.23s}
+.sb-body>*:nth-child(9){animation-delay:.26s}
+.sb-body>*:nth-child(n+10){animation-delay:.29s}
 .sb-search{width:100%;border:1px solid #E2E8F0;border-radius:8px;padding:7px 11px;font-size:13px;color:#1E293B;outline:none;background:#F8FAFC;font-family:inherit}
-.btn-new-sb{background:#EFF6FF;border:none;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:600;color:#1D4ED8;cursor:pointer;width:100%;text-align:left;display:flex;align-items:center;gap:7px;font-family:inherit}
-.btn-new-sb:hover{background:#DBEAFE}
+.btn-new-sb{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--accent,#1D4ED8),var(--accent-2,#2563EB));border:none;border-radius:10px;padding:11px 12px;font-size:13.5px;font-weight:700;color:#fff;cursor:pointer;width:100%;text-align:left;display:flex;align-items:center;gap:8px;font-family:inherit;box-shadow:0 4px 12px color-mix(in srgb,var(--accent,#1D4ED8) 30%,transparent);transition:transform .12s var(--ease),box-shadow .2s var(--ease),filter .16s var(--ease)}
+.btn-new-sb i{font-size:17px}
+.btn-new-sb:hover{transform:translateY(-2px);filter:brightness(1.07);box-shadow:0 8px 20px color-mix(in srgb,var(--accent,#1D4ED8) 38%,transparent)}
+.btn-new-sb:active{transform:scale(.98)}
 .cat-group{display:flex;flex-direction:column;gap:4px}
 .cat-hd{display:flex;align-items:center;gap:6px;padding:6px 4px;cursor:pointer;user-select:none;border-radius:6px}.cat-hd:hover{background:#F8FAFC}
 .cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
@@ -221,7 +292,7 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .qa-ic{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px}
 .qa-t{font-size:15px;font-weight:700;color:#0F172A}
 .qa-d{font-size:12px;color:#94A3B8;line-height:1.4}
-.qa-primary{background:linear-gradient(135deg,var(--accent,#0F172A),#1E293B);border:none}
+.qa-primary{background:linear-gradient(135deg,var(--accent,#0F172A),var(--accent-2,#1E293B));border:none}
 .qa-primary .qa-t,.qa-primary .qa-d{color:#fff}
 .qa-primary .qa-d{color:rgba(255,255,255,.72)}
 .qa-primary .qa-ic{background:rgba(255,255,255,.16);color:#fff}
@@ -265,8 +336,8 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .stat-lbl{font-size:11px;color:#94A3B8;text-transform:uppercase;letter-spacing:.5px}
 .type-bars{width:100%;max-width:360px}
 .type-bars h3{font-size:11px;color:#94A3B8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
-.btn-cta{background:var(--accent,#0F172A);color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;margin-top:8px}
-.btn-cta:hover{background:#1E293B}
+.btn-cta{background:linear-gradient(135deg,var(--accent,#0F172A),var(--accent-2,#1E293B));color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;font-family:inherit;margin-top:8px}
+.btn-cta:hover{filter:brightness(1.08)}
 .fv{padding:20px 24px;display:flex;flex-direction:column;gap:12px;max-width:960px;margin:0 auto;width:100%}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .tb-right{display:flex;gap:6px;flex-wrap:wrap}
@@ -639,8 +710,16 @@ table.at tr.kit-row td.td-d{position:relative}
 .sb-user-role{font-size:10px;color:#94A3B8}
 .btn-logout{background:none;border:1px solid #E2E8F0;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;color:#64748B;font-family:inherit;flex-shrink:0}
 .btn-logout:hover{background:#FEF2F2;color:#DC2626;border-color:#FECACA}
-.btn-admin{background:#FEF2F2;border:none;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;color:#B91C1C;cursor:pointer;width:100%;text-align:left;display:flex;align-items:center;gap:7px;font-family:inherit}
-.btn-admin:hover{background:#FEE2E2}
+.btn-admin{position:relative;overflow:hidden;background:transparent;border:none;border-radius:10px;padding:9px 12px 9px 14px;font-size:13.5px;font-weight:600;color:#475569;cursor:pointer;width:100%;text-align:left;display:flex;align-items:center;gap:9px;font-family:inherit;transition:background .18s var(--ease),color .18s var(--ease),transform .1s var(--ease)}
+.btn-admin i{color:#94A3B8;transition:color .18s var(--ease);font-size:16px}
+.btn-admin::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%) scaleY(0);width:3px;height:60%;border-radius:3px;background:var(--c,#6D28D9);transition:transform .2s var(--spring)}
+.btn-admin:hover{background:color-mix(in srgb,var(--c,#6D28D9) 9%,transparent);color:var(--c,#334155)}
+.btn-admin:hover i{color:var(--c,#6D28D9)}
+.btn-admin:hover::before{transform:translateY(-50%) scaleY(.7)}
+.btn-admin:active{transform:scale(.98)}
+.btn-admin.active{background:color-mix(in srgb,var(--c,#6D28D9) 13%,transparent);color:var(--c,#334155)}
+.btn-admin.active i{color:var(--c,#6D28D9)}
+.btn-admin.active::before{transform:translateY(-50%) scaleY(1)}
 .adm-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:600;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .adm-overlay.open{display:flex;animation:jScrimIn .26s var(--ease)}
 .adm-overlay.open .adm-modal{animation:jCardIn .3s var(--ease)}
@@ -703,6 +782,7 @@ table.at tr.kit-row td.td-d{position:relative}
 html{transition:filter .35s var(--ease),background .35s var(--ease)}
 html.dark{filter:invert(0.91) hue-rotate(180deg);background:#0f172a;}
 html.dark img,html.dark [data-noinvert]{filter:invert(1) hue-rotate(180deg);}
+html.dark[data-amb] .home-hero::before{filter:invert(1) hue-rotate(180deg)}
 @media print{html.dark{filter:none!important}html.dark img{filter:none!important}}
 .btn-theme{width:30px;height:30px;border:none;background:rgba(148,163,184,.16);color:#64748B;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .btn-theme:hover{background:rgba(148,163,184,.28)}
@@ -734,7 +814,8 @@ body.vm-compact .btn-add-row{padding:5px 9px;font-size:12px}
   body.vm-compact .at td.cact .btn-ret,body.vm-compact .at td.cact .btn-del,body.vm-compact .at td.cmt-cell .btn-cmt{padding:3px 6px;font-size:11px}
 }
 </style>
-<script>try{if(localStorage.getItem("appro_theme")==="dark")document.documentElement.classList.add("dark");}catch(e){}</script>
+<script>try{if(localStorage.getItem("appro_theme")==="dark")document.documentElement.classList.add("dark");}catch(e){}
+try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.documentElement.setAttribute("data-amb",_amb);}catch(e){}</script>
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -820,6 +901,9 @@ body.vm-compact .btn-add-row{padding:5px 9px;font-size:12px}
             <div class="notif-list" id="notif-list"></div>
           </div>
         </div>
+        <div id="amb-btn-wrap" style="position:relative;display:inline-block">
+          <button class="btn-theme" id="amb-btn" onclick="event.stopPropagation();toggleAmbPop()" title="Ambiance couleur"><i class="ti ti-palette" style="font-size:15px"></i></button>
+        </div>
         <button class="btn-theme" id="theme-btn" onclick="toggleTheme()" title="Th&#232;me clair / sombre"><i class="ti ti-moon" style="font-size:15px"></i></button>
         <button class="btn-logout" onclick="doLogout()" title="D\u00e9connexion"><i class="ti ti-logout" style="font-size:13px"></i></button>
       </div>
@@ -827,19 +911,19 @@ body.vm-compact .btn-add-row{padding:5px 9px;font-size:12px}
     
     <div class="sb-body">
       <input class="sb-search" type="search" id="srch" placeholder="Chantier, adresse, article..." oninput="renderList()"/>
-      <button class="btn-admin" id="btn-home" onclick="goHome()" style="background:#F1F5F9;color:#334155"><i class="ti ti-home" style="font-size:15px"></i> Accueil</button>
+      <button class="btn-admin" id="btn-home" onclick="goHome()" style="--c:#475569"><i class="ti ti-home" style="font-size:15px"></i> Accueil</button>
       <button class="btn-new-sb" onclick="openNew()"><i class="ti ti-plus" style="font-size:16px"></i> Nouvelle appro</button>
-      <button class="btn-admin" id="btn-biblio" onclick="switchTab('biblio')" style="background:#F0FDF4;color:#15803D"><i class="ti ti-books" style="font-size:15px"></i> Biblioth&#232;que</button>
-      <button class="btn-admin" id="btn-terrain" onclick="renderTerrainDemande()" style="display:none;background:#EFF6FF;color:#1D4ED8"><i class="ti ti-message-report" style="font-size:15px"></i> Demande du terrain</button>
-      <button class="btn-admin" id="btn-admin" onclick="showAdmin()" style="display:none"><i class="ti ti-shield-lock" style="font-size:15px"></i> Administration</button>
-      <button class="btn-admin" id="btn-dash" onclick="renderDashboard()" style="display:none;background:#EFF6FF;color:#1D4ED8"><i class="ti ti-chart-bar" style="font-size:15px"></i> Tableau de bord</button>
-      <button class="btn-admin" id="btn-ui" onclick="renderUISettings()" style="display:none;background:#F5F3FF;color:#6D28D9"><i class="ti ti-adjustments" style="font-size:15px"></i> Param&#233;trage interface</button>
-      <button class="btn-admin" id="btn-alo" onclick="renderAlobeesSettings()" style="display:none;background:#ECFEFF;color:#0E7490"><i class="ti ti-plug-connected" style="font-size:15px"></i> Gestion lien Alobees</button>
-      <button class="btn-admin" id="btn-trucks" onclick="renderTrucksSettings()" style="display:none;background:#FEFCE8;color:#A16207"><i class="ti ti-truck" style="font-size:15px"></i> Gestion des camions</button>
-      <button class="btn-admin" id="btn-cmd" onclick="renderCommandes()" style="display:none;background:#F5F3FF;color:#6D28D9"><i class="ti ti-clipboard-list" style="font-size:15px"></i> Commande</button>
-      <button class="btn-admin" id="btn-annonce" onclick="renderAnnonces()" style="display:none;background:#FFF1F2;color:#BE123C"><i class="ti ti-speakerphone" style="font-size:15px"></i> Annonces</button>
-      <button class="btn-admin" id="btn-tickets" onclick="renderTickets()" style="display:none;background:#EFF6FF;color:#1D4ED8"><i class="ti ti-ticket" style="font-size:15px"></i> <span id="tk-lbl">Demandes dépôt</span></button>
-      <button class="btn-admin" id="btn-perso" onclick="renderPersonnalisation()" style="display:none;background:#F5F3FF;color:#6D28D9"><i class="ti ti-palette" style="font-size:15px"></i> Personnalisation</button>
+      <button class="btn-admin" id="btn-biblio" onclick="switchTab('biblio')" style="--c:#15803D"><i class="ti ti-books" style="font-size:15px"></i> Biblioth&#232;que</button>
+      <button class="btn-admin" id="btn-terrain" onclick="renderTerrainDemande()" style="display:none;--c:#1D4ED8"><i class="ti ti-message-report" style="font-size:15px"></i> Demande du terrain</button>
+      <button class="btn-admin" id="btn-admin" onclick="showAdmin()" style="display:none;--c:#DC2626"><i class="ti ti-shield-lock" style="font-size:15px"></i> Administration</button>
+      <button class="btn-admin" id="btn-dash" onclick="renderDashboard()" style="display:none;--c:#1D4ED8"><i class="ti ti-chart-bar" style="font-size:15px"></i> Tableau de bord</button>
+      <button class="btn-admin" id="btn-ui" onclick="renderUISettings()" style="display:none;--c:#6D28D9"><i class="ti ti-adjustments" style="font-size:15px"></i> Param&#233;trage interface</button>
+      <button class="btn-admin" id="btn-alo" onclick="renderAlobeesSettings()" style="display:none;--c:#0E7490"><i class="ti ti-plug-connected" style="font-size:15px"></i> Gestion lien Alobees</button>
+      <button class="btn-admin" id="btn-trucks" onclick="renderTrucksSettings()" style="display:none;--c:#A16207"><i class="ti ti-truck" style="font-size:15px"></i> Gestion des camions</button>
+      <button class="btn-admin" id="btn-cmd" onclick="renderCommandes()" style="display:none;--c:#6D28D9"><i class="ti ti-clipboard-list" style="font-size:15px"></i> Commande</button>
+      <button class="btn-admin" id="btn-annonce" onclick="renderAnnonces()" style="display:none;--c:#BE123C"><i class="ti ti-speakerphone" style="font-size:15px"></i> Annonces</button>
+      <button class="btn-admin" id="btn-tickets" onclick="renderTickets()" style="display:none;--c:#1D4ED8"><i class="ti ti-ticket" style="font-size:15px"></i> <span id="tk-lbl">Demandes dépôt</span></button>
+      <button class="btn-admin" id="btn-perso" onclick="renderPersonnalisation()" style="display:none;--c:#6D28D9"><i class="ti ti-palette" style="font-size:15px"></i> Personnalisation</button>
       <div id="sheets-list"></div>
     </div>
   </aside>
@@ -1970,13 +2054,19 @@ function tabsBarHTML(){
   return h;
 }
 function goBack(){if(currentRole==="depot")renderDepot();else if(currentTab==="biblio")renderLibrary();else renderWelcome();}
-function goHome(){if(typeof closeSidebar==="function")closeSidebar();cur=null;if(currentRole==="depot"){currentTab="depot";renderDepot();}else{currentTab="";renderWelcome();}}
+function setActiveNav(id){
+  try{
+    document.querySelectorAll(".sb-body .btn-admin").forEach(function(b){b.classList.remove("active");});
+    if(id){var el=document.getElementById(id);if(el)el.classList.add("active");}
+  }catch(e){}
+}
+function goHome(){if(typeof closeSidebar==="function")closeSidebar();cur=null;setActiveNav("btn-home");if(currentRole==="depot"){currentTab="depot";renderDepot();}else{currentTab="";renderWelcome();}}
 function switchTab(t){
   if(typeof closeSidebar==="function")closeSidebar();
   currentTab=t;
   cur=null;
-  if(t==="biblio")renderLibrary();
-  else renderWelcome();
+  if(t==="biblio"){setActiveNav("btn-biblio");renderLibrary();}
+  else {setActiveNav("btn-home");renderWelcome();}
 }
 
 // LIBRARY
@@ -3354,7 +3444,7 @@ function rebuildCatOrder(){
 
 // ═══ PARAMÉTRAGE INTERFACE (admin) ═══
 var SEC_LABELS={consommables:"Consommables",fournitures:"Fournitures",outillage:"Outillage"};
-function renderUISettings(){
+function renderUISettings(){try{setActiveNav('btn-ui');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   if(!canManage()){toast("Acc\u00e8s admin ou d\u00e9p\u00f4t","ti-lock");return;}
   cur=null;currentTab="uisettings";
@@ -3772,7 +3862,7 @@ function truckMiniNav(){
   if(!n)return "";
   return "<div class=\"trucks-mininav\" style=\"border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;margin-bottom:16px\"><div style=\"background:#FEFCE8;padding:9px 12px;font-size:12px;font-weight:700;color:#854D0E;display:flex;align-items:center;gap:6px\"><i class=\"ti ti-list-search\"></i> Acc\u00e8s rapide \u2014 touchez un camion <span style=\"margin-left:auto;font-weight:500;color:#A16207\">"+n+"</span></div>"+rows+"</div>";
 }
-function renderTrucksSettings(){
+function renderTrucksSettings(){try{setActiveNav('btn-trucks');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   if(!canManage()){toast("Acc\u00e8s admin ou d\u00e9p\u00f4t","ti-lock");return;}
   cur=null;currentTab="trucks";
@@ -4067,7 +4157,7 @@ function checkCommandesForAffaire(){
   saved=false;renderForm();
   toast(toAdd.length+" produit(s) en commande ajout\u00e9(s) pour ce N\u00b0 d'affaire","ti-clipboard-check");
 }
-function renderCommandes(){
+function renderCommandes(){try{setActiveNav('btn-cmd');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   if(isField())return;
   cur=null;currentTab="commande";
@@ -4159,7 +4249,7 @@ function saveAnnonces(cb){
     if(cb)cb();
   }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
 }
-function renderAnnonces(){
+function renderAnnonces(){try{setActiveNav('btn-annonce');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   if(!canManage()){toast("Acc\u00e8s admin ou d\u00e9p\u00f4t","ti-lock");return;}
   cur=null;currentTab="annonces";
@@ -4321,7 +4411,7 @@ function updateTicketBadge(){
   var n=ticketsPendingCount();
   l.innerHTML="Demandes d\u00e9p\u00f4t"+(n?" <span style=\"background:#1D4ED8;color:#fff;border-radius:10px;padding:0 7px;font-size:11px;font-weight:700\">"+n+"</span>":"");
 }
-function renderTickets(){
+function renderTickets(){try{setActiveNav('btn-tickets');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   if(!canManage()){toast("Acc\u00e8s admin ou d\u00e9p\u00f4t","ti-lock");return;}
   cur=null;currentTab="tickets";
@@ -4490,7 +4580,7 @@ function saveConfig(cb){
   }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
 }
 function setAccentPreview(c){if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};CONFIG.accent=c;try{document.documentElement.style.setProperty("--accent",c);}catch(e){}renderPersonnalisation();}
-function renderPersonnalisation(){
+function renderPersonnalisation(){try{setActiveNav('btn-perso');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   if(!isAdmin()){toast("Acc\u00e8s admin uniquement","ti-lock");return;}
   cur=null;currentTab="perso";
@@ -4546,7 +4636,7 @@ function savePerso(){
 }
 
 // ═══ GESTION LIEN ALOBEES (admin) ═══
-function renderAlobeesSettings(){
+function renderAlobeesSettings(){try{setActiveNav('btn-alo');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   if(!isAdmin()){toast("Acc\u00e8s admin uniquement","ti-lock");return;}
   cur=null;currentTab="alosettings";
@@ -4607,6 +4697,35 @@ function _techMarkOpened(id){if(!isTech()||!id)return;try{var a=_techOpened();if
 function _techVisible(s){if(!isTech())return true;var op=_techOpened();if(op.indexOf(s.id)>=0||(s._id&&op.indexOf(s._id)>=0))return true;var me=_stripAccents((currentUser.name||"").toLowerCase());return _stripAccents((s.tlCamion||"").toLowerCase())===me||_stripAccents((s.tlName||"").toLowerCase())===me;}
 function updateThemeBtn(){var d=document.documentElement.classList.contains("dark");var b=document.getElementById("theme-btn");if(b)b.innerHTML="<i class=\"ti "+(d?"ti-sun":"ti-moon")+"\" style=\"font-size:15px\"></i>";}
 function toggleTheme(){var d=!document.documentElement.classList.contains("dark");document.documentElement.classList.toggle("dark",d);try{localStorage.setItem("appro_theme",d?"dark":"light");}catch(e){}updateThemeBtn();}
+var AMB_LIST=[["aurore","Aurore"],["halo","Halo"],["maille","Maille"],["teinte","Teinte"],["frais","Frais"]];
+function currentAmb(){try{return localStorage.getItem("appro_amb")||"none";}catch(e){return "none";}}
+function toggleAmbPop(){
+  var ex=document.getElementById("amb-pop");
+  if(ex){ex.remove();return;}
+  var cur=currentAmb();
+  var pop=document.createElement("div");pop.id="amb-pop";pop.className="amb-pop";
+  var h="<h4>Ambiance couleur</h4><div class=\"amb-grid\">";
+  AMB_LIST.forEach(function(a){
+    h+="<button class=\"amb-opt amb-sw-"+a[0]+(cur===a[0]?" sel":"")+"\" onclick=\"setAmbiance('"+a[0]+"')\">"+a[1]+"</button>";
+  });
+  h+="<button class=\"amb-opt amb-none"+(cur==="none"?" sel":"")+"\" onclick=\"setAmbiance('none')\"><i class=\"ti ti-ban\" style=\"font-size:14px;margin-right:5px\"></i> Aucune</button>";
+  h+="</div>";
+  pop.innerHTML=h;
+  var host=document.getElementById("amb-btn-wrap");
+  if(host)host.appendChild(pop);
+}
+function setAmbiance(a){
+  if(a==="none"){document.documentElement.removeAttribute("data-amb");}
+  else{document.documentElement.setAttribute("data-amb",a);}
+  try{localStorage.setItem("appro_amb",a);}catch(e){}
+  var pop=document.getElementById("amb-pop");if(pop)pop.remove();
+  var names={none:"sobre",aurore:"Aurore",halo:"Halo",maille:"Maille",teinte:"Teinte",frais:"Frais"};
+  toast("Ambiance : "+(names[a]||a),"ti-palette");
+}
+document.addEventListener("click",function(e){
+  var pop=document.getElementById("amb-pop");
+  if(pop&&!e.target.closest("#amb-btn-wrap"))pop.remove();
+});
 if(document.readyState!=="loading")updateThemeBtn();else document.addEventListener("DOMContentLoaded",updateThemeBtn);
 function setViewMode(mode){
   window._viewMode=mode;
@@ -4851,7 +4970,7 @@ function dashLiveKPIs(){
   return h;
 }
 
-function renderDashboard(){
+function renderDashboard(){try{setActiveNav('btn-dash');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   cur=null;currentTab="dashboard";
   var m=document.getElementById("main-area");
@@ -5254,7 +5373,7 @@ function applyRoleView(){
 }
 
 // ═══════════════ ADMINISTRATION ═══════════════
-function showAdmin(){renderAdmin();document.getElementById("adm-overlay").classList.add("open");}
+function showAdmin(){try{setActiveNav('btn-admin');}catch(e){}renderAdmin();document.getElementById("adm-overlay").classList.add("open");}
 function hideAdmin(){document.getElementById("adm-overlay").classList.remove("open");}
 function renderAdmin(){
   var body=document.getElementById("adm-body");
