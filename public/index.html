@@ -185,6 +185,32 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .btn-cta:hover,.btn-new-sb:hover,.btn-add:hover,.btn-ai:hover,.btn-save:hover,.btn-pdf:hover,.btn-print:hover,.btn-ok:hover,.btn-auth:hover,.btn-gen:hover,.btn-all:hover,.btn-back:hover,.btn-ret:hover,.btn-admin:hover{transform:translateY(-2px)}
 .btn-cta:active,.btn-new-sb:active,.btn-add:active,.btn-add-row:active,.btn-ai:active,.btn-cat:active,.btn-ins:active,.btn-kit:active,.btn-save:active,.btn-pdf:active,.btn-print:active,.btn-ok:active,.btn-auth:active,.btn-gen:active,.btn-all:active,.sc-btn:active,.btn-back:active,.btn-ret:active,.btn-admin:active{transform:scale(.97)}
 
+/* ═══ WAVE 4 — boîte à outils avancée (cartes 3D, statut vivant, odomètre, menu contextuel, burger, onde succès) ═══ */
+.tilt3d{position:relative;transform-style:preserve-3d;will-change:transform}
+.tilt3d::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.28),transparent 60%);opacity:0;pointer-events:none;transition:opacity .2s}
+.tilt3d.tilted::after{opacity:1}
+.dstat,.hstat{transform-style:preserve-3d;will-change:transform}
+.live-dot{position:relative;display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ld,#16A34A);flex-shrink:0}
+.live-dot::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--ld,#16A34A);animation:ldpulse 1.7s var(--ease) infinite}
+@keyframes ldpulse{0%{transform:scale(1);opacity:.55}100%{transform:scale(3);opacity:0}}
+.odo{display:inline-flex;overflow:hidden;line-height:1em;height:1em;vertical-align:-.06em}
+.odo .ocol{display:flex;flex-direction:column;transition:transform .85s var(--spring)}
+.odo .ocol span{height:1em;display:block;text-align:center}
+.swave{position:absolute;inset:0;background:#16A34A;transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease);pointer-events:none;z-index:0}
+.swave.on{transform:scaleX(1)}
+.ctxm{position:fixed;z-index:1300;background:#fff;border:1px solid #E8EDF4;border-radius:12px;box-shadow:0 20px 50px -18px rgba(15,23,42,.45);padding:6px;min-width:186px;transform-origin:top left;transform:scale(.9);opacity:0;pointer-events:none;transition:transform .18s var(--spring),opacity .15s}
+.ctxm.show{transform:scale(1);opacity:1;pointer-events:auto}
+.ctxm .ci{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;font-size:13px;cursor:pointer;color:#0F172A}
+.ctxm .ci:hover{background:#F5F3FF}
+.ctxm .ci i{color:var(--accent,#6D28D9);font-size:17px}
+.ctxm .ci.danger,.ctxm .ci.danger i{color:#DC2626}
+.mtop-burger{width:20px;height:14px;position:relative;display:inline-block;color:inherit}
+.mtop-burger span{position:absolute;left:0;height:2.5px;width:100%;background:currentColor;border-radius:2px;transition:transform .3s var(--ease),opacity .2s}
+.mtop-burger span:nth-child(1){top:0}.mtop-burger span:nth-child(2){top:6px}.mtop-burger span:nth-child(3){top:12px}
+.mtop-btn.on .mtop-burger span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.mtop-btn.on .mtop-burger span:nth-child(2){opacity:0}
+.mtop-btn.on .mtop-burger span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
 /* --- accessibilité : tout se coupe si animations réduites --- */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -1073,7 +1099,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
   <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
   <div class="main-col">
     <div class="mtop">
-      <button class="mtop-btn" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
+      <button class="mtop-btn" onclick="toggleSidebar()"><span class="mtop-burger"><span></span><span></span><span></span></span></button>
       <img data-jlogo="1" class="mtop-logo" alt="JARNIAS"/>
       <span class="mtop-title">AppROVISIO</span>
     </div>
@@ -1721,6 +1747,16 @@ function animateCounters(root){
   els.forEach(function(el){
     var target=parseFloat(el.getAttribute("data-count"))||0;
     var dec=(el.getAttribute("data-count-dec")==="1");
+    /* Odomètre (chiffres qui roulent) pour les entiers positifs ; texte animé sinon */
+    if(!dec&&target>=0&&target===Math.floor(target)&&target<100000){
+      if(el.querySelector&&el.querySelector(".odo"))return;
+      el.textContent="";
+      var od=document.createElement("span");od.className="odo";od.setAttribute("data-len",String(Math.round(target)).length||1);
+      el.appendChild(od);buildOdo(od);setOdo(od,0);
+      if(reduce){setOdo(od,target);return;}
+      (function(o,t){setTimeout(function(){setOdo(o,t);},70);})(od,target);
+      return;
+    }
     if(reduce){el.textContent=dec?target.toFixed(1):target;return;}
     var dur=650,start=null;
     function step(ts){
@@ -1746,6 +1782,29 @@ function animateBars(root){
     requestAnimationFrame(function(){requestAnimationFrame(function(){el.style.width=w;});});
   });
 }
+
+/* ═══ WAVE 4 — helpers avancés ═══ */
+/* Odomètre : chiffres qui roulent (buildOdo une fois, setOdo pour animer). */
+function buildOdo(el){if(!el)return;var len=parseInt(el.getAttribute("data-len"))||String(el.getAttribute("data-odo")||"").length||1;el.innerHTML="";el._cols=[];for(var i=0;i<len;i++){var col=document.createElement("span");col.className="ocol";for(var d=0;d<10;d++){var s=document.createElement("span");s.textContent=d;col.appendChild(s);}el.appendChild(col);el._cols.push(col);}}
+function setOdo(el,val){if(!el)return;if(!el._cols)buildOdo(el);var len=el._cols.length;var str=String(Math.max(0,Math.round(val))).slice(-len);while(str.length<len)str="0"+str;for(var i=0;i<len;i++){el._cols[i].style.transform="translateY(calc(-1em * "+(+str[i])+"))";}}
+function odosIn(root){(root||document).querySelectorAll(".odo[data-odo]").forEach(function(el){if(el._cols)return;buildOdo(el);var v=parseInt(el.getAttribute("data-odo"))||0;setOdo(el,0);setTimeout(function(){setOdo(el,v);},60);});}
+/* Cartes 3D : inclinaison douce des cartes de stats vers le curseur (souris uniquement). */
+(function(){var reduceT=false;try{reduceT=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;}catch(e){}if(reduceT)return;var cur=null;
+  document.addEventListener("pointermove",function(e){if(e.pointerType==="touch")return;var c=(e.target&&e.target.closest)?e.target.closest(".dstat, .hstat"):null;if(cur&&cur!==c){cur.style.transform="";}cur=c;if(!c)return;var r=c.getBoundingClientRect();if(!r.width)return;var px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;c.style.transform="perspective(650px) rotateX("+((py-.5)*-6).toFixed(2)+"deg) rotateY("+((px-.5)*8).toFixed(2)+"deg)";},{passive:true});
+})();
+/* Menu contextuel réutilisable + branché sur les cartes de la bibliothèque (clic droit / appui long). */
+function _ctxmEl(){var m=document.getElementById("ctxm-el");if(!m){m=document.createElement("div");m.id="ctxm-el";m.className="ctxm";document.body.appendChild(m);}return m;}
+function showCtxMenu(x,y,items){var m=_ctxmEl();m._items=items;m.innerHTML=items.map(function(it,i){return "<div class=\"ci"+(it.danger?" danger":"")+"\" data-i=\""+i+"\"><i class=\"ti "+it.ic+"\"></i> "+it.label+"</div>";}).join("");m.style.left=Math.max(6,Math.min(x,window.innerWidth-198))+"px";m.style.top=Math.max(6,Math.min(y,window.innerHeight-(items.length*40+22)))+"px";m.classList.add("show");}
+function hideCtxMenu(){var m=document.getElementById("ctxm-el");if(m)m.classList.remove("show");}
+function _libCtxItems(id,fav){return [{label:"Ouvrir",ic:"ti-eye",fn:function(){openFromLib(id);}},{label:fav?"Retirer l'\u00e9pingle":"\u00c9pingler comme mod\u00e8le",ic:"ti-pin",fn:function(){toggleLibFav(id);}},{label:"Prendre comme base",ic:"ti-copy",fn:function(){takeBaseFromLib(id);}},{label:"Supprimer",ic:"ti-trash",danger:true,fn:function(){delS(id);}}];}
+document.addEventListener("contextmenu",function(e){var card=(e.target&&e.target.closest)?e.target.closest(".lib-card[data-id]"):null;if(!card)return;e.preventDefault();showCtxMenu(e.clientX,e.clientY,_libCtxItems(card.getAttribute("data-id"),card.getAttribute("data-fav")==="1"));});
+(function(){var lpT,lpX,lpY,card0;
+  document.addEventListener("pointerdown",function(e){if(e.pointerType==="mouse")return;window._suppressCardClick=false;var card=(e.target&&e.target.closest)?e.target.closest(".lib-card[data-id]"):null;if(!card)return;card0=card;lpX=e.clientX;lpY=e.clientY;lpT=setTimeout(function(){window._suppressCardClick=true;showCtxMenu(lpX,lpY,_libCtxItems(card0.getAttribute("data-id"),card0.getAttribute("data-fav")==="1"));},500);},{passive:true});
+  function clr(){clearTimeout(lpT);}
+  document.addEventListener("pointerup",clr);document.addEventListener("pointermove",clr);document.addEventListener("pointercancel",clr);
+  document.addEventListener("click",function(e){if(window._suppressCardClick){window._suppressCardClick=false;var c=(e.target&&e.target.closest)?e.target.closest(".lib-card"):null;if(c){e.stopPropagation();e.preventDefault();}}},true);
+})();
+document.addEventListener("click",function(e){var m=document.getElementById("ctxm-el");if(!m||!m.classList.contains("show"))return;var ci=(e.target&&e.target.closest)?e.target.closest(".ci"):null;if(ci&&m.contains(ci)){var it=m._items[+ci.getAttribute("data-i")];hideCtxMenu();if(it&&it.fn)it.fn();}else if(!m.contains(e.target)){hideCtxMenu();}});
 
 // CATALOGUE
 var _cpLayout="list";
@@ -2326,7 +2385,7 @@ function libCardHTML(s){
   var isUrgent=(s.priorite&&s.priorite!=="normale");var avg=avgNote(s);var fav=!!s.favorite;
   var canDel=(currentUser&&s._createdBy)?(s._createdBy===currentUser.id||currentUser.role==="admin"):false;
   var cl=TC[primaryType(s)]||{dot:"#CBD5E1"};
-  var h="<div class=\"lib-card\" style=\"--type:"+cl.dot+"\" onclick=\"openFromLib('"+s.id+"')\">";
+  var h="<div class=\"lib-card\" data-id=\""+s.id+"\" data-fav=\""+(s.favorite?"1":"0")+"\" style=\"--type:"+cl.dot+"\" onclick=\"openFromLib('"+s.id+"')\">";
   h+="<div class=\"lib-card-top\"><div class=\"lib-card-name\">"+esc(s.nomChantier||"Sans titre")+"</div><div style=\"display:flex;align-items:center;gap:4px;flex-shrink:0\">"+(isUrgent?prioBadge(s.priorite):"")+"<button class=\"lib-pin\" onclick=\"event.stopPropagation();toggleLibFav('"+s.id+"')\" title=\""+(fav?"Retirer l'\u00e9pingle":"\u00c9pingler comme mod\u00e8le")+"\" style=\"color:"+(fav?"#F59E0B":"#CBD5E1")+"\"><i class=\"ti ti-pin"+(fav?"-filled":"")+"\" style=\"font-size:17px\"></i></button></div></div>";
   h+="<div class=\"lib-card-cond\"><span class=\"cond-av\">"+condInitials(s.conducteur||s.chargeAffaires)+"</span><span>"+(esc(s.conducteur||s.chargeAffaires)||"Conducteur non renseign\u00e9")+"</span></div>";
   h+="<div style=\"display:flex;align-items:center;gap:6px\">"+starsHTML(avg,false,s.id)+(avg>0?"<span style=\"font-size:11px;color:#94A3B8;margin-left:2px\">"+avg.toFixed(1)+" ("+s.notes.length+")</span>":"<span style=\"font-size:11px;color:#CBD5E1;margin-left:2px\">Pas encore not\u00e9e</span>")+"</div>";
@@ -5436,10 +5495,12 @@ function toggleSidebar(){
   var s=document.getElementById("sidebar"),o=document.getElementById("sb-overlay");
   var open=!s.classList.contains("open");
   s.classList.toggle("open",open);if(o)o.classList.toggle("open",open);
+  var b=document.querySelector(".mtop-btn");if(b)b.classList.toggle("on",open);
 }
 function closeSidebar(){
   var s=document.getElementById("sidebar"),o=document.getElementById("sb-overlay");
   if(s)s.classList.remove("open");if(o)o.classList.remove("open");
+  var b=document.querySelector(".mtop-btn");if(b)b.classList.remove("on");
 }
 document.addEventListener("click",function(e){
   var wrap=document.querySelector(".news-wrap");
