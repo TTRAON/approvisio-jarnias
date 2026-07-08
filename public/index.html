@@ -198,6 +198,7 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .odo .ocol span{height:1em;display:block;text-align:center}
 .swave{position:absolute;inset:0;background:#16A34A;transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease);pointer-events:none;z-index:0}
 .swave.on{transform:scaleX(1)}
+.mm-zoom{position:fixed;z-index:900;background:#fff;border:1px solid #DDD6FE;border-radius:16px;box-shadow:0 24px 55px -18px rgba(76,29,149,.4);pointer-events:none;opacity:1;transition:left .44s var(--ease),top .44s var(--ease),width .44s var(--ease),height .44s var(--ease),opacity .44s var(--ease),border-radius .44s var(--ease)}
 .ctxm{position:fixed;z-index:1300;background:#fff;border:1px solid #E8EDF4;border-radius:12px;box-shadow:0 20px 50px -18px rgba(15,23,42,.45);padding:6px;min-width:186px;transform-origin:top left;transform:scale(.9);opacity:0;pointer-events:none;transition:transform .18s var(--spring),opacity .15s}
 .ctxm.show{transform:scale(1);opacity:1;pointer-events:auto}
 .ctxm .ci{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;font-size:13px;cursor:pointer;color:#0F172A}
@@ -844,7 +845,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .depot-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
 .depot-col-hd{display:flex;align-items:center;gap:8px;padding:12px 16px;border-radius:10px;font-weight:700;font-size:14px}
 .depot-col-hd .dch-n{margin-left:auto;font-size:12px;background:rgba(255,255,255,.5);padding:2px 9px;border-radius:10px}
-.depot-card{border:1px solid #E2E8F0;border-radius:11px;padding:13px;background:#fff;cursor:pointer;transition:border-color .15s,transform .16s var(--ease),box-shadow .18s var(--ease)}
+.depot-card{position:relative;overflow:hidden;border:1px solid #E2E8F0;border-radius:11px;padding:13px;background:#fff;cursor:pointer;transition:border-color .15s,transform .16s var(--ease),box-shadow .18s var(--ease)}
 .depot-card:hover{border-color:#94A3B8;box-shadow:0 8px 18px rgba(15,23,42,.08);transform:translateY(-2px)}
 .depot-card-name{font-size:14px;font-weight:600;color:#0F172A;margin-bottom:4px}
 .depot-card-sub{font-size:11px;color:#94A3B8;margin-bottom:8px}
@@ -1627,7 +1628,7 @@ fillLogos();if(document.readyState==="loading")document.addEventListener("DOMCon
 var PRIO={normale:{label:"Normale",color:"#475569",bg:"#F1F5F9",ic:"ti-minus",rank:0},urgente:{label:"Urgente",color:"#C2410C",bg:"#FFF7ED",ic:"ti-alert-triangle",rank:1},tres_urgente:{label:"Tr\u00e8s urgente",color:"#B91C1C",bg:"#FEF2F2",ic:"ti-flame",rank:2}};
 function prioBadge(p){var x=PRIO[p]||PRIO.normale;return "<span style=\"display:inline-flex;align-items:center;gap:4px;background:"+x.bg+";color:"+x.color+";border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600\"><i class=\"ti "+x.ic+"\" style=\"font-size:11px\"></i> "+x.label+"</span>";}
 var STATUT={en_attente:{label:"En attente",color:"#92400E",bg:"#FFF7ED",ic:"ti-clock"},prete:{label:"Pr\u00eate au d\u00e9p\u00f4t",color:"#065F46",bg:"#D1FAE5",ic:"ti-package-import"},sur_chantier:{label:"Sur chantier",color:"#1D4ED8",bg:"#DBEAFE",ic:"ti-tool"},rendu:{label:"Rendu \u00e0 traiter",color:"#9A3412",bg:"#FFEDD5",ic:"ti-package-export"},sortie:{label:"Chantier fini",color:"#475569",bg:"#F1F5F9",ic:"ti-checks"}};
-function statutBadge(st){var x=STATUT[st]||STATUT.en_attente;return "<span style=\"display:inline-flex;align-items:center;gap:4px;background:"+x.bg+";color:"+x.color+";border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600\"><i class=\"ti "+x.ic+"\" style=\"font-size:11px\"></i> "+x.label+"</span>";}
+function statutBadge(st){var x=STATUT[st]||STATUT.en_attente;var pulse=(st==="en_attente"||st==="rendu");var dot=pulse?"<span class=\"live-dot\" style=\"--ld:"+x.color+";width:7px;height:7px\"></span>":"";return "<span style=\"display:inline-flex;align-items:center;gap:5px;background:"+x.bg+";color:"+x.color+";border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600\">"+dot+"<i class=\"ti "+x.ic+"\" style=\"font-size:11px\"></i> "+x.label+"</span>";}
 function avgNote(s){if(!s.notes||!s.notes.length)return 0;var t=0;s.notes.forEach(function(n){t+=n.stars;});return t/s.notes.length;}
 function starsHTML(val,interactive,id){var h="";for(var i=1;i<=5;i++){var filled=i<=Math.round(val);var col=filled?"#F59E0B":"#CBD5E1";if(interactive){h+="<i class=\"ti ti-star-filled rate-star\" data-sheet=\""+id+"\" data-star=\""+i+"\" style=\"font-size:18px;color:"+col+";cursor:pointer\" onclick=\"rateSheet('"+id+"',"+i+")\"></i>";}else{h+="<i class=\"ti ti-star-filled\" style=\"font-size:13px;color:"+col+"\"></i>";}}return h;}
 
@@ -1788,6 +1789,37 @@ function animateBars(root){
 function buildOdo(el){if(!el)return;var len=parseInt(el.getAttribute("data-len"))||String(el.getAttribute("data-odo")||"").length||1;el.innerHTML="";el._cols=[];for(var i=0;i<len;i++){var col=document.createElement("span");col.className="ocol";for(var d=0;d<10;d++){var s=document.createElement("span");s.textContent=d;col.appendChild(s);}el.appendChild(col);el._cols.push(col);}}
 function setOdo(el,val){if(!el)return;if(!el._cols)buildOdo(el);var len=el._cols.length;var str=String(Math.max(0,Math.round(val))).slice(-len);while(str.length<len)str="0"+str;for(var i=0;i<len;i++){el._cols[i].style.transform="translateY(calc(-1em * "+(+str[i])+"))";}}
 function odosIn(root){(root||document).querySelectorAll(".odo[data-odo]").forEach(function(el){if(el._cols)return;buildOdo(el);var v=parseInt(el.getAttribute("data-odo"))||0;setOdo(el,0);setTimeout(function(){setOdo(el,v);},60);});}
+/* Onde de succès : une vague verte balaie un élément (ex. carte dépôt validée). */
+function _successWaveOn(el){
+  if(!el)return;
+  var reduce=false;try{reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;}catch(e){}
+  if(reduce)return;
+  try{
+    if(el.style&&getComputedStyle&&getComputedStyle(el).position==="static")el.style.position="relative";
+    el.style.overflow="hidden";
+    var w=document.createElement("div");w.className="swave";el.appendChild(w);
+    requestAnimationFrame(function(){requestAnimationFrame(function(){w.classList.add("on");});});
+    setTimeout(function(){if(w.parentNode)w.parentNode.removeChild(w);},700);
+  }catch(e){}
+}
+/* Magic move : calque qui grandit depuis la carte cliquée pour révéler la fiche (dégrade sans rien casser). */
+function _magicOpenFx(cardRect){
+  var reduce=false;try{reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;}catch(e){}
+  if(reduce||!cardRect||!cardRect.width)return;
+  try{
+    var ma=document.getElementById("main-area");
+    var mr=ma?ma.getBoundingClientRect():{left:0,top:0,width:window.innerWidth,height:window.innerHeight};
+    var ov=document.createElement("div");ov.className="mm-zoom";
+    ov.style.left=cardRect.left+"px";ov.style.top=cardRect.top+"px";ov.style.width=cardRect.width+"px";ov.style.height=cardRect.height+"px";
+    document.body.appendChild(ov);
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      ov.style.left=mr.left+"px";ov.style.top=mr.top+"px";ov.style.width=mr.width+"px";
+      ov.style.height=Math.max(120,Math.min(mr.height,window.innerHeight-mr.top))+"px";
+      ov.style.opacity="0";ov.style.borderRadius="0px";
+    });});
+    setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov);},560);
+  }catch(e){}
+}
 /* Cartes 3D : inclinaison douce des cartes de stats vers le curseur (souris uniquement). */
 (function(){var reduceT=false;try{reduceT=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;}catch(e){}if(reduceT)return;var cur=null;
   document.addEventListener("pointermove",function(e){if(e.pointerType==="touch")return;var c=(e.target&&e.target.closest)?e.target.closest(".dstat, .hstat"):null;if(cur&&cur!==c){cur.style.transform="";}cur=c;if(!c)return;var r=c.getBoundingClientRect();if(!r.width)return;var px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;c.style.transform="perspective(650px) rotateX("+((py-.5)*-6).toFixed(2)+"deg) rotateY("+((px-.5)*8).toFixed(2)+"deg)";},{passive:true});
@@ -2111,7 +2143,7 @@ function renderDepot(){
       var isModif=(s.statut==="prete"&&s.modifPrep);
       var isAddCh=(s.statut==="sur_chantier"&&s.addToPrepare);
       var blCol=isAddCh?"#1D4ED8":(isModif?"#7C3AED":(isUrgent?pr.color:""));
-      h+="<div class=\"depot-card\""+((isModif||isUrgent||isAddCh)?" style=\"border-left:4px solid "+blCol+";padding-left:9px\"":"")+">";
+      h+="<div class=\"depot-card\" data-id=\""+s.id+"\""+((isModif||isUrgent||isAddCh)?" style=\"border-left:4px solid "+blCol+";padding-left:9px\"":"")+">";
       if(isAddCh){
         h+="<div style=\"display:flex;align-items:center;gap:6px;background:#DBEAFE;color:#1E40AF;border:1px solid #93C5FD;border-radius:7px;padding:5px 9px;font-size:11px;font-weight:700;margin-bottom:8px\"><i class=\"ti ti-tool\" style=\"font-size:13px\"></i> D\u00e9j\u00e0 sur chantier \u2014 seul l'ajout est \u00e0 pr\u00e9parer</div>";
       } else if(isModif){
@@ -2135,7 +2167,7 @@ function renderDepot(){
     h+="<div class=\"depot-empty\"><i class=\"ti ti-package-off\" style=\"font-size:32px\"></i><div style=\"margin-top:8px\">Aucune appro au d\u00e9p\u00f4t</div></div>";
   } else {
     auDepot.forEach(function(s){
-      h+="<div class=\"depot-card\">";
+      h+="<div class=\"depot-card\" data-id=\""+s.id+"\">";
       h+="<div onclick=\"openFromDepot('"+s.id+"')\">";
       h+="<div class=\"depot-card-name\">"+esc(s.nomChantier||"Sans titre")+"</div>";
       h+="<div class=\"depot-card-sub\">"+esc(s.conducteur||s.chargeAffaires||"Conducteur ?")+(s.preparedAt?" \u00b7 pr\u00eate depuis "+s.preparedAt:"")+"</div>";
@@ -2175,7 +2207,7 @@ function renderDepot(){
     h+="<div style=\"display:flex;align-items:center;gap:8px;padding:10px 14px;background:#FFEDD5;border-radius:10px;margin-bottom:12px\"><i class=\"ti ti-package-export\" style=\"font-size:18px;color:#9A3412\"></i><span style=\"font-weight:700;font-size:14px;color:#9A3412\">Rendu \u00e0 traiter</span><span style=\"font-size:12px;background:#fff;color:#9A3412;padding:2px 9px;border-radius:10px\">"+renduATraiter.length+"</span></div>";
     h+="<div style=\"display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px\">";
     renduATraiter.forEach(function(s){
-      h+="<div class=\"depot-card\" style=\"border-left:4px solid #EA580C;padding-left:9px\">";
+      h+="<div class=\"depot-card\" data-id=\""+s.id+"\" style=\"border-left:4px solid #EA580C;padding-left:9px\">";
       h+="<div onclick=\"openFromDepot('"+s.id+"')\">";
       h+="<div class=\"depot-card-name\">"+esc(s.nomChantier||"Sans titre")+"</div>";
       h+="<div class=\"depot-card-sub\">"+(s.tlName?"<i class=\"ti ti-user\" style=\"font-size:11px\"></i> Rendu par "+esc(s.tlName)+" (TL)":esc(s.conducteur||s.chargeAffaires||"Conducteur ?"))+(s.renduAt?" \u00b7 rendu le "+s.renduAt:"")+"</div>";
@@ -2222,6 +2254,7 @@ function openFromDepot(id){
 function depotMarkPrete(id){
   var s=null;sheets.forEach(function(x){if(x.id===id)s=x;});
   if(!s||!s._id)return;
+  try{_successWaveOn(document.querySelector('.depot-card[data-id="'+id+'"]'));}catch(e){}
   if(s.statut==="sur_chantier"&&s.addToPrepare){
     // L'ajout est pr\u00eat : l'appro reste SUR CHANTIER (les gars viennent r\u00e9cup\u00e9rer l'ajout)
     s.addToPrepare=false;
@@ -2239,6 +2272,7 @@ function depotMarkRendu(id){
   if(!confirm("Confirmer que cette appro a \u00e9t\u00e9 compl\u00e8tement rendue au d\u00e9p\u00f4t ?"))return;
   var s=null;sheets.forEach(function(x){if(x.id===id)s=x;});
   if(!s||!s._id)return;
+  try{_successWaveOn(document.querySelector('.depot-card[data-id="'+id+'"]'));}catch(e){}
   s.statut="sortie";
   ["consommables","fournitures","outillage"].forEach(function(k){
     s[k].forEach(function(r){if(r.designation)r.returned=true;});
@@ -2435,9 +2469,11 @@ function takeBaseFromLib(id){
 function openFromLib(id){
   var s=null;sheets.forEach(function(x){if(x.id===id)s=x;});
   if(!s)return;
+  var cardRect=null;try{var c=document.querySelector('.lib-card[data-id="'+id+'"]')||document.querySelector('.sc-card[data-id="'+id+'"]');if(c&&c.getBoundingClientRect)cardRect=c.getBoundingClientRect();}catch(e){}
   _techMarkOpened(s.id);_techMarkOpened(s._id);
   cur=JSON.parse(JSON.stringify(s));saved=true;aiSug=null;tpl=null;window._err=null;addMode=false;addDate=null;
   renderForm();
+  _magicOpenFx(cardRect);
 }
 
 // SIDEBAR
