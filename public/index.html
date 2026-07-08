@@ -211,6 +211,13 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .mtop-btn.on .mtop-burger span:nth-child(1){transform:translateY(6px) rotate(45deg)}
 .mtop-btn.on .mtop-burger span:nth-child(2){opacity:0}
 .mtop-btn.on .mtop-burger span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+[data-sort].sorting{opacity:.92;box-shadow:0 16px 32px -12px rgba(15,23,42,.4);position:relative;z-index:6}
+.drag-h{cursor:grab;touch-action:none}
+.drag-h:active{cursor:grabbing}
+.notif-bell .ti-bell{display:inline-block;transform-origin:top center}
+.notif-bell .ti-bell.bell-ring{animation:bellRing .7s var(--ease)}
+@keyframes bellRing{0%,100%{transform:rotate(0)}15%{transform:rotate(15deg)}30%{transform:rotate(-12deg)}45%{transform:rotate(8deg)}60%{transform:rotate(-5deg)}75%{transform:rotate(3deg)}}
+.notif-badge.nb-pop{animation:pop .4s var(--spring)}
 
 /* --- accessibilité : tout se coupe si animations réduites --- */
 @media (prefers-reduced-motion:reduce){
@@ -1789,6 +1796,34 @@ function animateBars(root){
 function buildOdo(el){if(!el)return;var len=parseInt(el.getAttribute("data-len"))||String(el.getAttribute("data-odo")||"").length||1;el.innerHTML="";el._cols=[];for(var i=0;i<len;i++){var col=document.createElement("span");col.className="ocol";for(var d=0;d<10;d++){var s=document.createElement("span");s.textContent=d;col.appendChild(s);}el.appendChild(col);el._cols.push(col);}}
 function setOdo(el,val){if(!el)return;if(!el._cols)buildOdo(el);var len=el._cols.length;var str=String(Math.max(0,Math.round(val))).slice(-len);while(str.length<len)str="0"+str;for(var i=0;i<len;i++){el._cols[i].style.transform="translateY(calc(-1em * "+(+str[i])+"))";}}
 function odosIn(root){(root||document).querySelectorAll(".odo[data-odo]").forEach(function(el){if(el._cols)return;buildOdo(el);var v=parseInt(el.getAttribute("data-odo"))||0;setOdo(el,0);setTimeout(function(){setOdo(el,v);},60);});}
+/* Glisser-déposer pour réordonner (listes verticales avec [data-sortlist] + poignée .drag-h ; flèches gardées en secours). */
+function _flipReorder(list,except,mutate){var kids=[].slice.call(list.children);var firsts=kids.map(function(k){return k.getBoundingClientRect().top;});mutate();kids.forEach(function(k,i){if(k===except)return;var dy=firsts[i]-k.getBoundingClientRect().top;if(!dy)return;k.style.transition="none";k.style.transform="translateY("+dy+"px)";requestAnimationFrame(function(){k.style.transition="transform .2s var(--ease)";k.style.transform="";});});}
+function _commitSort(list,order){var kind=list.getAttribute("data-sortlist");if(kind==="menu"){if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};CONFIG.menuOrder=order.slice();if(typeof applyMenuOrder==="function")applyMenuOrder();if(typeof saveConfig==="function")saveConfig(function(){});if(typeof renderPersonnalisation==="function")renderPersonnalisation();}}
+document.addEventListener("pointerdown",function(e){
+  var h=(e.target&&e.target.closest)?e.target.closest(".drag-h"):null;if(!h)return;
+  var list=h.closest("[data-sortlist]");if(!list)return;
+  var item=h.closest("[data-sort]");if(!item||item.parentNode!==list)return;
+  e.preventDefault();
+  var sy=e.clientY,moved=false;
+  item.classList.add("sorting");item.style.pointerEvents="none";
+  function onMove(ev){
+    item.style.transform="translateY("+(ev.clientY-sy)+"px)";
+    var el=document.elementFromPoint(ev.clientX,ev.clientY);
+    var over=(el&&el.closest)?el.closest("[data-sort]"):null;
+    if(!over||over===item||over.parentNode!==list)return;
+    var r=over.getBoundingClientRect();
+    var ref=(ev.clientY<r.top+r.height/2)?over:over.nextElementSibling;
+    if(ref===item)return;
+    _flipReorder(list,item,function(){list.insertBefore(item,ref);});
+    sy=ev.clientY;item.style.transform="translateY(0px)";moved=true;
+  }
+  function onUp(){
+    document.removeEventListener("pointermove",onMove);document.removeEventListener("pointerup",onUp);
+    item.classList.remove("sorting");item.style.pointerEvents="";item.style.transform="";item.style.transition="";
+    if(moved){var order=[].slice.call(list.querySelectorAll("[data-sort]")).map(function(x){return x.getAttribute("data-sort");});_commitSort(list,order);}
+  }
+  document.addEventListener("pointermove",onMove);document.addEventListener("pointerup",onUp);
+});
 /* Onde de succès : une vague verte balaie un élément (ex. carte dépôt validée). */
 function _successWaveOn(el){
   if(!el)return;
@@ -4819,11 +4854,12 @@ function moveMenu(i,dir){var mo=_menuOrder();var j=i+dir;if(j<0||j>=mo.length)re
 function menuOrderCard(){
   var mo=_menuOrder();
   var h="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-menu-2\" style=\"color:#6D28D9\"></i> Ordre du menu de gauche</div><div style=\"padding:10px 12px\">";
-  h+="<div style=\"font-size:12px;color:#94A3B8;margin-bottom:8px\">Range les entr\u00e9es comme tu veux (seules celles autoris\u00e9es par le r\u00f4le s'affichent \u00e0 l'\u00e9cran).</div>";
+  h+="<div style=\"font-size:12px;color:#94A3B8;margin-bottom:8px\">Glisse la poign\u00e9e \u2261 pour ranger (ou les fl\u00e8ches). Seules les entr\u00e9es autoris\u00e9es par le r\u00f4le s'affichent \u00e0 l'\u00e9cran.</div>";
+  h+="<div data-sortlist=\"menu\">";
   mo.forEach(function(k,i){
-    h+="<div style=\"display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:6px;background:#fff\"><i class=\"ti ti-grip-vertical\" style=\"color:#CBD5E1;font-size:14px\"></i><span style=\"flex:1;font-size:13px;color:#334155\">"+esc(MENU_LABELS[k]||k)+"</span><button onclick=\"moveMenu("+i+",-1)\" style=\"background:none;border:none;color:"+(i===0?"#CBD5E1":"#6D28D9")+";cursor:pointer;font-size:15px\"><i class=\"ti ti-chevron-up\"></i></button><button onclick=\"moveMenu("+i+",1)\" style=\"background:none;border:none;color:"+(i===mo.length-1?"#CBD5E1":"#6D28D9")+";cursor:pointer;font-size:15px\"><i class=\"ti ti-chevron-down\"></i></button></div>";
+    h+="<div data-sort=\""+k+"\" style=\"display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid #E2E8F0;border-radius:8px;margin-bottom:6px;background:#fff\"><i class=\"ti ti-grip-vertical drag-h\" style=\"color:#CBD5E1;font-size:15px\"></i><span style=\"flex:1;font-size:13px;color:#334155\">"+esc(MENU_LABELS[k]||k)+"</span><button onclick=\"moveMenu("+i+",-1)\" style=\"background:none;border:none;color:"+(i===0?"#CBD5E1":"#6D28D9")+";cursor:pointer;font-size:15px\"><i class=\"ti ti-chevron-up\"></i></button><button onclick=\"moveMenu("+i+",1)\" style=\"background:none;border:none;color:"+(i===mo.length-1?"#CBD5E1":"#6D28D9")+";cursor:pointer;font-size:15px\"><i class=\"ti ti-chevron-down\"></i></button></div>";
   });
-  h+="</div></div>";
+  h+="</div></div></div>";
   return h;
 }
 
@@ -5576,8 +5612,17 @@ function renderNotifs(){
   var unread=notifData.filter(function(n){return !n.is_read;}).length;
   var badge=document.getElementById("notif-badge");
   if(badge){
-    if(unread>0){badge.style.display="flex";badge.textContent=unread>9?"9+":unread;}
+    var _prev=window._prevUnread||0;
+    if(unread>0){
+      badge.style.display="flex";badge.textContent=unread>9?"9+":unread;
+      if(unread>_prev){
+        badge.classList.remove("nb-pop");void badge.offsetWidth;badge.classList.add("nb-pop");
+        var _bell=document.querySelector(".notif-bell .ti-bell");
+        if(_bell){_bell.classList.remove("bell-ring");void _bell.offsetWidth;_bell.classList.add("bell-ring");}
+      }
+    }
     else badge.style.display="none";
+    window._prevUnread=unread;
   }
   var list=document.getElementById("notif-list");
   if(!list)return;
