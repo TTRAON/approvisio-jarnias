@@ -339,13 +339,9 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .sc-client{display:flex;align-items:center;gap:4px;font-size:11.5px;color:#64748B;font-weight:600;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sc-client i{font-size:12px;color:#94A3B8;flex-shrink:0}
 /* --- Appro sur 2 colonnes en grand écran (les tableaux restent pleine largeur) --- */
-@media(min-width:1180px){
-  .fv{max-width:1240px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
-  .fv>*{grid-column:1/-1}
-  .fv>.info-sec{grid-column:auto}
-  .fv>#info-card{grid-column:1/-1}
-}
-@media print{.fv{display:flex!important}}
+.info-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:1100px){.fv{max-width:1180px}.info-grid{grid-template-columns:1fr 1fr;align-items:start}}
+@media print{.info-grid{display:block!important}}
 .sc-foot{display:flex;justify-content:space-between;align-items:center;margin-top:5px}
 .sc-acts{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
 .sc-btn{background:#fff;border:1px solid #E2E8F0;border-radius:5px;padding:2px 8px;font-size:11px;cursor:pointer;color:#64748B;font-family:inherit;display:inline-flex;align-items:center;gap:3px}
@@ -2054,6 +2050,8 @@ function loadSheetsFromServer(retries){
   if(retries===undefined)retries=3;
   return apiCall("GET","/appros").then(function(data){
     sheets=(data||[]).map(function(s){return mig(s);});
+    try{if(currentTab==="dash"&&typeof renderDashboard==="function")renderDashboard();
+         else if(currentTab==="depot"&&typeof renderDepot==="function")renderDepot();}catch(e){}
     return sheets;
   }).catch(function(e){
     if(retries>0){
@@ -2678,6 +2676,7 @@ function depotItemsPreview(s){
   return h;
 }
 function renderDepot(){
+  if(typeof _unmountCpFab==="function")_unmountCpFab();
   if(typeof closeSidebar==="function")closeSidebar();
   if(typeof renderDeadlineBanner==="function")renderDeadlineBanner();
   cur=null;currentTab="depot";
@@ -2897,6 +2896,7 @@ function previewItems(s){
 }
 
 function renderLibrary(){
+  if(typeof _unmountCpFab==="function")_unmountCpFab();
   cur=null;
   var q=_stripAccents(libSearch.toLowerCase());
   var vis=sheets.filter(function(s){
@@ -3156,6 +3156,7 @@ function togC(cid,key){
 
 // WELCOME
 function renderWelcome(){
+  if(typeof _unmountCpFab==="function")_unmountCpFab();
   cur=null;saved=false;aiSug=null;addMode=false;addDate=null;currentTab="mes";
   var mine=sheets.filter(function(s){return !s.draft;});
   var ctb=mine.reduce(function(a,s){getTypes(s).forEach(function(t){a[t]=(a[t]||0)+1;});return a;},{});
@@ -3232,12 +3233,7 @@ function renderWelcome(){
 
   // REPARTITION
   if(Object.keys(ctb).length>0){
-    h+="<div class=\"home-panel\"><div class=\"home-panel-hd\"><i class=\"ti ti-chart-bar\"></i><h3>R\u00e9partition par type</h3></div>";
-    Object.keys(ctb).sort(function(a,b){return ctb[b]-ctb[a];}).slice(0,7).forEach(function(t){
-      var c=TC[t]||TC["Autre"];
-      h+="<div class=\"tbr\"><div class=\"tbr-lbl\">"+esc(t)+"</div><div class=\"tbr-bg\"><div class=\"tbr-fill\" data-fill=\""+Math.round((ctb[t]/mx)*100)+"%\" style=\"background:"+c.b+"\"></div></div><div class=\"tbr-n\">"+ctb[t]+"</div></div>";
-    });
-    h+="</div>";
+  /* Panneau "Répartition par type" supprimé (le type de travaux n'existe plus). */
   }
 
   h+="</div>";
@@ -3342,10 +3338,10 @@ function tblH(sec,secColor){
     var bg=isR?"#FFF5F5":(isRTL?"#FFF7ED":(isDep?DEPOT_C.bg:(ac?ac.bg:"")));
     var lb=retCol?("3px solid "+retCol):(isDep?"3px solid "+DEPOT_C.left:(ac?"3px solid "+ac.left:"none"));
     var isKit=!!r.kit;var ks=isKit?_kitStyle(r.kit):null;
-    if(isKit&&!bg)bg=ks.tint;
+    if(isKit&&!bg)bg="#FBFCFE"; /* teinte de kit tr\u00e8s sobre (une seule couleur d'accent : le liser\u00e9) */
     var dLeft=(lb!=="none")?lb:(isKit?("3px solid "+ks.spine):"none");
     var trSec=(isKit&&lb==="none")?ks.spine:secColor;
-    if(isKit&&kitRun[i]){var _kc=kitRun[i];html+="<tr class=\"kit-hd\"><td colspan=\"7\"><div class=\"kit-band\" style=\"display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 0;padding:8px 12px;background:"+ks.band+";border:1px solid "+ks.spine+"33;border-left:3px solid "+ks.spine+";border-radius:9px 9px 0 0;font-weight:700;font-size:12px;color:"+ks.text+"\"><i class=\"ti ti-package\" style=\"font-size:15px\"></i><span>"+esc(r.kit)+"</span><span style=\"margin-left:auto;font-weight:600;font-size:10px;background:"+ks.spine+";color:#fff;padding:1px 8px;border-radius:20px\">"+_kc+" article"+(_kc>1?"s":"")+"</span><button onclick=\"removeKitFromAppro(this.getAttribute('data-kit'))\" data-kit=\""+esc(r.kit)+"\" title=\"Retirer tout le kit de l'appro\" style=\"background:rgba(255,255,255,.55);border:1px solid "+ks.spine+"66;color:"+ks.spine+";border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:3px\"><i class=\"ti ti-trash\" style=\"font-size:12px\"></i> Retirer</button></div></td></tr>";}
+    if(isKit&&kitRun[i]){var _kc=kitRun[i];html+="<tr class=\"kit-hd\"><td colspan=\"7\"><div class=\"kit-band\" style=\"display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 0;padding:8px 12px;background:#F8FAFC;border:1px solid #E2E8F0;border-left:3px solid "+ks.spine+";border-radius:9px 9px 0 0;font-weight:700;font-size:12px;color:#334155\"><i class=\"ti ti-package\" style=\"font-size:15px;color:"+ks.spine+"\"></i><span>"+esc(r.kit)+"</span><span style=\"margin-left:auto;font-weight:600;font-size:10px;background:#EEF2F7;color:#64748B;padding:1px 8px;border-radius:20px\">"+_kc+" article"+(_kc>1?"s":"")+"</span><button onclick=\"removeKitFromAppro(this.getAttribute('data-kit'))\" data-kit=\""+esc(r.kit)+"\" title=\"Retirer tout le kit de l'appro\" style=\"background:#fff;border:1px solid #E2E8F0;color:#64748B;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:3px\"><i class=\"ti ti-trash\" style=\"font-size:12px\"></i> Retirer</button></div></td></tr>";}
     var st=retCol?("text-decoration:line-through;color:"+retCol+";"):"";
     var hasCmt=!!(r.commentaire&&r.commentaire.trim());
     var dOpts="<option value=\"\">-</option>";
@@ -3426,6 +3422,16 @@ function legH(){
 }
 
 // FORM
+/* Le FAB catalogue doit vivre dans <body> : #main-area est anim\u00e9 (transform),
+   ce qui casse position:fixed pour ses enfants (le bouton scrollait avec la page). */
+function _mountCpFab(){
+  var b=document.getElementById("cp-fab");
+  if(!b){b=document.createElement("button");b.id="cp-fab";b.className="cp-fab liv";b.title="Ouvrir le catalogue";
+    b.innerHTML="<i class=\"ti ti-package\"></i><span class=\"cp-fab-t\">Catalogue</span>";
+    b.onclick=function(){showCp();};document.body.appendChild(b);}
+  b.style.display="inline-flex";
+}
+function _unmountCpFab(){var b=document.getElementById("cp-fab");if(b)b.style.display="none";}
 function renderForm(){
   if(typeof closeSidebar==="function")closeSidebar();
   var ai=(cur.additionDates||[]).indexOf(addDate);
@@ -3455,7 +3461,7 @@ function renderForm(){
   var canDelCur=(cur&&cur.id&&typeof sheets!=="undefined"&&sheets.some(function(x){return x.id===cur.id;})&&currentUser&&currentUser.role!=="team_leader"&&(currentUser.role==="admin"||currentUser.role==="depot"||!cur._createdBy||cur._createdBy===currentUser.id));
   var delBtn=canDelCur?"<button class=\"tbi\" style=\"color:#DC2626\" title=\"Supprimer cette appro\" onclick=\"delS(cur.id)\"><i class=\"ti ti-trash\"></i></button>":"";
   h+="<div class=\"topbar\"><button class=\"btn-back\" onclick=\"goBack()\"><i class=\"ti ti-arrow-left\" style=\"font-size:13px\"></i> Retour</button><div class=\"tb-right\"><button class=\"tbi\" style=\"color:#6D28D9\" title=\"Catalogue\" onclick=\"showCp()\"><i class=\"ti ti-package\"></i></button>"+addBtn+"<button class=\"tbi\" style=\"color:#B91C1C\" title=\"Exporter en PDF\" onclick=\"doPDF()\"><i class=\"ti ti-file-type-pdf\"></i></button>"+delBtn+shareBtn+saveBtn+"</div></div>";
-  h+="<button class=\"cp-fab liv\" id=\"cp-fab\" onclick=\"showCp()\" title=\"Ouvrir le catalogue\"><i class=\"ti ti-package\"></i><span class=\"cp-fab-t\">Catalogue</span></button>";
+  _mountCpFab();
   h+=tplNotice+addBanner;
   if(cur.draft&&!isField()){
     h+="<div style=\"background:#fff;border:1px solid #FDE9C8;border-left:4px solid #F59E0B;border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 3px 12px -7px rgba(245,158,11,.5)\"><div style=\"display:flex;align-items:center;gap:11px\"><div style=\"width:38px;height:38px;border-radius:11px;background:#FEF3C7;color:#D97706;display:flex;align-items:center;justify-content:center;flex-shrink:0\"><i class=\"ti ti-pencil\" style=\"font-size:19px\"></i></div><div><div style=\"font-size:14px;font-weight:700;color:#0F172A\">Brouillon</div><div style=\"font-size:12px;color:#78716C\">Le chef d\u00e9p\u00f4t ne voit pas encore cette appro. Envoie-la en production quand elle est pr\u00eate.</div></div></div><button onclick=\"sendToProduction()\" class=\"liv\" style=\"background:#15803D;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;box-shadow:0 5px 14px -6px rgba(21,128,61,.6)\"><i class=\"ti ti-send\"></i> Envoyer en production</button></div>";
@@ -3468,6 +3474,7 @@ function renderForm(){
     h+="<div class=\"fg fg-full\" style=\"display:flex;align-items:center;gap:10px;flex-wrap:wrap\"><button type=\"button\" onclick=\"showAlobeesPicker()\" style=\"display:inline-flex;align-items:center;gap:7px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-cloud-download\" style=\"font-size:16px\"></i> Importer un chantier depuis Alobees</button>"+(cur.alobeesSiteId?" <span style=\"font-size:11px;color:#15803D;background:#DCFCE7;padding:4px 9px;border-radius:20px;font-weight:600\"><i class=\"ti ti-link\"></i> Li\u00e9 \u00e0 Alobees</span>":"")+"</div>";
   }
   h+="</div></div>";
+  h+="<div class=\"info-grid\">";
   h+="<div class=\"card info-sec\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class=\"ti ti-building-community\" style=\"font-size:16px;color:#6D28D9\"></i> Chantier</div></div><div class=\"card-fields\">";
   h+="<div class=\"fg\"><label>Nom du chantier</label><input class=\"fin\" value=\""+esc(cur.nomChantier)+"\" placeholder=\"Ex: Ravalement fa&#231;ade...\" oninput=\"upF('nomChantier',this.value)\"/></div>";
   h+="<div class=\"fg fg-full\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-map-pin\" style=\"font-size:12px;color:#DC2626\"></i> Adresse du chantier</label><textarea class=\"fin\" rows=\"2\" style=\"resize:vertical\" placeholder=\"Adresse compl&#232;te du chantier (rue, code postal, ville)...\" oninput=\"upF('adresseChantier',this.value)\">"+esc(cur.adresseChantier||"")+"</textarea></div>";
@@ -3488,6 +3495,7 @@ h+="";
   _autoSujetCheck();
   h+=truckSelectorHTML();
   h+="</div></div>";
+  h+="</div>"; /* fin .info-grid (2 colonnes sur ordinateur) */
   h+="<div class=\"card\" style=\"border-left:4px solid \"+((STATUT[cur.statut]||STATUT.en_attente).color)+\"\"><div style=\"padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap\"><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:12px;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.5px\">Statut :</span>"+statutBadge(cur.statut)+(cur.preparedAt?"<span style=\"font-size:11px;color:#94A3B8\">pr\u00e9par\u00e9e le "+cur.preparedAt+"</span>":"")+"</div><div style=\"display:flex;gap:6px\">"+statutButtons()+"</div></div></div>";
   h+=catDatalistHTML();
   h+=aiBanner+aiErr+legH()+secH;
@@ -5091,21 +5099,38 @@ function checkCommandesForAffaire(){
   saved=false;renderForm();
   toast(toAdd.length+" produit(s) en commande ajout\u00e9(s) pour ce N\u00b0 d'affaire","ti-clipboard-check");
 }
+/* Commandes visibles par l'utilisateur : un conducteur ne voit que celles
+   rattach\u00e9es \u00e0 une de ses affaires, ou qu'il a lui-m\u00eame ajout\u00e9es. */
+function _cmdVisible(c){
+  if(typeof canManage==="function"&&canManage())return true;      /* admin + d\u00e9p\u00f4t : tout */
+  if(!c)return false;
+  var me=(currentUser&&(currentUser.name||currentUser.username))||"";
+  if(c.auteur&&_normEq(c.auteur)===_normEq(me))return true;
+  if(currentUser&&c.createdBy&&c.createdBy===currentUser.id)return true;
+  var aff=c.noAffaire||"";
+  if(!aff)return false;
+  return (sheets||[]).some(function(sh){
+    if(_normEq(sh.noAffaire||"")!==_normEq(aff))return false;
+    return _normEq(sh.conducteur||sh.chargeAffaires||"")===_normEq(me);
+  });
+}
+function _cmdList(){return (typeof COMMANDES!=="undefined"?COMMANDES:[]).filter(_cmdVisible);}
 var _cmdFilter="all"; // all | att | rec
 function renderCommandes(){try{setActiveNav('btn-cmd');}catch(e){}
+  if(typeof _unmountCpFab==="function")_unmountCpFab();
   if(typeof closeSidebar==="function")closeSidebar();
   if(isField())return;
   cur=null;currentTab="commande";
   var m=document.getElementById("main-area");
-  var enAttente=COMMANDES.filter(function(c){return c.statut!=="recu";}).length;
-  var recues=COMMANDES.length-enAttente;
+  var enAttente=_cmdList().filter(function(c){return c.statut!=="recu";}).length;
+  var recues=_cmdList().length-enAttente;
 
   var h="<div class=\"cmd-wrap\">";
   h+=_dashHeader("Commandes","Mat\u00e9riel en commande \u2014 issu des appros ou ajout\u00e9 \u00e0 la main, li\u00e9 par N\u00b0 d'affaire");
 
   // Cartes de stats cliquables (filtres) — odomètre auto via data-count
   h+="<div class=\"dash-grid stagger\" style=\"grid-template-columns:repeat(auto-fit,minmax(150px,1fr))\">";
-  h+="<div class=\"dstat liv dstat-click tone-slate"+(_cmdFilter==="all"?" cmd-on":"")+"\" onclick=\"cmdSetFilter('all')\"><div class=\"dstat-top\"><div class=\"dstat-ic\"><i class=\"ti ti-clipboard-list\"></i></div></div><div class=\"dstat-num\" data-count=\""+COMMANDES.length+"\">0</div><div class=\"dstat-lbl\">Toutes</div></div>";
+  h+="<div class=\"dstat liv dstat-click tone-slate"+(_cmdFilter==="all"?" cmd-on":"")+"\" onclick=\"cmdSetFilter('all')\"><div class=\"dstat-top\"><div class=\"dstat-ic\"><i class=\"ti ti-clipboard-list\"></i></div></div><div class=\"dstat-num\" data-count=\""+_cmdList().length+"\">0</div><div class=\"dstat-lbl\">Toutes</div></div>";
   h+="<div class=\"dstat liv dstat-click tone-amber"+(_cmdFilter==="att"?" cmd-on":"")+"\" onclick=\"cmdSetFilter('att')\"><div class=\"dstat-top\"><div class=\"dstat-ic\"><i class=\"ti ti-clock\"></i></div><span class=\"live-dot\" style=\"--ld:#D97706\"></span></div><div class=\"dstat-num\" data-count=\""+enAttente+"\">0</div><div class=\"dstat-lbl\">En attente</div></div>";
   h+="<div class=\"dstat liv dstat-click tone-green"+(_cmdFilter==="rec"?" cmd-on":"")+"\" onclick=\"cmdSetFilter('rec')\"><div class=\"dstat-top\"><div class=\"dstat-ic\"><i class=\"ti ti-circle-check\"></i></div></div><div class=\"dstat-num\" data-count=\""+recues+"\">0</div><div class=\"dstat-lbl\">Re\u00e7ues</div></div>";
   h+="</div>";
@@ -5120,13 +5145,13 @@ function renderCommandes(){try{setActiveNav('btn-cmd');}catch(e){}
   h+="<button class=\"cmd-add-btn liv\" onclick=\"addCommandeManual()\"><i class=\"ti ti-plus\"></i> Ajouter</button>";
   h+="</div></div>";
 
-  if(!COMMANDES.length){
+  if(!_cmdList().length){
     h+="<div class=\"cmd-empty\"><i class=\"ti ti-clipboard-off\"></i><div class=\"cmd-empty-t\">Aucune commande en cours</div><div class=\"cmd-empty-d\">Les articles marqu\u00e9s \u00ab En commande \u00bb dans une appro appara\u00eetront ici, ou ajoutez-en un manuellement ci-dessus.</div></div></div>";
     m.innerHTML=h;setTimeout(function(){animateCounters(m);},240);return;
   }
 
   // Filtrage
-  var shown=COMMANDES.filter(function(c){var recu=c.statut==="recu";if(_cmdFilter==="att")return !recu;if(_cmdFilter==="rec")return recu;return true;});
+  var shown=_cmdList().filter(function(c){var recu=c.statut==="recu";if(_cmdFilter==="att")return !recu;if(_cmdFilter==="rec")return recu;return true;});
   if(!shown.length){
     h+="<div class=\"cmd-empty\"><i class=\"ti ti-filter-off\"></i><div class=\"cmd-empty-t\">Aucune commande "+(_cmdFilter==="att"?"en attente":"re\u00e7ue")+"</div><div class=\"cmd-empty-d\">Changez de filtre pour voir les autres commandes.</div></div></div>";
     m.innerHTML=h;setTimeout(function(){animateCounters(m);},240);return;
@@ -6022,7 +6047,6 @@ function dashLiveKPIs(){
   var tick=(typeof ticketsPendingCount==="function")?ticketsPendingCount():0;
   var cmd=(typeof COMMANDES!=="undefined")?COMMANDES.filter(function(c){return c.statut!=="recu";}).length:0;
   var pretes=(typeof TRUCKS!=="undefined")?TRUCKS.filter(function(t){return t.pret&&t.pret.to;}).length:0;
-  var urgent=cnt(function(s){return !s.draft&&s.statut!=="sortie"&&(s.priorite==="urgente"||s.priorite==="tres_urgente");});
   var brouillons=cnt(function(s){return s.draft;});
   var h="<div class=\"dash-sec-t\"><i class=\"ti ti-bolt\"></i> \u00c0 traiter maintenant</div>";
   h+="<div class=\"dash-grid stagger\">";
@@ -6032,7 +6056,6 @@ function dashLiveKPIs(){
   h+=_dashStat(cmd,"Commandes en attente","ti-truck-delivery","amber","renderCommandes()");
   h+=_dashStat(tick,"Demandes d\u00e9p\u00f4t","ti-ticket","pink","renderTickets()");
   h+=_dashStat(pretes,"Camions pr\u00eat\u00e9s","ti-arrows-exchange","orange","renderTrucksSettings()");
-  h+=_dashStat(urgent,"Priorit\u00e9 urgente","ti-flame","red","renderList()");
   h+=_dashStat(brouillons,"Brouillons","ti-file-pencil","purple","window._draftView=true;renderList()");
   h+="</div>";
   return h;
@@ -6122,7 +6145,6 @@ function _dashDepot(){
   var rendus=cnt(function(s){return !s.draft&&s.statut==="rendu";});
   var tick=(typeof ticketsPendingCount==="function")?ticketsPendingCount():0;
   var cmd=(typeof COMMANDES!=="undefined")?COMMANDES.filter(function(c){return c.statut!=="recu";}).length:0;
-  var urgent=cnt(function(s){return !s.draft&&s.statut!=="sortie"&&(s.priorite==="urgente"||s.priorite==="tres_urgente");});
   var TK=(typeof TRUCKS!=="undefined")?TRUCKS:[];
   var pretes=TK.filter(function(t){return t.pret&&t.pret.to;}).length;
   var enRev=TK.filter(function(t){return t.etat==="revision";}).length;
@@ -6133,7 +6155,6 @@ function _dashDepot(){
   h+=_dashStat(aPreparer,"\u00c0 pr\u00e9parer","ti-clipboard-list","blue","renderDepot()");
   h+=_dashStat(rendus,"Rendus \u00e0 contr\u00f4ler","ti-package-import","cyan","renderDepot()");
   h+=_dashStat(prete,"Pr\u00eates","ti-package","green","renderDepot()");
-  h+=_dashStat(urgent,"Priorit\u00e9 urgente","ti-flame","red","renderList()");
   h+="</div>";
   h+="<div class=\"dash-sec-t\"><i class=\"ti ti-inbox\"></i> Demandes &amp; commandes</div>";
   h+="<div class=\"dash-grid stagger\">";
