@@ -340,6 +340,45 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .sc-client i{font-size:12px;color:#94A3B8;flex-shrink:0}
 /* --- Appro sur 2 colonnes en grand écran (les tableaux restent pleine largeur) --- */
 .info-grid{display:grid;grid-template-columns:1fr;gap:12px}
+/* ═══ Parcours visuel de l'appro (guider un débutant) ═══ */
+.appro-steps{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #E8EDF4;border-radius:14px;padding:11px 14px;margin-bottom:16px;overflow-x:auto;box-shadow:0 3px 14px -8px rgba(15,23,42,.2)}
+html.dark .appro-steps{background:#1E293B;border-color:#334155}
+.astep{display:flex;align-items:center;gap:8px;flex:1;min-width:max-content}
+.astep-dot{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;background:#EEF1F6;color:#94A3B8;transition:all .25s var(--ease)}
+.astep-lbl{font-size:12.5px;font-weight:600;color:#94A3B8;white-space:nowrap;transition:color .25s var(--ease)}
+.astep-line{flex:1;height:2px;background:#EEF1F6;border-radius:2px;min-width:14px;transition:background .25s var(--ease)}
+.astep.now .astep-dot{background:linear-gradient(135deg,var(--accent,#6D28D9),var(--accent-2,#7C3AED));color:#fff;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent,#6D28D9) 15%,transparent)}
+.astep.now .astep-lbl{color:var(--accent,#6D28D9);font-weight:700}
+.astep.done .astep-dot{background:#16A34A;color:#fff}
+.astep.done .astep-lbl{color:#15803D}
+.astep.done+.astep-line,.astep-line.done{background:#16A34A}
+/* pastille numérotée sur les cartes */
+.card-num{width:24px;height:24px;border-radius:50%;background:color-mix(in srgb,var(--accent,#6D28D9) 13%,transparent);color:var(--accent,#6D28D9);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;margin-right:2px}
+.card-hint{font-size:11.5px;color:#94A3B8;font-weight:400;margin-left:4px}
+/* bandeau prochaine étape */
+.next-step{position:sticky;bottom:14px;z-index:29;margin:16px auto 0;max-width:560px;background:linear-gradient(135deg,var(--accent,#6D28D9),var(--accent-2,#7C3AED));color:#fff;border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:13px;box-shadow:0 12px 30px -10px color-mix(in srgb,var(--accent,#6D28D9) 60%,transparent)}
+.next-step-ic{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.next-step-ic i{font-size:20px}
+.next-step-txt{flex:1;min-width:0}
+.next-step-t{font-size:11px;font-weight:600;opacity:.8;text-transform:uppercase;letter-spacing:.5px}
+.next-step-d{font-size:14px;font-weight:700;margin-top:1px}
+.next-step-btn{background:#fff;color:var(--accent,#6D28D9);border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;transition:transform .12s var(--ease)}
+.next-step-btn:hover{transform:scale(1.04)}
+.next-step-btn:active{transform:scale(.96)}
+@media print{.appro-steps,.next-step{display:none!important}}
+@media(max-width:640px){.next-step{max-width:none;margin-left:8px;margin-right:8px}.next-step-d{font-size:13px}}
+/* encart d'invitation quand aucun article */
+.art-empty{text-align:center;background:#fff;border:1.5px dashed #D8E0EA;border-radius:16px;padding:26px 22px;margin-bottom:14px}
+html.dark .art-empty{background:#1E293B;border-color:#334155}
+.art-empty-ic{width:56px;height:56px;border-radius:16px;margin:0 auto 12px;background:color-mix(in srgb,var(--accent,#6D28D9) 12%,transparent);color:var(--accent,#6D28D9);display:flex;align-items:center;justify-content:center}
+.art-empty-ic i{font-size:28px}
+.art-empty-t{font-size:16px;font-weight:700;color:#0F172A}
+html.dark .art-empty-t{color:#F1F5F9}
+.art-empty-d{font-size:13px;color:#94A3B8;line-height:1.5;max-width:380px;margin:5px auto 16px}
+.art-empty-btn{background:linear-gradient(135deg,var(--accent,#6D28D9),var(--accent-2,#7C3AED));color:#fff;border:none;border-radius:11px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;box-shadow:0 6px 16px -6px color-mix(in srgb,var(--accent,#6D28D9) 50%,transparent);transition:transform .12s var(--ease)}
+.art-empty-btn:hover{transform:translateY(-2px)}
+.art-empty-btn:active{transform:scale(.97)}
+@media print{.art-empty{display:none!important}}
 @media(min-width:1100px){.fv{max-width:1180px}.info-grid{grid-template-columns:1fr 1fr;align-items:start}}
 @media print{.info-grid{display:block!important}}
 .sc-foot{display:flex;justify-content:space-between;align-items:center;margin-top:5px}
@@ -665,6 +704,35 @@ html.dark .tour-prev{background:#0F172A;color:#CBD5E1}
 .tour-next{background:var(--accent,#6D28D9);color:#fff}
 .tour-next:hover{filter:brightness(1.08)}
 .tour-skip-x{position:absolute;top:12px;right:13px;background:none;border:none;color:#94A3B8;cursor:pointer;font-size:16px;padding:2px;line-height:1}
+/* centre d'aide (liste de modules) */
+.help-card{background:#fff;border-radius:22px;max-width:460px;width:100%;padding:30px 28px;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,.4);animation:tourPop .4s var(--spring);position:relative;max-height:88vh;overflow-y:auto}
+html.dark .help-card{background:#1E293B}
+.help-card h2{font-size:22px;font-weight:800;color:#0F172A;margin-bottom:6px}
+html.dark .help-card h2{color:#F1F5F9}
+.help-card p{font-size:13.5px;color:#64748B;line-height:1.5;margin-bottom:6px}
+.help-prog{margin:16px 0 8px}
+.help-prog-bar{height:8px;border-radius:5px;background:#EEF1F6;overflow:hidden}
+html.dark .help-prog-bar{background:#0F172A}
+.help-prog-bar span{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent,#6D28D9),var(--accent-2,#7C3AED));transition:width .5s var(--ease)}
+.help-prog-t{font-size:11.5px;color:#94A3B8;font-weight:600;margin-top:6px}
+.help-mods{display:flex;flex-direction:column;gap:8px;margin-top:16px;text-align:left}
+.help-mod{display:flex;align-items:center;gap:12px;background:#F8FAFC;border:1px solid #E8EDF4;border-radius:13px;padding:12px 14px;cursor:pointer;font-family:inherit;transition:transform .14s var(--ease),box-shadow .16s var(--ease),border-color .15s}
+html.dark .help-mod{background:#0F172A;border-color:#334155}
+.help-mod:hover{transform:translateX(3px);border-color:var(--accent,#6D28D9);box-shadow:0 6px 16px rgba(15,23,42,.08)}
+.help-mod-ic{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--accent,#6D28D9) 12%,transparent);color:var(--accent,#6D28D9)}
+.help-mod-ic i{font-size:19px}
+.help-mod-txt{flex:1;min-width:0}
+.help-mod-t{display:block;font-size:14px;font-weight:700;color:#0F172A}
+html.dark .help-mod-t{color:#F1F5F9}
+.help-mod-s{display:block;font-size:11.5px;color:#94A3B8;margin-top:1px}
+.help-mod-chk{flex-shrink:0;color:#CBD5E1;font-size:20px;display:flex;align-items:center}
+.help-mod.done .help-mod-ic{background:color-mix(in srgb,#16A34A 14%,transparent);color:#16A34A}
+.help-mod.done .help-mod-chk{color:#16A34A}
+/* indice "à vous de cliquer" dans la bulle */
+.tour-click-hint{margin-top:10px;font-size:12px;font-weight:600;color:var(--accent,#6D28D9);background:color-mix(in srgb,var(--accent,#6D28D9) 10%,transparent);border-radius:9px;padding:8px 10px;display:flex;align-items:center;gap:7px}
+.tour-click-hint i{font-size:15px;animation:pop 1.2s var(--ease) infinite}
+.tour-skip-step{background:transparent;color:#94A3B8;text-decoration:underline}
+@media(prefers-reduced-motion:reduce){.tour-click-hint i{animation:none}}
 .tour-skip-x:hover{color:#DC2626}
 @media(max-width:520px){.tour-bubble{width:calc(100vw - 28px)}}
 @media print{.tour-ov,.tour-welcome{display:none!important}}
@@ -3432,6 +3500,50 @@ function _mountCpFab(){
   b.style.display="inline-flex";
 }
 function _unmountCpFab(){var b=document.getElementById("cp-fab");if(b)b.style.display="none";}
+// ═══ Parcours visuel de l'appro : calcule l'avancement pour guider ═══
+function _approStepState(){
+  // renvoie {chantier, equipe, materiel} = booléens de complétion
+  var chantier=!!(cur&&(cur.nomChantier||"").trim());
+  var equipe=!!(cur&&((cur.conducteur||"").trim()||(cur.chargeAffaires||"").trim()));
+  var materiel=false;
+  if(cur){["consommables","fournitures","outillage"].forEach(function(k){(cur[k]||[]).forEach(function(r){if(r.designation&&(""+r.designation).trim())materiel=true;});});}
+  return {chantier:chantier,equipe:equipe,materiel:materiel};
+}
+function _approStepperHTML(){
+  if(isField())return ""; // vue terrain simplifiée : pas de stepper
+  var st=_approStepState();
+  var steps=[
+    {n:1,l:"Le chantier",done:st.chantier},
+    {n:2,l:"L'équipe",done:st.equipe},
+    {n:3,l:"Le matériel",done:st.materiel},
+    {n:4,l:"Envoyer",done:false}
+  ];
+  // l'étape "now" = la première non terminée
+  var nowIdx=steps.findIndex(function(s){return !s.done;});
+  if(nowIdx<0)nowIdx=3;
+  var h="<div class=\"appro-steps\" aria-label=\"Progression de l'appro\">";
+  steps.forEach(function(s,i){
+    var cls=s.done?"done":(i===nowIdx?"now":"");
+    h+="<div class=\"astep "+cls+"\"><span class=\"astep-dot\">"+(s.done?"<i class=\"ti ti-check\" style=\"font-size:14px\"></i>":s.n)+"</span><span class=\"astep-lbl\">"+s.l+"</span></div>";
+    if(i<steps.length-1)h+="<span class=\"astep-line"+(s.done?" done":"")+"\"></span>";
+  });
+  h+="</div>";
+  return h;
+}
+function _approNextStepHTML(){
+  if(isField())return "";
+  var st=_approStepState();
+  var next;
+  if(!st.chantier)next={t:"Étape 1",d:"Renseignez le nom du chantier",ic:"ti-building-community",btn:null,act:null};
+  else if(!st.equipe)next={t:"Étape 2",d:"Indiquez le conducteur ou le chargé d'affaires",ic:"ti-users",btn:null,act:null};
+  else if(!st.materiel)next={t:"Étape 3",d:"Ajoutez du matériel à l'appro",ic:"ti-package",btn:"Ouvrir le catalogue",act:"showCp()"};
+  else if(cur&&cur.draft)next={t:"Dernière étape",d:"Envoyez l'appro au dépôt",ic:"ti-send",btn:"Envoyer en production",act:"sendToProduction()"};
+  else next={t:"C'est prêt",d:"Pensez à enregistrer vos modifications",ic:"ti-device-floppy",btn:"Enregistrer",act:"doSave()"};
+  var h="<div class=\"next-step\"><div class=\"next-step-ic\"><i class=\"ti "+next.ic+"\"></i></div><div class=\"next-step-txt\"><div class=\"next-step-t\">"+esc(next.t)+" · prochaine étape</div><div class=\"next-step-d\">"+esc(next.d)+"</div></div>";
+  if(next.btn&&next.act)h+="<button class=\"next-step-btn\" onclick=\""+next.act+"\"><i class=\"ti ti-arrow-right\"></i> "+esc(next.btn)+"</button>";
+  h+="</div>";
+  return h;
+}
 function renderForm(){
   if(typeof closeSidebar==="function")closeSidebar();
   var ai=(cur.additionDates||[]).indexOf(addDate);
@@ -3452,7 +3564,12 @@ function renderForm(){
   var typeOpts="<option value=\"\">&#8212; S&#233;lectionner &#8212;</option>";
   WT.forEach(function(t){typeOpts+="<option value=\""+esc(t)+"\""+( cur.typeChantier===t?" selected":"")+">"+esc(t)+"</option>";});
   var secs=[{k:"consommables",l:"Consommables",i:"ti-flask",c:"#1D4ED8"},{k:"fournitures",l:"Fournitures",i:"ti-bolt",c:"#B45309"},{k:"outillage",l:"Outillage",i:"ti-tool",c:"#0F766E"}];
-  var secH=secs.map(function(s){
+  var _totalArts=0;secs.forEach(function(s){_totalArts+=cur[s.k].filter(function(r){return r.designation&&(""+r.designation).trim();}).length;});
+  var secH="";
+  if(_totalArts===0&&!isField()){
+    secH+="<div class=\"art-empty\"><div class=\"art-empty-ic\"><i class=\"ti ti-package\"></i></div><div class=\"art-empty-t\">Ajoutez votre premier article</div><div class=\"art-empty-d\">Tapez le nom d'un produit dans le tableau ci-dessous (il se complète tout seul), ou ouvrez le catalogue pour piocher dedans.</div><button class=\"art-empty-btn liv\" onclick=\"showCp()\"><i class=\"ti ti-package\"></i> Ouvrir le catalogue</button></div>";
+  }
+  secH+=secs.map(function(s){
     var cnt=cur[s.k].filter(function(r){return r.designation;}).length;
     return "<div class=\"card sec-card\" style=\"border-top:3px solid "+s.c+"\"><div class=\"card-hd\" style=\"background:"+s.c+"0F\"><div class=\"card-hd-t\" style=\"color:"+s.c+"\"><i class=\"ti "+s.i+"\" style=\"font-size:17px;color:"+s.c+"\"></i> "+s.l+"<span class=\"card-hd-n\" style=\"background:"+s.c+"1A;color:"+s.c+"\">"+cnt+" article"+(cnt!==1?"s":"")+"</span></div></div>"+tblH(s.k,s.c)+"</div>";
   }).join("");
@@ -3463,6 +3580,7 @@ function renderForm(){
   h+="<div class=\"topbar\"><button class=\"btn-back\" onclick=\"goBack()\"><i class=\"ti ti-arrow-left\" style=\"font-size:13px\"></i> Retour</button><div class=\"tb-right\"><button class=\"tbi\" style=\"color:#6D28D9\" title=\"Catalogue\" onclick=\"showCp()\"><i class=\"ti ti-package\"></i></button>"+addBtn+"<button class=\"tbi\" style=\"color:#B91C1C\" title=\"Exporter en PDF\" onclick=\"doPDF()\"><i class=\"ti ti-file-type-pdf\"></i></button>"+delBtn+shareBtn+saveBtn+"</div></div>";
   _mountCpFab();
   h+=tplNotice+addBanner;
+  h+=_approStepperHTML();
   if(cur.draft&&!isField()){
     h+="<div style=\"background:#fff;border:1px solid #FDE9C8;border-left:4px solid #F59E0B;border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 3px 12px -7px rgba(245,158,11,.5)\"><div style=\"display:flex;align-items:center;gap:11px\"><div style=\"width:38px;height:38px;border-radius:11px;background:#FEF3C7;color:#D97706;display:flex;align-items:center;justify-content:center;flex-shrink:0\"><i class=\"ti ti-pencil\" style=\"font-size:19px\"></i></div><div><div style=\"font-size:14px;font-weight:700;color:#0F172A\">Brouillon</div><div style=\"font-size:12px;color:#78716C\">Le chef d\u00e9p\u00f4t ne voit pas encore cette appro. Envoie-la en production quand elle est pr\u00eate.</div></div></div><button onclick=\"sendToProduction()\" class=\"liv\" style=\"background:#15803D;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;box-shadow:0 5px 14px -6px rgba(21,128,61,.6)\"><i class=\"ti ti-send\"></i> Envoyer en production</button></div>";
   }
@@ -3475,13 +3593,13 @@ function renderForm(){
   }
   h+="</div></div>";
   h+="<div class=\"info-grid\">";
-  h+="<div class=\"card info-sec\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class=\"ti ti-building-community\" style=\"font-size:16px;color:#6D28D9\"></i> Chantier</div></div><div class=\"card-fields\">";
+  h+="<div class=\"card info-sec\"><div class=\"card-hd\"><div class=\"card-hd-t\"><span class=\"card-num\">1</span><i class=\"ti ti-building-community\" style=\"font-size:16px;color:#6D28D9\"></i> Chantier <span class=\"card-hint\">Où sont les travaux ?</span></div></div><div class=\"card-fields\">";
   h+="<div class=\"fg\"><label>Nom du chantier</label><input class=\"fin\" value=\""+esc(cur.nomChantier)+"\" placeholder=\"Ex: Ravalement fa&#231;ade...\" oninput=\"upF('nomChantier',this.value)\"/></div>";
   h+="<div class=\"fg fg-full\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-map-pin\" style=\"font-size:12px;color:#DC2626\"></i> Adresse du chantier</label><textarea class=\"fin\" rows=\"2\" style=\"resize:vertical\" placeholder=\"Adresse compl&#232;te du chantier (rue, code postal, ville)...\" oninput=\"upF('adresseChantier',this.value)\">"+esc(cur.adresseChantier||"")+"</textarea></div>";
   h+="";
 h+="";
   h+="</div></div>";
-  h+="<div class=\"card info-sec\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class=\"ti ti-users\" style=\"font-size:16px;color:#6D28D9\"></i> Intervenants</div></div><div class=\"card-fields\">";
+  h+="<div class=\"card info-sec\"><div class=\"card-hd\"><div class=\"card-hd-t\"><span class=\"card-num\">2</span><i class=\"ti ti-users\" style=\"font-size:16px;color:#6D28D9\"></i> Intervenants <span class=\"card-hint\">Qui s'en occupe ?</span></div></div><div class=\"card-fields\">";
   h+="<div class=\"fg\"><label>Charg&#233; d&#39;affaires</label><input class=\"fin\" value=\""+esc(cur.chargeAffaires)+"\" placeholder=\"Nom Pr&#233;nom\" oninput=\"upF('chargeAffaires',this.value)\"/></div>";
   var clientOpts=CLIENTS.map(function(c){return "<option value=\""+esc(c)+"\"></option>";}).join("");
   h+="<div class=\"fg\"><label style=\"display:flex;align-items:center;gap:6px\"><i class=\"ti ti-building\" style=\"font-size:12px;vertical-align:-1px\"></i> Client / Site <button type=\"button\" onclick=\"addNewClient()\" title=\"Ajouter un client\" style=\"background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:5px;padding:1px 6px;font-size:11px;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i></button>"+(isAdmin()?"<button type=\"button\" onclick=\"manageClients()\" title=\"G\u00e9rer les clients\" style=\"background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;border-radius:5px;padding:1px 6px;font-size:11px;cursor:pointer;font-family:inherit\"><i class=\"ti ti-settings\"></i></button>":"")+"</label><input class=\"fin\" list=\"clients-list\" value=\""+esc(cur.clientSite||"")+"\" placeholder=\"Rechercher ou saisir...\" oninput=\"upF('clientSite',this.value)\"/><datalist id=\"clients-list\">"+clientOpts+"</datalist></div>";
@@ -3489,7 +3607,7 @@ h+="";
   h+="<div class=\"fg fg-full\"><label>Conducteur de travaux responsable</label><input class=\"fin\" list=\"conducteurs-list\" value=\""+esc(cur.conducteur||"")+"\" placeholder=\"Nom Pr\u00e9nom\" oninput=\"upF('conducteur',this.value)\"/><datalist id=\"conducteurs-list\">"+condOpts+"</datalist></div>";
   h+="<div class=\"fg fg-full\"><label>Coordonn\u00e9es client</label><textarea class=\"fin\" rows=\"2\" style=\"resize:vertical\" placeholder=\"Nom, t\u00e9l, contact...\" oninput=\"upF('coordClient',this.value)\">"+esc(cur.coordClient||"")+"</textarea></div>";
   h+="</div></div>";
-  h+="<div class=\"card info-sec\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class=\"ti ti-calendar-clock\" style=\"font-size:16px;color:#6D28D9\"></i> Planning &amp; camion</div></div><div class=\"card-fields\">";
+  h+="<div class=\"card info-sec\"><div class=\"card-hd\"><div class=\"card-hd-t\"><span class=\"card-num\">3</span><i class=\"ti ti-calendar-clock\" style=\"font-size:16px;color:#6D28D9\"></i> Planning &amp; camion <span class=\"card-hint\">Pour quand ?</span></div></div><div class=\"card-fields\">";
   h+="<div class=\"fg\"><label><i class=\"ti ti-calendar-due\" style=\"font-size:12px;vertical-align:-1px\"></i> Date limite d&#39;appro</label><input class=\"fin\" type=\"date\" value=\""+esc(cur.dateAppro)+"\" oninput=\"upF('dateAppro',this.value)\"/></div>";
   h+="<div class=\"fg\"><label><i class=\"ti ti-calendar-event\" style=\"font-size:12px;vertical-align:-1px\"></i> Date d&#233;but de chantier</label><input class=\"fin\" type=\"date\" value=\""+esc(cur.dateChantier)+"\" oninput=\"upF('dateChantier',this.value)\"/></div>";
   _autoSujetCheck();
@@ -3501,6 +3619,7 @@ h+="";
   h+=aiBanner+aiErr+legH()+secH;
 h+="<div class=\"card\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class=\"ti ti-star\" style=\"font-size:16px;color:#F59E0B\"></i> Qualit\u00e9 de l'appro</div>"+(avgNote(cur)>0?"<span class=\"card-hd-n\">"+avgNote(cur).toFixed(1)+"/5 \u00b7 "+cur.notes.length+" avis</span>":"")+"</div><div style=\"padding:16px 18px;display:flex;align-items:center;gap:14px\"><div style=\"display:flex;gap:3px\">"+starsHTML(avgNote(cur),true,cur.id)+"</div><span style=\"font-size:12px;color:#94A3B8\">"+(avgNote(cur)>0?"Note moyenne : "+avgNote(cur).toFixed(1)+"/5":"Cliquez sur les \u00e9toiles pour noter")+"</span></div></div>";
   h+="<div class=\"card\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class=\"ti ti-notes\" style=\"font-size:16px;color:#64748B\"></i> Observation</div></div><textarea class=\"obs-ta\" placeholder=\"Remarques, consignes particuli&#232;res...\" rows=\"3\" oninput=\"upF('observation',this.value)\">"+esc(cur.observation)+"</textarea></div>";
+  h+=_approNextStepHTML();
   h+="<div style=\"height:16px\"></div></div>";
   if(cur&&cur._id){
     h+="<div style=\"max-width:920px;margin:0 auto 24px;padding:0 18px\"><div style=\"background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden\"><button type=\"button\" onclick=\"toggleHistory()\" style=\"width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:14px 16px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#0F172A\"><i class=\"ti ti-history\" style=\"font-size:17px;color:#64748B\"></i> Historique &amp; acc\u00e8s <i class=\"ti ti-chevron-down\" id=\"hist-chev\" style=\"margin-left:auto;color:#94A3B8\"></i></button><div id=\"hist-box\" style=\"display:none;padding:0 16px 16px\"></div></div></div>";
@@ -6558,9 +6677,9 @@ function doLogout(){
   document.getElementById("li-user").value="";
   document.getElementById("li-pass").value="";
 }
-// ═══════════════ TUTO INTERACTIF (onboarding par rôle) ═══════════════
-var _tourSteps=[],_tourIdx=0;
-function _tourKey(){return "appro_tour_done_"+((currentUser&&currentUser.id)||"u");}
+// ═══════════════ TUTO INTERACTIF MODULAIRE (centre d'aide par rôle) ═══════════════
+var _tourSteps=[],_tourIdx=0,_tourModule=null,_tourClickWait=null,_tourMissTimer=null;
+function _tourRole(){var r=(currentUser&&currentUser.role)||"conducteur";if(r==="admin")return "conducteur";if(r==="technicien")return "team_leader";return r;}
 function _tourRoleLabel(){
   var r=(currentUser&&currentUser.role)||"conducteur";
   if(r==="admin")return "Administrateur";
@@ -6568,71 +6687,170 @@ function _tourRoleLabel(){
   if(r==="team_leader"||r==="technicien")return "Terrain";
   return "Conducteur de travaux";
 }
-/* Étapes adaptées au rôle. Chaque étape : sélecteur de l'élément réel à mettre
-   en avant (ou null = bulle centrée), titre, texte, icône. */
-function _buildTourSteps(){
-  var r=(currentUser&&currentUser.role)||"conducteur";
-  var s=[];
-  if(r==="depot"){
-    s.push({sel:"#btn-home",ic:"ti-home",t:"Votre tableau de bord",d:"Ici, votre poste de pilotage : ce qu'il y a à préparer, les rendus à contrôler et l'état du parc camions."});
-    s.push({sel:"#btn-cmd",ic:"ti-clipboard-list",t:"Les commandes",d:"Suivez le matériel en commande, groupé par affaire. Marquez « Reçu » quand la livraison arrive."});
-    s.push({sel:"#btn-trucks",ic:"ti-truck",t:"Gestion des camions",d:"Chaque camion, son équipement et ses prêts entre équipes. Tout se modifie d'un clic."});
-    s.push({sel:"#srch",ic:"ti-search",t:"Rechercher",d:"Retrouvez vite un chantier, une adresse ou un article."});
-  } else if(r==="team_leader"||r==="technicien"){
-    s.push({sel:"#btn-home",ic:"ti-home",t:"Votre accueil",d:"Vos appros à prendre, sur chantier et à rendre, et l'état de votre camion."});
-    s.push({sel:"#sheets-list",ic:"ti-list",t:"Vos appros",d:"La liste de vos approvisionnements. Touchez-en un pour voir le détail du matériel."});
-  } else {
-    // conducteur / admin
-    s.push({sel:"#btn-new-sb",ic:"ti-plus",t:"Créer une appro",d:"Le bouton principal : lancez une nouvelle feuille d'approvisionnement pour un chantier."});
-    s.push({sel:"#btn-home",ic:"ti-home",t:"Votre accueil",d:"Le suivi de vos chantiers en un coup d'œil : brouillons, en préparation, prêts, sur chantier."});
-    s.push({sel:"#btn-biblio",ic:"ti-books",t:"La bibliothèque",d:"Toutes les appros, rangées par conducteur. Réutilisez-en une comme base pour gagner du temps."});
-    s.push({sel:"#srch",ic:"ti-search",t:"Rechercher",d:"Retrouvez vite un chantier, une adresse, un N° d'affaire ou un article."});
-  }
-  // commun à tous
-  s.push({sel:"#amb-btn",ic:"ti-palette",t:"Votre ambiance",d:"Choisissez votre thème de couleur — y compris les thèmes « années 80 ». C'est personnel à votre appareil."});
-  s.push({sel:"#help-btn",ic:"ti-help-circle",t:"Besoin d'aide ?",d:"Rejouez cette visite quand vous voulez en cliquant ici. Bonne prise en main !"});
-  return s;
+/* Modules de tuto. Chaque étape : {sel, ic, t, d, action:"click"|"next", before:fn}
+   action "click" = on attend le vrai clic de l'utilisateur sur la cible (jamais simulé). */
+var TUTO_MODULES={
+  bases:{titre:"Les bases",ic:"ti-compass",roles:["conducteur","depot","team_leader"],etapes:function(){
+    var s=[{sel:"#btn-home",ic:"ti-home",t:"Votre accueil",d:"Le point de départ : le suivi de votre activité en un coup d'œil.",action:"next"}];
+    s.push({sel:"#srch",ic:"ti-search",t:"Rechercher",d:"Retrouvez vite un chantier, une adresse, un N° d'affaire ou un article.",action:"next"});
+    s.push({sel:".notif-bell",ic:"ti-bell",t:"Vos notifications",d:"La cloche sonne quand quelque chose vous attend. Cliquez pour voir les détails.",action:"next"});
+    s.push({sel:"#amb-btn",ic:"ti-palette",t:"Votre ambiance",d:"Choisissez votre thème de couleur — même les styles « années 80 ». C'est personnel à votre appareil.",action:"next"});
+    s.push({sel:"#help-btn",ic:"ti-help-circle",t:"L'aide, quand vous voulez",d:"Revenez ici à tout moment pour rejouer un module ou en découvrir un nouveau.",action:"next"});
+    return s;
+  }},
+  appro:{titre:"Créer une appro",ic:"ti-plus",roles:["conducteur"],etapes:function(){
+    return [
+      {sel:".btn-new-sb",ic:"ti-plus",t:"Lancer une appro",d:"Cliquez ici pour créer une nouvelle feuille d'approvisionnement.",action:"click"},
+      {sel:".cin-d",ic:"ti-keyboard",t:"Saisir un article",d:"Tapez le début d'un produit connu, puis appuyez sur Tab : il se complète tout seul.",action:"next"},
+      {sel:"#cp-fab",ic:"ti-package",t:"Le catalogue",d:"Pour aller plus vite, ouvrez le catalogue et piochez dans les produits déjà enregistrés.",action:"next"},
+      {sel:".btn-save",ic:"ti-device-floppy",t:"Enregistrer",d:"Sauvegardez votre appro à tout moment : vous pourrez la reprendre plus tard.",action:"next"}
+    ];
+  }},
+  catalogue:{titre:"Maîtriser le catalogue",ic:"ti-package",roles:["conducteur","depot"],etapes:function(){
+    return [
+      {sel:"#cp-fab",ic:"ti-package",t:"Ouvrez le catalogue",d:"Cliquez sur ce bouton pour afficher le catalogue.",action:"click"},
+      {sel:"#cp-search",ic:"ti-search",t:"Une recherche maligne",d:"Tapez « maçonnerie » : vous obtenez la catégorie ET les produits qui s'en rapprochent. Les fautes de frappe sont pardonnées.",action:"next"},
+      {sel:".cp-tile,.cp-row",ic:"ti-checkbox",t:"Cochez un article",d:"Sélectionnez un ou plusieurs articles à ajouter.",action:"next"},
+      {sel:"#cp-n,#cp-count",ic:"ti-list-check",t:"Sélection conservée",d:"Votre sélection reste en mémoire même si vous relancez une recherche.",action:"next"},
+      {sel:".cp-ins,button[onclick^=\"insertCp\"]",ic:"ti-circle-plus",t:"Insérer",d:"Ajoutez vos articles : le catalogue reste ouvert pour enchaîner sans le rouvrir.",action:"next"}
+    ];
+  }},
+  biblio:{titre:"La bibliothèque",ic:"ti-books",roles:["conducteur","depot"],etapes:function(){
+    return [
+      {sel:"#btn-biblio",ic:"ti-books",t:"Ouvrez la bibliothèque",d:"Toutes les appros sont ici, rangées par conducteur.",action:"click"},
+      {sel:".lib-search,#lib-search",ic:"ti-search",t:"Chercher par article",d:"Retrouvez une appro même en tapant le nom d'un article qu'elle contient.",action:"next"},
+      {sel:".lib-card",ic:"ti-copy",t:"Réutiliser un modèle",d:"Un chantier ressemble à un précédent ? Prenez-le comme base pour gagner du temps. Un clic droit (ou appui long) ouvre les actions.",action:"next"}
+    ];
+  }},
+  depot:{titre:"Préparer & rendre",ic:"ti-building-warehouse",roles:["depot"],etapes:function(){
+    return [
+      {sel:"#btn-home",ic:"ti-clipboard-list",t:"À préparer",d:"Votre poste de pilotage liste les appros à préparer aujourd'hui.",action:"next"},
+      {sel:".depot-card",ic:"ti-package",t:"Ouvrir une appro",d:"Ouvrez une appro pour cocher le matériel disponible au fur et à mesure.",action:"next"},
+      {sel:"#btn-home",ic:"ti-check",t:"Marquer préparée",d:"Une fois tout coché, l'appro passe en « prête ». Elle rejoint la colonne suivante.",action:"next"}
+    ];
+  }},
+  commandes:{titre:"Les commandes",ic:"ti-clipboard-list",roles:["conducteur","depot"],etapes:function(){
+    return [
+      {sel:"#btn-cmd",ic:"ti-clipboard-list",t:"Ouvrez les commandes",d:"Le matériel en commande, regroupé par N° d'affaire.",action:"click"},
+      {sel:".cmd-add,#cmd-prod",ic:"ti-plus",t:"Ajouter une commande",d:"Notez un produit à commander, avec sa quantité et son affaire.",action:"next"},
+      {sel:".cmd-recu-btn,button[onclick^=\"toggleCommandeRecu\"]",ic:"ti-check",t:"Marquer reçu",d:"Quand la livraison arrive, marquez-la reçue : une vague verte confirme.",action:"next"}
+    ];
+  }},
+  camions:{titre:"Les camions",ic:"ti-truck",roles:["depot"],etapes:function(){
+    return [
+      {sel:"#btn-trucks",ic:"ti-truck",t:"Ouvrez les camions",d:"Chaque camion, rattaché à un Team Leader.",action:"click"},
+      {sel:".tcard",ic:"ti-adjustments",t:"Modifier un camion",d:"Type, plaque, état (chantier / dépôt / révision) : tout se change directement sur la carte.",action:"next"},
+      {sel:".tequip,button[onclick^=\"openTruckEquip\"]",ic:"ti-package",t:"L'équipement",d:"Ouvrez l'équipement embarqué : il sera déduit automatiquement lors d'une appro.",action:"next"}
+    ];
+  }},
+  annonces:{titre:"Les annonces",ic:"ti-speakerphone",roles:["depot"],etapes:function(){
+    return [
+      {sel:"#btn-annonce",ic:"ti-speakerphone",t:"Ouvrez les annonces",d:"Diffusez un message à toute l'équipe, aux Team Leaders, ou à une personne.",action:"click"},
+      {sel:"#an-t-general,.ann-seg",ic:"ti-users",t:"Choisir la cible",d:"Générale, Team Leaders ou une personne précise : sélectionnez qui reçoit l'annonce.",action:"next"},
+      {sel:".ann-wrap",ic:"ti-send",t:"Publier",d:"Rédigez puis publiez. Vous pourrez activer ou désactiver une annonce à tout moment.",action:"next"}
+    ];
+  }},
+  reglages:{titre:"Personnaliser",ic:"ti-adjustments",roles:["conducteur","depot"],etapes:function(){
+    var s=[{sel:"#amb-btn",ic:"ti-palette",t:"Vos couleurs",d:"Changez d'ambiance quand vous voulez, y compris les thèmes « années 80 ».",action:"next"}];
+    if(canManage())s.push({sel:"#btn-ui",ic:"ti-settings",t:"Paramétrage",d:"Gérez le catalogue, les kits et l'ordre des catégories (glissez-les pour réordonner).",action:"next"});
+    if((currentUser&&currentUser.role)==="admin")s.push({sel:"#btn-perso",ic:"ti-user-cog",t:"Personnalisation",d:"Libellés, notifications par email, ordre du menu : les réglages de l'équipe.",action:"next"});
+    return s;
+  }}
+};
+function _tutoOrder(){return ["bases","appro","catalogue","biblio","depot","commandes","camions","annonces","reglages"];}
+function _tutoModulesForRole(){
+  var role=_tourRole();
+  return _tutoOrder().filter(function(k){return TUTO_MODULES[k]&&TUTO_MODULES[k].roles.indexOf(role)>=0;});
 }
-function startTour(){
-  _tourSteps=_buildTourSteps();_tourIdx=0;
-  var ov=document.getElementById("tour-ov");if(!ov){ov=document.createElement("div");ov.id="tour-ov";ov.className="tour-ov";document.body.appendChild(ov);}
+function _tutoDoneKey(m){return "appro_tuto_"+((currentUser&&currentUser.id)||"u")+"_"+m;}
+function _tutoModuleDone(m){try{return localStorage.getItem(_tutoDoneKey(m))==="1";}catch(e){return false;}}
+function _tutoAllDoneKey(){return "appro_tuto_seen_"+((currentUser&&currentUser.id)||"u");}
+
+// ---- Centre d'aide (liste des modules) ----
+function startTour(){openHelpCenter();}
+function openHelpCenter(){
+  var mods=_tutoModulesForRole();
+  var done=mods.filter(_tutoModuleDone).length;
+  var ov=_tourOverlay();
   ov.classList.add("on");
-  ov.innerHTML="<div class=\"tour-welcome\" id=\"tour-welcome\"><div class=\"tour-w-card\"><div class=\"tour-w-ic\"><i class=\"ti ti-route\"></i></div><h2>Bienvenue sur AppROVISIO</h2><div class=\"tour-w-role\"><i class=\"ti ti-user\" style=\"font-size:11px\"></i> "+esc(_tourRoleLabel())+"</div><p>Une courte visite guidée pour prendre l'application en main, adaptée à votre rôle. Ça prend moins d'une minute.</p><div class=\"tour-w-btns\"><button class=\"tour-w-skip\" onclick=\"endTour()\">Passer</button><button class=\"tour-w-go\" onclick=\"_tourBegin()\"><i class=\"ti ti-player-play\" style=\"font-size:14px\"></i> Commencer</button></div></div></div>";
+  var cards="";
+  mods.forEach(function(k){
+    var mod=TUTO_MODULES[k];var fin=_tutoModuleDone(k);
+    cards+="<button class=\"help-mod"+(fin?" done":"")+"\" onclick=\"startTutoModule('"+k+"')\">"+
+      "<span class=\"help-mod-ic\"><i class=\"ti "+mod.ic+"\"></i></span>"+
+      "<span class=\"help-mod-txt\"><span class=\"help-mod-t\">"+esc(mod.titre)+"</span><span class=\"help-mod-s\">"+(fin?"Terminé":"À découvrir")+"</span></span>"+
+      "<span class=\"help-mod-chk\"><i class=\"ti "+(fin?"ti-circle-check-filled":"ti-player-play")+"\"></i></span></button>";
+  });
+  var pct=mods.length?Math.round(done/mods.length*100):0;
+  ov.innerHTML="<div class=\"tour-welcome\"><div class=\"help-card\">"+
+    "<button class=\"tour-skip-x\" onclick=\"endTour()\"><i class=\"ti ti-x\"></i></button>"+
+    "<div class=\"tour-w-ic\"><i class=\"ti ti-help-circle\"></i></div>"+
+    "<h2>Centre d'aide</h2>"+
+    "<div class=\"tour-w-role\"><i class=\"ti ti-user\" style=\"font-size:11px\"></i> "+esc(_tourRoleLabel())+"</div>"+
+    "<p>Des mini-visites pour découvrir chaque partie de l'application, à votre rythme.</p>"+
+    "<div class=\"help-prog\"><div class=\"help-prog-bar\"><span style=\"width:"+pct+"%\"></span></div><div class=\"help-prog-t\">"+done+" / "+mods.length+" module"+(mods.length>1?"s":"")+" terminé"+(done>1?"s":"")+"</div></div>"+
+    "<div class=\"help-mods\">"+cards+"</div>"+
+    "</div></div>";
 }
-function _tourBegin(){
-  var w=document.getElementById("tour-welcome");if(w)w.remove();
-  var ov=document.getElementById("tour-ov");
+function startTutoModule(m){
+  var mod=TUTO_MODULES[m];if(!mod)return;
+  _tourModule=m;
+  _tourSteps=(typeof mod.etapes==="function")?mod.etapes():mod.etapes;
+  _tourIdx=0;
+  var ov=_tourOverlay();ov.classList.add("on");
   ov.innerHTML="<div class=\"tour-scrim\" onclick=\"return false\"></div><div class=\"tour-hole\" id=\"tour-hole\"></div><div class=\"tour-bubble\" id=\"tour-bubble\"></div>";
-  _tourShow();
   window.addEventListener("resize",_tourReposition);
+  _tourShow();
+}
+function _tourOverlay(){
+  var ov=document.getElementById("tour-ov");
+  if(!ov){ov=document.createElement("div");ov.id="tour-ov";ov.className="tour-ov";document.body.appendChild(ov);}
+  return ov;
+}
+function _tourClearWaits(){
+  if(_tourClickWait){try{_tourClickWait.el.removeEventListener("click",_tourClickWait.fn,true);}catch(e){}_tourClickWait=null;}
+  if(_tourMissTimer){clearTimeout(_tourMissTimer);_tourMissTimer=null;}
 }
 function _tourShow(){
-  var step=_tourSteps[_tourIdx];if(!step){endTour();return;}
+  _tourClearWaits();
+  var step=_tourSteps[_tourIdx];if(!step){_tourModuleComplete();return;}
   var hole=document.getElementById("tour-hole");
   var bubble=document.getElementById("tour-bubble");
   if(!hole||!bubble)return;
+  if(step.before){try{step.before();}catch(e){}}
+  // sur mobile, ouvrir la sidebar pour viser un bouton de menu
+  if(window.innerWidth<900&&step.sel&&step.sel.indexOf("#btn-")===0&&typeof openSidebar==="function"){try{openSidebar();}catch(e){}}
   var target=step.sel?document.querySelector(step.sel):null;
   var visible=target&&target.offsetParent!==null;
-  // dots
   var dots="";for(var i=0;i<_tourSteps.length;i++)dots+="<span class=\"tour-dot"+(i===_tourIdx?" on":"")+"\"></span>";
   var isLast=_tourIdx===_tourSteps.length-1;
+  var isClick=step.action==="click"&&visible;
+  var nextLabel=isClick?"":(isLast?"Terminer":"Suivant");
   bubble.innerHTML="<button class=\"tour-skip-x\" onclick=\"endTour()\" title=\"Fermer\"><i class=\"ti ti-x\"></i></button>"+
     "<h3><i class=\"ti "+step.ic+"\"></i> "+esc(step.t)+"</h3><p>"+esc(step.d)+"</p>"+
+    (isClick?"<div class=\"tour-click-hint\"><i class=\"ti ti-hand-finger\"></i> À vous : cliquez sur l'élément en surbrillance</div>":"")+
     "<div class=\"tour-b-foot\"><div class=\"tour-dots\">"+dots+"</div><div class=\"tour-b-btns\">"+
     (_tourIdx>0?"<button class=\"tour-prev\" onclick=\"_tourNav(-1)\">Précédent</button>":"")+
-    "<button class=\"tour-next\" onclick=\"_tourNav(1)\">"+(isLast?"Terminer":"Suivant")+"</button></div></div>";
+    (isClick?"<button class=\"tour-skip-step\" onclick=\"_tourNav(1)\">Passer</button>":"<button class=\"tour-next\" onclick=\"_tourNav(1)\">"+nextLabel+"</button>")+
+    "</div></div>";
   if(visible){
-    var r=target.getBoundingClientRect();
-    var pad=6;
+    var r=target.getBoundingClientRect();var pad=6;
     hole.style.display="block";
     hole.style.left=(r.left-pad)+"px";hole.style.top=(r.top-pad)+"px";
     hole.style.width=(r.width+pad*2)+"px";hole.style.height=(r.height+pad*2)+"px";
     _tourPlaceBubble(bubble,r);
     try{target.scrollIntoView({block:"nearest",behavior:"smooth"});}catch(e){}
+    // étape "click" : on attend le vrai clic de l'utilisateur
+    if(step.action==="click"){
+      var fn=function(){_tourClearWaits();setTimeout(function(){_tourNav(1);},350);};
+      target.addEventListener("click",fn,{capture:true,once:true});
+      _tourClickWait={el:target,fn:fn};
+    }
   } else {
-    // pas de cible visible : bulle centrée, pas de découpe
     hole.style.display="none";
     bubble.style.left="50%";bubble.style.top="50%";bubble.style.transform="translate(-50%,-50%)";
+    // cible absente : laisser un court instant puis passer si elle n'apparaît pas
+    if(step.sel){_tourMissTimer=setTimeout(function(){var t2=document.querySelector(step.sel);if(t2&&t2.offsetParent!==null)_tourShow();},1200);}
   }
 }
 function _tourPlaceBubble(bubble,r){
@@ -6640,32 +6858,55 @@ function _tourPlaceBubble(bubble,r){
   var bw=bubble.offsetWidth||290,bh=bubble.offsetHeight||150;
   var gap=14,vw=window.innerWidth,vh=window.innerHeight;
   var left,top;
-  // essaie à droite, sinon à gauche, sinon dessous, sinon dessus
   if(r.right+gap+bw<vw){left=r.right+gap;top=r.top;}
   else if(r.left-gap-bw>0){left=r.left-gap-bw;top=r.top;}
   else if(r.bottom+gap+bh<vh){left=r.left;top=r.bottom+gap;}
   else{left=r.left;top=Math.max(10,r.top-gap-bh);}
-  // clamp écran
   left=Math.max(10,Math.min(left,vw-bw-10));
   top=Math.max(10,Math.min(top,vh-bh-10));
   bubble.style.left=left+"px";bubble.style.top=top+"px";
 }
-function _tourReposition(){if(document.getElementById("tour-bubble"))_tourShow();}
+function _tourReposition(){if(document.getElementById("tour-bubble")&&_tourSteps.length)_tourShow();}
 function _tourNav(d){
+  _tourClearWaits();
   _tourIdx+=d;
-  if(_tourIdx>=_tourSteps.length){endTour();return;}
+  if(_tourIdx>=_tourSteps.length){_tourModuleComplete();return;}
   if(_tourIdx<0)_tourIdx=0;
   _tourShow();
 }
+function _tourModuleComplete(){
+  // marque le module courant terminé
+  if(_tourModule){try{localStorage.setItem(_tutoDoneKey(_tourModule),"1");}catch(e){}}
+  _tourClearWaits();
+  window.removeEventListener("resize",_tourReposition);
+  // propose le module suivant non terminé du rôle
+  var mods=_tutoModulesForRole();
+  var next=null;
+  for(var i=0;i<mods.length;i++){if(!_tutoModuleDone(mods[i])){next=mods[i];break;}}
+  var ov=_tourOverlay();ov.classList.add("on");
+  var curTitle=(_tourModule&&TUTO_MODULES[_tourModule])?TUTO_MODULES[_tourModule].titre:"Module";
+  var body="<div class=\"tour-w-ic\" style=\"background:linear-gradient(135deg,#16A34A,#15803D)\"><i class=\"ti ti-circle-check\"></i></div>"+
+    "<h2>"+esc(curTitle)+" terminé !</h2>";
+  if(next){
+    body+="<p>Prêt pour la suite ?</p><div class=\"tour-w-btns\"><button class=\"tour-w-skip\" onclick=\"openHelpCenter()\">Le menu d'aide</button>"+
+      "<button class=\"tour-w-go\" onclick=\"startTutoModule('"+next+"')\"><i class=\"ti "+TUTO_MODULES[next].ic+"\" style=\"font-size:14px\"></i> "+esc(TUTO_MODULES[next].titre)+"</button></div>";
+  } else {
+    body+="<p>Vous avez fait le tour de l'application. Bravo ! Vous pouvez rejouer n'importe quel module depuis le bouton d'aide.</p><div class=\"tour-w-btns\"><button class=\"tour-w-go\" onclick=\"endTour()\"><i class=\"ti ti-check\" style=\"font-size:14px\"></i> C'est parti</button></div>";
+    try{localStorage.setItem(_tutoAllDoneKey(),"1");}catch(e){}
+  }
+  ov.innerHTML="<div class=\"tour-welcome\"><div class=\"tour-w-card\"><button class=\"tour-skip-x\" onclick=\"endTour()\"><i class=\"ti ti-x\"></i></button>"+body+"</div></div>";
+}
 function endTour(){
+  _tourClearWaits();
   var ov=document.getElementById("tour-ov");if(ov){ov.classList.remove("on");ov.innerHTML="";}
   window.removeEventListener("resize",_tourReposition);
-  try{localStorage.setItem(_tourKey(),"1");}catch(e){}
+  _tourSteps=[];_tourModule=null;
 }
 function maybeAutoTour(){
-  try{if(localStorage.getItem(_tourKey())==="1")return;}catch(e){}
-  // 1ère connexion : petit délai pour laisser l'UI se stabiliser
-  setTimeout(function(){if(document.getElementById("app")&&document.getElementById("app").style.display!=="none")startTour();},700);
+  try{if(localStorage.getItem(_tutoAllDoneKey())==="1")return;}catch(e){}
+  // 1ère connexion : on lance le module "bases" après stabilisation de l'UI
+  try{if(_tutoModuleDone("bases"))return;}catch(e){}
+  setTimeout(function(){if(document.getElementById("app")&&document.getElementById("app").style.display!=="none")startTutoModule("bases");},800);
 }
 function enterApp(){
   // Configure sidebar selon le r\u00f4le
