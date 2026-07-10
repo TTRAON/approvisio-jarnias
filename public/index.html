@@ -757,7 +757,7 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
 /* transition uniquement au CHANGEMENT d'étape : pendant le suivi, on colle à la cible. */
 .tour-ov.tour-anim .tour-mask,.tour-ov.tour-anim .tour-hole{transition:left .26s var(--ease),top .26s var(--ease),width .26s var(--ease),height .26s var(--ease)}
 /* bulle */
-.tour-bubble{position:fixed;z-index:6120;pointer-events:auto;background:#fff;border-radius:16px;padding:16px 18px;width:290px;max-width:calc(100vw - 28px);box-shadow:0 20px 50px rgba(0,0,0,.3);animation:tourPop .3s var(--spring)}
+.tour-bubble{position:fixed;z-index:6120;pointer-events:auto;background:#fff;border-radius:16px;padding:18px 20px 16px;width:352px;max-width:calc(100vw - 28px);box-shadow:0 20px 50px rgba(0,0,0,.3);animation:tourPop .3s var(--spring)}
 .tour-bubble h3{font-size:15px;font-weight:800;color:#0F172A;margin-bottom:6px;display:flex;align-items:center;gap:7px}
 .tour-bubble h3 i{color:var(--accent,#6D28D9);font-size:18px}
 .tour-bubble p{font-size:13px;color:#64748B;line-height:1.55}
@@ -1390,6 +1390,24 @@ table.at tr.kit-row td.td-d{position:relative}
 .depot-btn-rendu{background:#DBEAFE;color:#1D4ED8}
 .depot-btn-rendu:hover{background:#BFDBFE}
 .depot-empty{text-align:center;padding:40px 16px;color:#CBD5E1;font-size:13px}
+/* ═══ VUE DÉPÔT — DA actuelle ═══ */
+.depot-wrap{max-width:1240px;margin:0 auto;padding:4px 24px 40px;gap:18px}
+.depot-col-hd{position:sticky;top:0;z-index:5;padding:13px 16px;border-radius:12px;font-weight:700;font-size:14px;box-shadow:0 4px 14px -10px rgba(15,23,42,.35);backdrop-filter:blur(6px)}
+.depot-col-hd i{font-size:18px}
+.depot-col-hd.dc-prep{background:linear-gradient(135deg,#FFF7ED,#FFEDD5);color:#9A3412;border:1px solid #FED7AA}
+.depot-col-hd.dc-ready{background:linear-gradient(135deg,#F0FDF4,#DCFCE7);color:#166534;border:1px solid #BBF7D0}
+.dch-n{margin-left:auto;background:rgba(255,255,255,.75);border-radius:20px;padding:1px 10px;font-size:12px;font-weight:800}
+.depot-card{border:1px solid #E8EDF4;border-radius:14px;padding:14px 15px;box-shadow:0 4px 16px -13px rgba(15,23,42,.4);transition:transform .16s var(--ease),box-shadow .2s}
+.depot-card:hover{transform:translateY(-2px);box-shadow:0 12px 26px -14px rgba(15,23,42,.45);border-color:#E2E8F0}
+.depot-card-name{font-size:14.5px;font-weight:700;color:#0F172A;line-height:1.3}
+.depot-card-sub{font-size:11.5px;color:#94A3B8;margin-top:2px}
+.depot-card-items{background:#F8FAFC;border:1px solid #F1F5F9;border-radius:10px;padding:9px 11px;margin-top:10px;font-size:12.5px;color:#475569;line-height:1.75}
+.depot-btn{width:100%;border:none;border-radius:10px;padding:10px 0;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:11px;transition:transform .14s var(--ease),box-shadow .2s}
+.depot-btn:hover{transform:translateY(-1px)}
+.depot-btn:active{transform:scale(.97)}
+.depot-empty{text-align:center;padding:44px 16px;color:#94A3B8;font-size:13px;background:#fff;border:1px dashed #E2E8F0;border-radius:14px}
+.depot-empty i{color:#CBD5E1}
+@media(max-width:900px){.depot-wrap{flex-direction:column;padding:4px 12px 30px}.depot-col-hd{position:static}}
 
 .auth-screen{position:fixed;inset:0;background:#0F172A;display:flex;align-items:center;justify-content:center;z-index:3000;flex-direction:column;gap:22px;padding:20px}
 .auth-logo img{width:170px;border-radius:12px;display:block}
@@ -2941,7 +2959,7 @@ function changeRole(r){
     if(newBtn)newBtn.style.display="none";
     if(slist)slist.style.display="none";
     if(srch)srch.style.display="none";
-    if(bbl)bbl.style.display="none";
+    if(bbl)bbl.style.display="flex";   /* le chef d\u00e9p\u00f4t a besoin de la biblioth\u00e8que */
     renderDepot();
   }else{
     if(newBtn)newBtn.style.display="";
@@ -2986,22 +3004,21 @@ function renderDepot(){
   var auDepot=sheets.filter(function(s){return !s.draft&&s.statut==="prete"&&!s.modifPrep;});
   auDepot.sort(function(a,b){return (b.preparedAt||"").localeCompare(a.preparedAt||"");});
 
-  var h=(typeof dashLiveKPIs==="function"?dashLiveKPIs():"");
+  var h=_dashHeader("Poste de pilotage \u2014 D\u00e9p\u00f4t","Ce qu'il y a \u00e0 pr\u00e9parer et ce qui est pr\u00eat \u00e0 partir.");
+  h+=(typeof dashLiveKPIs==="function"?dashLiveKPIs():"");
   h+="<div class=\"depot-wrap\">";
 
   // COLUMN 1 - A PREPARER
-  h+="<div class=\"depot-col\">";
-  h+="<div class=\"depot-col-hd\" style=\"background:#FFF7ED;color:#92400E\"><i class=\"ti ti-clipboard-list\" style=\"font-size:18px\"></i> \u00c0 pr\u00e9parer<span class=\"dch-n\">"+aPreparer.length+"</span></div>";
+  h+="<div class=\"depot-col stagger\">";
+  h+="<div class=\"depot-col-hd dc-prep\"><i class=\"ti ti-clipboard-list\"></i> \u00c0 pr\u00e9parer<span class=\"dch-n\">"+aPreparer.length+"</span></div>";
   if(!aPreparer.length){
-    h+="<div class=\"depot-empty\"><i class=\"ti ti-check\" style=\"font-size:32px\"></i><div style=\"margin-top:8px\">Tout est pr\u00e9par\u00e9 !</div></div>";
+    h+="<div class=\"depot-empty\"><i class=\"ti ti-check\" style=\"font-size:32px\"></i><div style=\"margin-top:8px\">Rien \u00e0 pr\u00e9parer</div></div>";
   } else {
     aPreparer.forEach(function(s){
-      var pr=PRIO[s.priorite]||PRIO.normale;
-      var isUrgent=(s.priorite&&s.priorite!=="normale");
       var isModif=(s.statut==="prete"&&s.modifPrep);
       var isAddCh=(s.statut==="sur_chantier"&&s.addToPrepare);
-      var blCol=isAddCh?"#1D4ED8":(isModif?"#7C3AED":(isUrgent?pr.color:""));
-      h+="<div class=\"depot-card\" data-id=\""+s.id+"\""+((isModif||isUrgent||isAddCh)?" style=\"border-left:4px solid "+blCol+";padding-left:9px\"":"")+">";
+      var blCol=isAddCh?"#1D4ED8":(isModif?"#7C3AED":"#F59E0B");
+      h+="<div class=\"depot-card\" data-id=\""+s.id+"\""+(true?" style=\"border-left:4px solid "+blCol+"\"":"")+">";
       if(isAddCh){
         h+="<div style=\"display:flex;align-items:center;gap:6px;background:#DBEAFE;color:#1E40AF;border:1px solid #93C5FD;border-radius:7px;padding:5px 9px;font-size:11px;font-weight:700;margin-bottom:8px\"><i class=\"ti ti-tool\" style=\"font-size:13px\"></i> D\u00e9j\u00e0 sur chantier \u2014 seul l'ajout est \u00e0 pr\u00e9parer</div>";
       } else if(isModif){
@@ -3019,8 +3036,8 @@ function renderDepot(){
   h+="</div>";
 
   // COLUMN 2 - AU DEPOT
-  h+="<div class=\"depot-col\">";
-  h+="<div class=\"depot-col-hd\" style=\"background:#D1FAE5;color:#065F46\"><i class=\"ti ti-package\" style=\"font-size:18px\"></i> Au d\u00e9p\u00f4t (pr\u00eates)<span class=\"dch-n\">"+auDepot.length+"</span></div>";
+  h+="<div class=\"depot-col stagger\">";
+  h+="<div class=\"depot-col-hd dc-ready\"><i class=\"ti ti-package\"></i> Au d\u00e9p\u00f4t (pr\u00eates)<span class=\"dch-n\">"+auDepot.length+"</span></div>";
   if(!auDepot.length){
     h+="<div class=\"depot-empty\"><i class=\"ti ti-package-off\" style=\"font-size:32px\"></i><div style=\"margin-top:8px\">Aucune appro au d\u00e9p\u00f4t</div></div>";
   } else {
@@ -3100,7 +3117,11 @@ function renderDepot(){
   }
   h+="</div>";
 
-  document.getElementById("main-area").innerHTML=h;
+  var _m=document.getElementById("main-area");
+  _m.innerHTML=h;
+  /* _dashStat \u00e9crit "0" et compte sur l'odom\u00e8tre pour afficher la vraie valeur :
+     sans cet appel, tous les compteurs du d\u00e9p\u00f4t restent fig\u00e9s \u00e0 z\u00e9ro. */
+  setTimeout(function(){if(typeof animateCounters==="function")animateCounters(_m);},240);
 }
 function toggleDepotDone(){depotShowDone=!depotShowDone;renderDepot();}
 function openFromDepot(id){
@@ -3140,7 +3161,8 @@ function depotMarkRendu(id){
   }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
 }
 function tabsBarHTML(){
-  var nMes=sheets.length;
+  /* "Mes appros" compte les appros EN COURS de l'utilisateur, pas toute la biblioth\u00e8que. */
+  var nMes=(typeof _maMine==="function")?_maMine().filter(_maEnCours).length:sheets.length;
   var h="<div class=\"tabs-bar\">";
   h+="<button class=\"tab-btn"+(currentTab==="mes"?" active":"")+"\" onclick=\"switchTab('mes')\"><i class=\"ti ti-clipboard-list\" style=\"font-size:16px\"></i> Mes appros <span class=\"tab-badge\">"+nMes+"</span></button>";
   h+="<button class=\"tab-btn"+(currentTab==="biblio"?" active":"")+"\" onclick=\"switchTab('biblio')\"><i class=\"ti ti-books\" style=\"font-size:16px\"></i> Biblioth\u00e8que <span class=\"tab-badge\">"+sheets.length+"</span></button>";
@@ -3510,6 +3532,8 @@ function togC(cid,key){
 
 // WELCOME
 function renderWelcome(){
+  /* L'accueil ne sert pas au chef d\u00e9p\u00f4t : son \u00e9cran de travail, c'est la vue d\u00e9p\u00f4t. */
+  if(currentRole==="depot"&&typeof renderDepot==="function"){renderDepot();return;}
   if(typeof _unmountCpFab==="function")_unmountCpFab();
   cur=null;saved=false;aiSug=null;addMode=false;addDate=null;currentTab="mes";
   var mine=sheets.filter(function(s){return !s.draft;});
@@ -3785,7 +3809,11 @@ function _mountCpFab(){
     b.onclick=function(){showCp();};document.body.appendChild(b);}
   b.style.display="inline-flex";
 }
-function _unmountCpFab(){var b=document.getElementById("cp-fab");if(b)b.style.display="none";}
+function _unmountCpFab(){
+  var b=document.getElementById("cp-fab");if(b)b.style.display="none";
+  /* Le panneau catalogue n'a de sens que sur une appro : on le referme en quittant l'\u00e9cran. */
+  try{var pn=document.getElementById("cp-panel");if(pn&&pn.classList.contains("open")&&typeof hideCp==="function")hideCp();}catch(e){}
+}
 // ═══ Parcours visuel de l'appro : calcule l'avancement pour guider ═══
 function _approStepState(){
   // renvoie {chantier, equipe, materiel} = booléens de complétion
@@ -7087,7 +7115,7 @@ function _tutoNeedCatalogue(){
   _tutoNeedAppro();
   try{ if(!document.getElementById("cp-search")&&typeof showCp==="function")showCp(); }catch(e){}
 }
-function _navHome(){_tutoEnsure(".hstat",function(){renderWelcome();});}
+function _navHome(){if(currentRole==="depot"){_navDepot();return;}_tutoEnsure(".hstat",function(){renderWelcome();});}
 function _navBiblio(){_tutoEnsure(".lib-card,.lib-empty,.lib-wrap",function(){renderLibrary();});}
 function _navDepot(){_tutoEnsure(".depot-col-hd",function(){renderDepot();});}
 function _navCmd(){_tutoEnsure("#cmd-prod",function(){renderCommandes();});}
@@ -7098,14 +7126,24 @@ function _navTerrain(){_tutoEnsure(".td-wrap",function(){renderTerrainDemande();
 function _navReglages(){_tutoEnsure("#cat-grid",function(){renderUISettings();});}
 var TUTO_MODULES={
   bases:{titre:"Les bases",ic:"ti-compass",roles:["conducteur","depot","team_leader"],etapes:function(){
-    var s=[
-      {before:_navHome,sel:".home-hero",ic:"ti-home",t:"Votre accueil",d:"Le point de départ. Vous y voyez l'état de vos appros d'un coup d'œil.",action:"next"},
-      {before:_navHome,sel:".home-stats",ic:"ti-chart-bar",t:"Vos chiffres",d:"Chaque carte est un raccourci : cliquez dessus pour filtrer la liste sur cet état.",action:"next"},
-      {before:_navHome,sel:".st-chips",ic:"ti-filter",t:"Les pastilles de statut",d:"Brouillons, en préparation, prêtes, sur chantier. Un clic filtre, un second annule.",action:"next"},
-      {before:_navHome,sel:".tabs-bar",ic:"ti-layout-navbar",t:"Deux onglets",d:"« Mes appros » liste vos chantiers en cours. « Bibliothèque » sert à réutiliser une ancienne appro.",action:"next"},
-      {before:_navHome,sel:".qa-primary",ic:"ti-plus",t:"Nouvelle appro",d:"Le bouton principal : il crée une feuille de chantier vierge.",action:"next"},
-      {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherchez par chantier, client, N° d'affaire… ou même par le nom d'un article contenu dans l'appro.",action:"next"},
-      {before:_navHome,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous prévient : appro prête, demande traitée, annonce de l'équipe.",action:"next"},
+    var depot=(typeof canManage==="function"&&currentRole==="depot");
+    var s=depot?[
+      /* Le chef d\u00e9p\u00f4t n'a pas d'accueil : son \u00e9cran de travail est la vue d\u00e9p\u00f4t. */
+      {before:_navDepot,sel:".dash-hero",ic:"ti-building-warehouse",t:"Votre poste de pilotage",d:"Vous arrivez directement ici : tout ce qu'il y a \u00e0 traiter aujourd'hui.",action:"next"},
+      {before:_navDepot,sel:".dash-grid",ic:"ti-bolt",t:"\u00c0 traiter maintenant",d:"Sept compteurs, tous cliquables : ils vous emm\u00e8nent au bon endroit.",action:"next"},
+      {before:_navDepot,sel:".dc-prep",ic:"ti-clipboard-list",t:"\u00c0 pr\u00e9parer",d:"La colonne de gauche : les appros que les conducteurs vous ont envoy\u00e9es.",action:"next"},
+      {before:_navDepot,sel:".dc-ready",ic:"ti-package",t:"Au d\u00e9p\u00f4t",d:"La colonne de droite : ce qui est pr\u00eat \u00e0 partir sur chantier.",action:"next"},
+      {before:_navDepot,sel:"#btn-biblio",ic:"ti-books",t:"La biblioth\u00e8que",d:"Toutes les appros de l'entreprise, pour retrouver un ancien chantier.",action:"next"},
+      {before:_navDepot,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous pr\u00e9vient : nouvelle appro \u00e0 pr\u00e9parer, demande du terrain, annonce.",action:"next"},
+      {before:_navDepot,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
+    ]:[
+      {before:_navHome,sel:".home-hero",ic:"ti-home",t:"Votre accueil",d:"Le point de d\u00e9part. Vous y voyez l'\u00e9tat de vos appros d'un coup d'\u0153il.",action:"next"},
+      {before:_navHome,sel:".home-stats",ic:"ti-chart-bar",t:"Vos chiffres",d:"Chaque carte est un raccourci : cliquez dessus pour filtrer la liste sur cet \u00e9tat.",action:"next"},
+      {before:_navHome,sel:".st-chips",ic:"ti-filter",t:"Les pastilles de statut",d:"Brouillons, en pr\u00e9paration, pr\u00eates, sur chantier. Un clic filtre, un second annule.",action:"next"},
+      {before:_navHome,sel:".tabs-bar",ic:"ti-layout-navbar",t:"Deux onglets",d:"\u00ab Mes appros \u00bb liste vos chantiers en cours. \u00ab Biblioth\u00e8que \u00bb sert \u00e0 r\u00e9utiliser une ancienne appro.",action:"next"},
+      {before:_navHome,sel:".qa-primary",ic:"ti-plus",t:"Nouvelle appro",d:"Le bouton principal : il cr\u00e9e une feuille de chantier vierge.",action:"next"},
+      {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherchez par chantier, client, N\u00b0 d'affaire\u2026 ou m\u00eame par le nom d'un article contenu dans l'appro.",action:"next"},
+      {before:_navHome,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous pr\u00e9vient : appro pr\u00eate, demande trait\u00e9e, annonce de l'\u00e9quipe.",action:"next"},
       {before:_navHome,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
     ];
     return s;
@@ -7115,8 +7153,8 @@ var TUTO_MODULES={
     return [
       {sel:".btn-new-sb,.qa-primary",ic:"ti-plus",t:"Créez une appro",d:"Cliquez : une feuille de chantier vierge s'ouvre.",action:"click"},
       {before:_tutoNeedAppro,sel:".appro-steps",ic:"ti-route",t:"Votre parcours",d:"Ces 4 étapes vous guident : le chantier, l'équipe, le matériel, puis l'envoi. L'étape en cours est mise en avant.",action:"next"},
-      {before:_tutoNeedAppro,sel:".card-num",ic:"ti-building-community",t:"1. Le chantier",d:"Nom du chantier, N° d'affaire, client. Le N° d'affaire relie l'appro aux commandes.",action:"next"},
-      {before:_tutoNeedAppro,sel:"#conducteurs-list,.info-sec",ic:"ti-users",t:"2. L'équipe",d:"Le conducteur de travaux et le team leader présent sur place. La couleur des cartes suit le conducteur.",action:"next"},
+      {before:_tutoNeedAppro,sel:".info-grid > .info-sec:nth-child(1)",ic:"ti-building-community",t:"1. Le chantier",d:"Nom du chantier, N° d'affaire, client. Le N° d'affaire relie l'appro aux commandes.",action:"next"},
+      {before:_tutoNeedAppro,sel:".info-grid > .info-sec:nth-child(2)",ic:"ti-users",t:"2. L'équipe",d:"Le conducteur de travaux et le team leader présent sur place. La couleur des cartes suit le conducteur.",action:"next"},
       {before:_tutoNeedAppro,sel:".cin-d",ic:"ti-keyboard",t:"3. Le matériel",d:"Tapez le début d'un nom d'article puis la touche Tab : il se complète tout seul.",action:"next"},
       {before:_tutoNeedAppro,sel:"#cp-fab",ic:"ti-package",t:"Ou passez par le catalogue",d:"Ce bouton reste accessible en bas à droite, même quand vous faites défiler la page.",action:"next"},
       {before:_tutoNeedAppro,sel:".next-step",ic:"ti-arrow-right",t:"Que faire maintenant ?",d:"Ce bandeau vous dit toujours la prochaine action à faire. En cas de doute, suivez-le.",action:"next"},
@@ -7132,7 +7170,7 @@ var TUTO_MODULES={
       {before:_tutoNeedAppro,sel:"#cp-fab",ic:"ti-package",t:"Ouvrez le catalogue",d:"Tout le matériel JARNIAS s'y trouve. Cliquez sur ce bouton.",action:"click"},
       {before:_tutoNeedCatalogue,sel:"#cp-search",ic:"ti-search",t:"Une recherche maligne",d:"Tapez « maçonnerie » : vous obtenez la catégorie ET les produits proches. Les fautes de frappe sont pardonnées.",action:"next"},
       {before:_tutoNeedCatalogue,sel:".cp-tile,.cp-row",ic:"ti-checkbox",t:"Cochez vos articles",d:"Cliquez pour sélectionner. Vous pouvez en cocher plusieurs d'affilée.",action:"next"},
-      {before:_tutoNeedCatalogue,sel:".cp-qty,.cp-tile,.cp-row",ic:"ti-numbers",t:"La quantité",d:"Réglez la quantité de chaque article avant de l'insérer.",action:"next"},
+      {before:_tutoNeedCatalogue,sel:".cp-qty",ic:"ti-numbers",t:"La quantité",d:"Réglez la quantité de chaque article avant de l'insérer.",action:"next"},
       {before:_tutoNeedCatalogue,sel:"#cp-n",ic:"ti-list-check",t:"Sélection conservée",d:"Votre sélection reste en mémoire même si vous relancez une recherche. Vous ne perdez rien.",action:"next"},
       {before:_tutoNeedCatalogue,sel:".btn-ins,button[onclick^=\"insertCp\"]",ic:"ti-circle-plus",t:"Insérer dans l'appro",d:"Les articles s'ajoutent. Le catalogue reste ouvert pour enchaîner sans le rouvrir.",action:"next"},
       {before:_tutoNeedCatalogue,sel:".cp-kit,.cp-tile,.cp-row",ic:"ti-box-multiple",t:"Les kits",d:"Un kit ajoute d'un coup tous les articles d'un métier. Multipliez-le par le nombre d'équipes.",action:"next"},
@@ -7181,8 +7219,8 @@ var TUTO_MODULES={
       {before:_navCmd,sel:"#cmd-prod",ic:"ti-writing",t:"Le produit",d:"Le seul champ obligatoire. Les autres aident à s'y retrouver.",action:"next"},
       {before:_navCmd,sel:".cmd-add-btn",ic:"ti-circle-plus",t:"Valider l'ajout",d:"La commande apparaît immédiatement dans la liste, groupée par affaire.",action:"next"},
       {before:_navCmd,sel:".cmd-grp-hd,.cmd-list",ic:"ti-folders",t:"Groupées par affaire",d:"Chaque groupe se replie. Vous voyez tout de suite ce qui manque sur un chantier donné.",action:"next"},
-      {before:_navCmd,sel:".cmd-grp-open,.cmd-grp-hd",ic:"ti-external-link",t:"Ouvrir l'affaire",d:"Ce lien vous emmène directement sur l'appro concernée.",action:"next"},
-      {before:_navCmd,sel:".cmd-card,.cmd-list",ic:"ti-circle-check",t:"Marquer reçu",d:"À la livraison, cochez la commande. Quand tout est reçu, l'appro peut être préparée.",action:"next"}
+      {before:_navCmd,sel:".cmd-grp-open",ic:"ti-external-link",t:"Ouvrir l'affaire",d:"Ce lien vous emmène directement sur l'appro concernée.",action:"next"},
+      {before:_navCmd,sel:".cmd-card",ic:"ti-circle-check",t:"Marquer reçu",d:"À la livraison, cochez la commande. Quand tout est reçu, l'appro peut être préparée.",action:"next"}
     ];
   }},
 
@@ -7203,8 +7241,8 @@ var TUTO_MODULES={
       {before:_navTrucks,sel:"#truck-search",ic:"ti-search",t:"Retrouver un camion",d:"Par nom, plaque, ou team leader attitré.",action:"next"},
       {before:_navTrucks,sel:".tcard",ic:"ti-id",t:"Une fiche camion",d:"Nom, plaque, team leader. Tout est modifiable directement dans la carte.",action:"next"},
       {before:_navTrucks,sel:".etat-seg2",ic:"ti-cone",t:"Où est-il ?",d:"Sur chantier, au dépôt, ou en révision. Trois états, un clic.",action:"next"},
-      {before:_navTrucks,sel:".tpret,.tcard",ic:"ti-user-check",t:"Prêter un camion",d:"Un camion peut être prêté à un autre team leader. L'appli garde la trace du prêt.",action:"next"},
-      {before:_navTrucks,sel:".trev,.tcard-foot",ic:"ti-calendar-off",t:"La révision",d:"Renseignez la prochaine révision : une pastille vous alerte quand la date approche.",action:"next"},
+      {before:_navTrucks,sel:".tpret",ic:"ti-user-check",t:"Prêter un camion",d:"Un camion peut être prêté à un autre team leader. L'appli garde la trace du prêt.",action:"next"},
+      {before:_navTrucks,sel:".trev",ic:"ti-calendar-off",t:"La révision",d:"Renseignez la prochaine révision : une pastille vous alerte quand la date approche.",action:"next"},
       {before:_navTrucks,sel:".tequip",ic:"ti-package",t:"L'équipement embarqué",d:"La liste du matériel qui reste dans le camion. Pratique avant de partir sur un chantier.",action:"next"},
       {before:_navTrucks,sel:"#btn-imp-trucks",ic:"ti-file-import",t:"Import Excel",d:"Vous pouvez importer toute la flotte depuis un fichier, plutôt que la saisir à la main.",action:"next"}
     ];
@@ -7231,7 +7269,7 @@ var TUTO_MODULES={
         {before:_navReglages,sel:"#ui-cat-name",ic:"ti-plus",t:"Ajouter un article",d:"Nom, catégorie, section, quantité par défaut. Il apparaîtra aussitôt dans le catalogue.",action:"next"},
         {before:_navReglages,sel:"#cat-grid",ic:"ti-folders",t:"Les catégories",d:"Chaque bloc est une catégorie du catalogue, avec ses articles.",action:"next"},
         {before:_navReglages,sel:".drag-h",ic:"ti-grip-vertical",t:"Réorganiser",d:"Attrapez cette poignée pour déplacer une catégorie. Les flèches ↑ ↓ font la même chose.",action:"next"},
-        {before:_navReglages,sel:".cat-box .ti-trash,.cat-box",ic:"ti-trash",t:"Supprimer une catégorie",d:"La corbeille retire la catégorie et tous ses articles. Une confirmation est demandée.",action:"next"},
+        {before:_navReglages,sel:".cat-box .ti-trash",ic:"ti-trash",t:"Supprimer une catégorie",d:"La corbeille retire la catégorie et tous ses articles. Une confirmation est demandée.",action:"next"},
         {before:_navReglages,sel:"#btn-import-kits",ic:"ti-file-import",t:"Import Excel",d:"Importez le catalogue ou les kits depuis un fichier, au lieu de tout saisir.",action:"next"},
         {before:_navReglages,sel:"#ui-client-new",ic:"ti-building",t:"Vos clients",d:"La liste proposée automatiquement quand vous remplissez une appro.",action:"next"}
       ]);
