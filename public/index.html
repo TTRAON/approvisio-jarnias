@@ -750,10 +750,12 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
 .tour-w-go:hover{filter:brightness(1.08)}
 .tour-w-skip{background:#F1F5F9;color:#64748B}
 /* scrim + découpe autour de l'élément mis en avant */
-.tour-scrim{position:fixed;inset:0;z-index:6100;pointer-events:auto;background:rgba(15,23,42,.72)}
-.tour-mask{position:fixed;z-index:6100;background:rgba(15,23,42,.72);pointer-events:auto;transition:all .26s var(--ease)}
+.tour-scrim{position:fixed;inset:0;z-index:6100;pointer-events:auto;background:rgba(15,23,42,.40)}
+.tour-mask{position:fixed;z-index:6100;background:rgba(15,23,42,.40);pointer-events:auto}
 .tour-target{position:relative;z-index:6105}
-.tour-hole{position:fixed;z-index:6110;border-radius:12px;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent,#6D28D9) 80%,#fff);transition:all .26s var(--ease);pointer-events:none}
+.tour-hole{position:fixed;z-index:6110;border-radius:12px;pointer-events:none;box-shadow:0 0 0 3px #fff,0 0 0 6px var(--accent,#6D28D9),0 0 0 10px rgba(109,40,217,.22),0 10px 30px -8px rgba(15,23,42,.35)}
+/* transition uniquement au CHANGEMENT d'étape : pendant le suivi, on colle à la cible. */
+.tour-ov.tour-anim .tour-mask,.tour-ov.tour-anim .tour-hole{transition:left .26s var(--ease),top .26s var(--ease),width .26s var(--ease),height .26s var(--ease)}
 /* bulle */
 .tour-bubble{position:fixed;z-index:6120;pointer-events:auto;background:#fff;border-radius:16px;padding:16px 18px;width:290px;max-width:calc(100vw - 28px);box-shadow:0 20px 50px rgba(0,0,0,.3);animation:tourPop .3s var(--spring)}
 .tour-bubble h3{font-size:15px;font-weight:800;color:#0F172A;margin-bottom:6px;display:flex;align-items:center;gap:7px}
@@ -1045,6 +1047,22 @@ table.at tr.kit-row td.td-d{position:relative}
 .cp-search:focus{border-color:#6D28D9;background-color:#fff}
 .cp-tile.sel{border-color:#6D28D9;background:#F5F3FF}
 .cin-ok{animation:cinOk .65s var(--ease)}
+/* ═══ Coche de confirmation (étapes importantes) ═══ */
+.sck{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5000;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:9px}
+.sck svg{width:64px;height:64px;filter:drop-shadow(0 8px 22px rgba(21,128,61,.35))}
+.sck circle{fill:#fff;stroke:#16A34A;stroke-width:2.5;stroke-dasharray:139;stroke-dashoffset:139}
+.sck path{fill:none;stroke:#16A34A;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:34;stroke-dashoffset:34}
+.sck-l{background:#0F172A;color:#fff;font-size:12.5px;font-weight:700;padding:6px 14px;border-radius:20px;white-space:nowrap;opacity:0;box-shadow:0 8px 20px -10px rgba(15,23,42,.6)}
+.sck.on{animation:sckOut 1.75s forwards}
+.sck.on circle{animation:sckC .45s var(--ease) forwards}
+.sck.on path{animation:sckP .3s var(--ease) .34s forwards}
+.sck.on .sck-l{animation:sckL .3s var(--ease) .5s forwards}
+@keyframes sckC{to{stroke-dashoffset:0}}
+@keyframes sckP{to{stroke-dashoffset:0}}
+@keyframes sckL{to{opacity:1;transform:translateY(0)}}
+@keyframes sckOut{0%,72%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.94)}}
+@media print{.sck{display:none!important}}
+
 /* ═══ DEMANDES DÉPÔT (tickets terrain) — DA actuelle ═══ */
 .tk-wrap{max-width:880px;margin:0 auto;padding:22px 18px 40px}
 .tk-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
@@ -1471,7 +1489,7 @@ html.dark[data-amb] .home-hero::before{filter:invert(1) hue-rotate(180deg)}
        pour ressortir sombre APRÈS inversion. */
 
 /* Voiles & scrims : décrits en clair => rendus sombres après inversion. */
-html.dark .tour-mask,html.dark .tour-scrim{background:rgba(222,229,240,.74)}
+html.dark .tour-mask,html.dark .tour-scrim{background:rgba(222,229,240,.42)}
 html.dark .cp-overlay,html.dark .adm-overlay,html.dark .teq-ov,html.dark .j-scrim{background:rgba(222,229,240,.5)}
 
 /* Page de connexion : déjà sombre par design => on la re-inverse pour qu'elle reste identique. */
@@ -1488,7 +1506,7 @@ html.dark .loading-screen{background:#E7EBF2}
 html.dark #annonce-ov,html.dark #share-ov,html.dark #alo-ov{background:rgba(222,229,240,.6)!important}
 
 /* Le trou du tuto : l'anneau reste lisible, le contenu surligné n'est pas re-teinté. */
-html.dark .tour-hole{box-shadow:0 0 0 4px #fff}
+html.dark .tour-hole{box-shadow:0 0 0 3px #0F172A,0 0 0 6px var(--accent,#6D28D9),0 0 0 10px rgba(109,40,217,.25)}
 
 /* Les captures/aperçus PDF s'ouvrent dans une fenêtre séparée : jamais inversés. */
 @media print{html.dark #auth-screen{filter:none!important}}
@@ -2306,7 +2324,30 @@ function toast(msg,ico){
 }
 /* Confettis de réussite — burst centré (ou près d'un élément). À doser :
    uniquement pour les moments forts (appro prête, chantier bouclé...). */
-function confettiBurst(originEl){
+/* ═══ Confirmation visuelle : une coche se dessine, puis s'efface. ═══
+   Sobre et explicite (« c'est valid\u00e9 »), r\u00e9serv\u00e9e aux \u00e9tapes importantes.
+   L'overlay est mont\u00e9 dans <body> : aucune contrainte sur la cible (overflow, position). */
+function successCheck(targetEl,label){
+  var reduce=false;try{reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;}catch(e){}
+  var ov=document.createElement("div");
+  ov.className="sck";
+  if(targetEl&&targetEl.getBoundingClientRect){
+    var r=targetEl.getBoundingClientRect();
+    if(r.width>0&&r.height>0){
+      ov.style.left=(r.left+r.width/2)+"px";
+      ov.style.top=(r.top+r.height/2)+"px";
+    }
+  }
+  ov.innerHTML="<svg viewBox=\"0 0 52 52\" aria-hidden=\"true\"><circle cx=\"26\" cy=\"26\" r=\"22\"/><path d=\"M15.5 26.5l7 7 14-15\"/></svg>"+
+               (label?"<div class=\"sck-l\">"+esc(label)+"</div>":"");
+  document.body.appendChild(ov);
+  if(reduce){setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov);},700);return;}
+  requestAnimationFrame(function(){ov.classList.add("on");});
+  setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov);},1750);
+}
+/* Ancien effet remplac\u00e9 : tout appel \u00e0 confettiBurst joue d\u00e9sormais la coche. */
+function confettiBurst(originEl){successCheck(originEl);}
+function _confettiBurstLegacy(originEl){
   try{
     if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches)return;
   }catch(e){}
@@ -4018,7 +4059,8 @@ function setStatut(st){
       var msg={prete:"Appro marqu\u00e9e pr\u00eate au d\u00e9p\u00f4t",en_attente:"Appro remise en attente",sur_chantier:"C'est not\u00e9 : appro prise, sur chantier",rendu:"Rendu signal\u00e9 au d\u00e9p\u00f4t",sortie:"Rendu valid\u00e9 \u2014 chantier fini"};
       var ic={prete:"ti-package-import",en_attente:"ti-rotate",sur_chantier:"ti-tool",rendu:"ti-package-export",sortie:"ti-checks"};
       toast(msg[st]||"Statut mis \u00e0 jour",ic[st]||"ti-check");
-      if(st==="prete"||st==="sortie")confettiBurst();
+      if(st==="prete")successCheck(document.querySelector(".info-sec")||null,"Appro pr\u00eate au d\u00e9p\u00f4t");
+      else if(st==="sortie")successCheck(null,"Appro cl\u00f4tur\u00e9e");
     }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
   }else{
     saved=false;renderForm();
@@ -4032,6 +4074,7 @@ function sendToProduction(){
   if(!confirm("Envoyer cette appro en production ? Le chef d\u00e9p\u00f4t pourra alors la voir et la pr\u00e9parer."))return;
   cur.draft=false;saved=false;
   doSave();
+  successCheck(null,"Envoy\u00e9e en production");
 }
 function doSave(){
   if(!cur)return;
@@ -4056,7 +4099,7 @@ function doSave(){
     saved=true;tpl=null;
     if(typeof syncApproCommandes==="function"&&syncApproCommandes(cur)){saveCommandes();}
     var sb2=document.querySelector(".btn-save");
-    if(sb2){sb2.innerHTML="<i class=\"ti ti-check\"></i> Enregistr\u00e9";sb2.classList.add("saved");sb2.disabled=true;confettiBurst(sb2);}
+    if(sb2){sb2.innerHTML="<i class=\"ti ti-check\"></i> Enregistr\u00e9";sb2.classList.add("saved");sb2.disabled=true;} /* enregistrement = action courante : le bouton suffit */
     renderList();toast("Appro enregistr\u00e9e");
   }).catch(function(e){
     var sb2=document.querySelector(".btn-save");
@@ -5464,7 +5507,7 @@ function toggleCommandeRecu(id){
   if(wasPending){
     try{var card=document.querySelector('.cmd-card[data-id="'+id+'"]');if(card&&typeof _successWaveOn==="function")_successWaveOn(card);}catch(e){}
     // petit confetti si plus rien en attente après ce reçu
-    try{var stillPending=COMMANDES.some(function(x){return x.statut!=="recu";});if(!stillPending&&typeof confettiBurst==="function")confettiBurst();}catch(e){}
+    try{var stillPending=COMMANDES.some(function(x){return x.statut!=="recu";});if(!stillPending)successCheck(null,"Toutes les commandes sont re\u00e7ues");}catch(e){}
   }
   // Renvoi vers l'appro li\u00e9e : refl\u00e9ter la r\u00e9ception sur l'article
   if(c.approId&&typeof sheets!=="undefined"){
@@ -5771,6 +5814,7 @@ function validateTicket(id){
   if(typeof COMMANDES!=="undefined"){COMMANDES.push(c);t.commandeId=c.id;}
   var _c=document.getElementById("tk_"+id);
   if(_c&&typeof _successWaveOn==="function"){try{_successWaveOn(_c);}catch(e){}}
+  successCheck(_c,"Demande valid\u00e9e");
   saveTickets(function(){
     if(typeof saveCommandes==="function")saveCommandes(function(){toast("Demande valid\u00e9e \u2014 ajout\u00e9e aux commandes","ti-check");renderTickets();});
     else{toast("Demande valid\u00e9e","ti-check");renderTickets();}
@@ -7001,6 +7045,7 @@ function _tourOverlay(){
   return ov;
 }
 function _tourClearWaits(){
+  _tourStopTrack();
   if(_tourClickWait){try{_tourClickWait.el.removeEventListener("click",_tourClickWait.fn,true);}catch(e){}_tourClickWait=null;}
   if(_tourMissTimer){clearTimeout(_tourMissTimer);clearInterval(_tourMissTimer);_tourMissTimer=null;}
 }
@@ -7014,7 +7059,7 @@ function _tourShow(){
   // sur mobile, ouvrir la sidebar pour viser un bouton de menu
   if(window.innerWidth<900&&step.sel&&step.sel.indexOf("#btn-")===0&&typeof openSidebar==="function"){try{openSidebar();}catch(e){}}
   var target=step.sel?document.querySelector(step.sel):null;
-  var visible=target&&target.offsetParent!==null;
+  var visible=_tourVisible(target);
   var dots="";for(var i=0;i<_tourSteps.length;i++)dots+="<span class=\"tour-dot"+(i===_tourIdx?" on":"")+"\"></span>";
   var isLast=_tourIdx===_tourSteps.length-1;
   var isClick=step.action==="click"&&visible;
@@ -7030,8 +7075,9 @@ function _tourShow(){
   if(visible){
     /* On amène la cible à l'écran PUIS on mesure (sinon le trou est décalé). */
     try{target.scrollIntoView({block:"center",behavior:_tourReduce()?"auto":"smooth"});}catch(e){}
-    setTimeout(function(){_tourPosition();},_tourReduce()?0:320);
+    _tourAnimPulse();      /* la transition ne sert qu'au saut d'une étape à l'autre */
     _tourPosition();
+    _tourStartTrack();     /* puis on colle à la cible, image par image */
     /* étape "click" : on attend le VRAI clic de l'utilisateur sur la cible */
     if(step.action==="click"){
       var fn=function(){_tourClearWaits();setTimeout(function(){_tourNav(1);},380);};
@@ -7044,7 +7090,7 @@ function _tourShow(){
         if(!_tourClickWait)return;
         if(document.body.contains(_tourClickWait.el)){_tourPosition();return;}
         var again=step.sel?document.querySelector(step.sel):null;
-        if(again&&again.offsetParent!==null){
+        if(_tourVisible(again)){
           var f2=_tourClickWait.fn;
           _tourClickWait={el:again,fn:f2};_tourTarget=again;
           again.addEventListener("click",f2,{capture:true,once:true});
@@ -7057,8 +7103,23 @@ function _tourShow(){
     hole.style.display="none";
     _tourMaskFull();
     bubble.style.left="50%";bubble.style.top="50%";bubble.style.transform="translate(-50%,-50%)";
-    if(step.sel){_tourMissTimer=setTimeout(function(){var t2=document.querySelector(step.sel);if(t2&&t2.offsetParent!==null)_tourShow();},1200);}
+    if(step.sel){_tourMissTimer=setTimeout(function(){var t2=document.querySelector(step.sel);if(_tourVisible(t2))_tourShow();},1200);}
   }
+}
+/* offsetParent est null pour tout \u00e9l\u00e9ment position:fixed (ex. #cp-fab) : ce test le croyait cach\u00e9.
+   On mesure le rectangle r\u00e9el \u00e0 la place. */
+function _tourVisible(el){
+  if(!el||!el.getBoundingClientRect)return false;
+  var st=null;try{st=window.getComputedStyle(el);}catch(e){}
+  /* NE PAS tester l'opacit\u00e9 : les \u00e9crans entrent en fondu (.stagger / fadeUp), un \u00e9l\u00e9ment
+     l\u00e9gitime vaut opacity:0 pendant quelques dizaines de ms. Seuls display/visibility comptent. */
+  if(st&&(st.display==="none"||st.visibility==="hidden"))return false;
+  var r=el.getBoundingClientRect();
+  if(r.width>=1&&r.height>=1)return true;
+  /* Repli : \u00e9l\u00e9ment non mesurable (rendu diff\u00e9r\u00e9). On le consid\u00e8re visible s'il est
+     attach\u00e9 \u00e0 la mise en page, ou s'il est en position:fixed (offsetParent y vaut toujours null). */
+  if(st&&st.position==="fixed")return true;
+  return el.offsetParent!==null;
 }
 function _tourReduce(){try{return window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;}catch(e){return false;}}
 function _tourMaskSet(id,l,t,w,h){
@@ -7072,13 +7133,40 @@ function _tourMaskFull(){
   _tourMaskSet("tm-t",0,0,vw,vh);
   ["tm-b","tm-l","tm-r"].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display="none";});
 }
+/* Suivi continu : scroll fluide, animations d'entrée d'écran (transform), polices qui chargent,
+   sidebar qui s'ouvre... la cible bouge APRÈS le premier calcul. On la suit à chaque frame,
+   et on ne réécrit le DOM que si elle a réellement bougé (pas de jank). */
+var _tourRaf=null,_tourLastRect=null;
+function _tourAnimPulse(){
+  var ov=document.getElementById("tour-ov");if(!ov)return;
+  ov.classList.add("tour-anim");
+  setTimeout(function(){ov.classList.remove("tour-anim");},300);
+}
+function _tourSameRect(a,b){
+  if(!a||!b)return false;
+  return Math.abs(a.top-b.top)<0.5&&Math.abs(a.left-b.left)<0.5&&Math.abs(a.width-b.width)<0.5&&Math.abs(a.height-b.height)<0.5;
+}
+function _tourStartTrack(){
+  _tourStopTrack();_tourLastRect=null;
+  var loop=function(){
+    if(!document.getElementById("tour-hole")){_tourRaf=null;return;}
+    var t=_tourTarget;
+    if(t&&document.body.contains(t)){
+      var r=t.getBoundingClientRect();
+      if(!_tourSameRect(r,_tourLastRect)){_tourLastRect={top:r.top,left:r.left,width:r.width,height:r.height};_tourPosition();}
+    }
+    _tourRaf=requestAnimationFrame(loop);
+  };
+  _tourRaf=requestAnimationFrame(loop);
+}
+function _tourStopTrack(){if(_tourRaf){cancelAnimationFrame(_tourRaf);_tourRaf=null;}}
 /* Positionne les 4 masques autour de la cible : le rectangle de la cible reste LIBRE => cliquable. */
 function _tourPosition(){
   var hole=document.getElementById("tour-hole"),bubble=document.getElementById("tour-bubble");
   if(!hole||!bubble)return;
   var step=_tourSteps[_tourIdx];if(!step)return;
   var target=_tourTarget&&document.body.contains(_tourTarget)?_tourTarget:(step.sel?document.querySelector(step.sel):null);
-  if(!target||target.offsetParent===null){hole.style.display="none";_tourMaskFull();return;}
+  if(!_tourVisible(target)){hole.style.display="none";_tourMaskFull();return;}
   _tourTarget=target;
   var r=target.getBoundingClientRect(),pad=6,vw=window.innerWidth,vh=window.innerHeight;
   var l=r.left-pad,t=r.top-pad,w=r.width+pad*2,h=r.height+pad*2;
@@ -7093,14 +7181,30 @@ function _tourPosition(){
 function _tourPlaceBubble(bubble,r){
   bubble.style.transform="none";
   var bw=bubble.offsetWidth||290,bh=bubble.offsetHeight||150;
-  var gap=14,vw=window.innerWidth,vh=window.innerHeight;
-  var left,top;
-  if(r.right+gap+bw<vw){left=r.right+gap;top=r.top;}
-  else if(r.left-gap-bw>0){left=r.left-gap-bw;top=r.top;}
-  else if(r.bottom+gap+bh<vh){left=r.left;top=r.bottom+gap;}
-  else{left=r.left;top=Math.max(10,r.top-gap-bh);}
-  left=Math.max(10,Math.min(left,vw-bw-10));
-  top=Math.max(10,Math.min(top,vh-bh-10));
+  var gap=14,vw=window.innerWidth,vh=window.innerHeight,m=10;
+  /* Ordre de préférence : droite, gauche, dessous, dessus. */
+  var cands=[
+    {l:r.right+gap,        t:r.top},
+    {l:r.left-gap-bw,      t:r.top},
+    {l:r.left,             t:r.bottom+gap},
+    {l:r.left,             t:r.top-gap-bh}
+  ];
+  function fits(c){return c.l>=m&&c.t>=m&&c.l+bw<=vw-m&&c.t+bh<=vh-m;}
+  var pick=null;
+  for(var i=0;i<cands.length;i++){if(fits(cands[i])){pick=cands[i];break;}}
+  if(!pick){
+    /* Rien ne tient : on place où il y a le plus de place, puis on borne. */
+    var below=vh-r.bottom, above=r.top;
+    pick=(below>=above)?{l:r.left,t:r.bottom+gap}:{l:r.left,t:r.top-gap-bh};
+  }
+  var left=Math.max(m,Math.min(pick.l,vw-bw-m));
+  var top=Math.max(m,Math.min(pick.t,vh-bh-m));
+  /* Dernier filet : si la bulle recouvre encore la cible, on la décale du côté le plus dégagé. */
+  var overlap=!(left+bw<r.left-2||left>r.right+2||top+bh<r.top-2||top>r.bottom+2);
+  if(overlap){
+    if(vh-r.bottom>=r.top)top=Math.min(r.bottom+gap,vh-bh-m);
+    else top=Math.max(m,r.top-gap-bh);
+  }
   bubble.style.left=left+"px";bubble.style.top=top+"px";
 }
 
@@ -7115,6 +7219,7 @@ function _tourModuleComplete(){
   // marque le module courant terminé
   if(_tourModule){try{localStorage.setItem(_tutoDoneKey(_tourModule),"1");}catch(e){}}
   _tourClearWaits();
+  _tourStopTrack();
   window.removeEventListener("resize",_tourPosition);
   window.removeEventListener("scroll",_tourPosition,true);
   // propose le module suivant non terminé du rôle
@@ -7137,6 +7242,7 @@ function _tourModuleComplete(){
 function endTour(){
   _tourClearWaits();
   var ov=document.getElementById("tour-ov");if(ov){ov.classList.remove("on");ov.innerHTML="";}
+  _tourStopTrack();
   window.removeEventListener("resize",_tourPosition);
   window.removeEventListener("scroll",_tourPosition,true);
   _tourSteps=[];_tourModule=null;
