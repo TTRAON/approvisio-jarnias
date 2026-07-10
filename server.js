@@ -710,10 +710,21 @@ app.put('/api/appros/:id', auth, async (req, res) => {
 
 app.delete('/api/appros/:id', auth, async (req, res) => {
   try {
-    // Vérifier que l'utilisateur est le créateur (ou admin)
-    const { rows } = await pool.query('SELECT created_by FROM appros WHERE id = $1', [req.params.id]);
+    // Récupère le créateur ET les données (pour comparer au nom inscrit sur l'appro)
+    const { rows } = await pool.query('SELECT created_by, data FROM appros WHERE id = $1', [req.params.id]);
     if (!rows[0]) return res.status(404).json({ error: 'Appro introuvable' });
-    if (rows[0].created_by !== req.user.id && req.user.role !== 'admin') {
+    const d = rows[0].data || {};
+    const norm = (x) => (x || '').toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const me = norm(req.user.name);
+    // Une appro est « la mienne » si mon compte l'a créée, si je suis admin/dépôt,
+    // OU si mon NOM figure dessus (conducteur, chargé d'affaires, team leader) —
+    // même si elle a été créée depuis un autre compte.
+    const nameMatches = me && [d.conducteur, d.chargeAffaires, d.tlName].some((n) => norm(n) === me);
+    const allowed = rows[0].created_by === req.user.id
+      || req.user.role === 'admin'
+      || req.user.role === 'depot'
+      || nameMatches;
+    if (!allowed) {
       return res.status(403).json({ error: 'Vous ne pouvez supprimer que vos propres appros' });
     }
     await pool.query('DELETE FROM appros WHERE id = $1', [req.params.id]);
