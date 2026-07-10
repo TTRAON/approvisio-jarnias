@@ -3479,6 +3479,8 @@ function renderList(){
   if(sf==="brouillon")window._draftView=true;else if(sf)window._draftView=false;
   var filtered=sheets.filter(function(s){
     if(!_techVisible(s))return false;
+    /* Un conducteur ne voit QUE ses appros (celles à son nom). Admin/dépôt voient tout. */
+    if(!canManage()&&!isField()&&!_isMyAppro(s))return false;
     if(s.statut==="sortie"&&!q)return false;
     if(window._draftView){if(!s.draft)return false;}else{if(s.draft)return false;}
     if(sf==="preparation"&&s.statut!=="en_attente")return false;
@@ -3526,7 +3528,7 @@ function renderList(){
       html+="</div></div>";
     });
   }
-  var _dc=sheets.filter(function(s){return s.draft&&s.statut!=="sortie";}).length;
+  var _dc=sheets.filter(function(s){return s.draft&&s.statut!=="sortie"&&(canManage()||isField()||_isMyAppro(s));}).length;
   var _dv=!!window._draftView;
   var toggle="";
   if(!(currentUser&&(currentUser.role==="depot"||isField()))){
@@ -3565,7 +3567,7 @@ function renderWelcome(){
   var nPretes=mine.filter(function(s){return s.statut==="prete"&&!s.modifPrep;}).length;
   var nChantier=mine.filter(function(s){return s.statut==="sur_chantier";}).length;
   var nATraiter=mine.filter(function(s){return s.statut==="rendu"||s.statut==="en_attente"||(s.statut==="prete"&&s.modifPrep)||(s.statut==="sur_chantier"&&s.addToPrepare);}).length;
-  var nDrafts=sheets.filter(function(s){return s.draft&&s.statut!=="sortie";}).length;
+  var nDrafts=sheets.filter(function(s){return s.draft&&s.statut!=="sortie"&&_isMineSheet(s);}).length;
   var field=isField();
 
   var _hr=new Date().getHours();
@@ -3614,7 +3616,6 @@ function renderWelcome(){
     h+=stat(nDrafts,"Brouillons","ti-file-pencil","#F5F3FF","#7C3AED","goDrafts()");
   }
   h+="</div>";
-  h+=statutChipsHTML();
 
   // ACTIONS RAPIDES
   h+="<div class=\"home-sec-t\">Actions rapides</div>";
