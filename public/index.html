@@ -584,7 +584,7 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .dash-hero{position:relative;overflow:hidden;border-radius:18px;padding:22px 24px;margin-bottom:22px;background:linear-gradient(135deg,var(--accent,#0F172A),var(--accent-2,#1E293B));color:#fff}
 .dash-hero>*{position:relative;z-index:2}
 html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.14) 50%,transparent 80%);background-size:250% 100%;animation:ambSheen 9s ease-in-out infinite}
-.dash-hero-t{font-size:23px;font-weight:800;letter-spacing:-.5px}
+.dash-hero-t{font-size:23px;font-weight:800;letter-spacing:-.5px;line-height:1.25;padding-bottom:1px}
 .dash-hero-s{font-size:13.5px;opacity:.85;margin-top:3px}
 .dash-sec-t{font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.7px;margin:22px 2px 12px;display:flex;align-items:center;gap:7px}
 .dash-sec-t i{font-size:15px;color:var(--accent,#6D28D9)}
@@ -758,6 +758,9 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
 .tour-ov.tour-anim .tour-mask,.tour-ov.tour-anim .tour-hole{transition:left .26s var(--ease),top .26s var(--ease),width .26s var(--ease),height .26s var(--ease)}
 /* bulle */
 .tour-bubble{position:fixed;z-index:6120;pointer-events:auto;background:#fff;border-radius:16px;padding:18px 20px 16px;width:352px;max-width:calc(100vw - 28px);box-shadow:0 20px 50px rgba(0,0,0,.3);animation:tourPop .3s var(--spring)}
+/* mobile : quand le tuto vise la sidebar, on la remonte au-dessus du voile pour la rendre cliquable */
+.sidebar.tour-lift{z-index:6115!important}
+.sb-overlay.tour-lift-ov{z-index:6099!important;opacity:1}
 .tour-bubble h3{font-size:15px;font-weight:800;color:#0F172A;margin-bottom:6px;display:flex;align-items:center;gap:7px}
 .tour-bubble h3 i{color:var(--accent,#6D28D9);font-size:18px}
 .tour-bubble p{font-size:13px;color:#64748B;line-height:1.55}
@@ -3536,7 +3539,17 @@ function renderWelcome(){
   if(currentRole==="depot"&&typeof renderDepot==="function"){renderDepot();return;}
   if(typeof _unmountCpFab==="function")_unmountCpFab();
   cur=null;saved=false;aiSug=null;addMode=false;addDate=null;currentTab="mes";
-  var mine=sheets.filter(function(s){return !s.draft;});
+  var _meN=_stripAccents((currentUser&&currentUser.name||"").toLowerCase());
+  /* « mine » = les appros qui ME concernent, d'après le NOM inscrit sur l'appro
+     (conducteur / chargé d'affaires / team leader), et non parce que c'est mon
+     compte qui l'a créée. Le dépôt/admin voit tout. */
+  function _isMineSheet(s){
+    if(!_meN)return true;
+    if(currentRole==="depot"||(typeof isAdmin==="function"&&isAdmin()))return true;
+    var noms=[s.conducteur,s.chargeAffaires,s.tlName];
+    return noms.some(function(n){return _stripAccents((n||"").toLowerCase())===_meN;});
+  }
+  var mine=sheets.filter(function(s){return !s.draft&&_isMineSheet(s);});
   var ctb=mine.reduce(function(a,s){getTypes(s).forEach(function(t){a[t]=(a[t]||0)+1;});return a;},{});
   var mx=Math.max.apply(null,Object.values(ctb).concat([1]));
   var nTotal=mine.length;
@@ -6598,11 +6611,14 @@ function _dashStat(val,label,ic,tone,action){
 function _sheetsMine(){
   var S=(typeof sheets!=="undefined"&&sheets)?sheets:[];
   if(!currentUser)return S;
+  if(currentUser.role==="depot"||(typeof isAdmin==="function"&&isAdmin()))return S;
   var me=_stripAccents((currentUser.name||"").toLowerCase());
-  if(currentUser.role==="conducteur"&&me){
-    return S.filter(function(s){return _stripAccents(((s.conducteur||s.chargeAffaires)||"").toLowerCase())===me||s._createdBy===currentUser.id;});
-  }
-  return S;
+  if(!me)return S;
+  /* Une appro « m'appartient » si mon NOM figure dessus (conducteur, chargé
+     d'affaires ou team leader) — pas parce que mon compte l'a créée. */
+  return S.filter(function(s){
+    return [s.conducteur,s.chargeAffaires,s.tlName].some(function(n){return _stripAccents((n||"").toLowerCase())===me;});
+  });
 }
 function _dashDueSoon(list){
   var out=[];
@@ -6865,6 +6881,11 @@ function toggleNews(){
       apiCall("PUT","/news/seen",{version:NEWS_VERSION}).catch(function(){});
     }
   }
+}
+function openSidebar(){
+  var s=document.getElementById("sidebar"),o=document.getElementById("sb-overlay");
+  if(s)s.classList.add("open");if(o)o.classList.add("open");
+  var b=document.querySelector(".mtop-btn");if(b)b.classList.add("on");
 }
 function toggleSidebar(){
   var s=document.getElementById("sidebar"),o=document.getElementById("sb-overlay");
@@ -7167,14 +7188,12 @@ var TUTO_MODULES={
 
   catalogue:{titre:"Maîtriser le catalogue",ic:"ti-package",roles:["conducteur","depot"],etapes:function(){
     return [
-      {before:_tutoNeedAppro,sel:"#cp-fab",ic:"ti-package",t:"Ouvrez le catalogue",d:"Tout le matériel JARNIAS s'y trouve. Cliquez sur ce bouton.",action:"click"},
+      {before:_tutoNeedAppro,sel:"#cp-fab",ic:"ti-package",t:"Ouvrez le catalogue",d:"Tout le matériel JARNIAS s'y trouve. Cliquez sur ce bouton pour l'ouvrir.",action:"click"},
       {before:_tutoNeedCatalogue,sel:"#cp-search",ic:"ti-search",t:"Une recherche maligne",d:"Tapez « maçonnerie » : vous obtenez la catégorie ET les produits proches. Les fautes de frappe sont pardonnées.",action:"next"},
-      {before:_tutoNeedCatalogue,sel:".cp-tile,.cp-row",ic:"ti-checkbox",t:"Cochez vos articles",d:"Cliquez pour sélectionner. Vous pouvez en cocher plusieurs d'affilée.",action:"next"},
-      {before:_tutoNeedCatalogue,sel:".cp-qty",ic:"ti-numbers",t:"La quantité",d:"Réglez la quantité de chaque article avant de l'insérer.",action:"next"},
-      {before:_tutoNeedCatalogue,sel:"#cp-n",ic:"ti-list-check",t:"Sélection conservée",d:"Votre sélection reste en mémoire même si vous relancez une recherche. Vous ne perdez rien.",action:"next"},
-      {before:_tutoNeedCatalogue,sel:".btn-ins,button[onclick^=\"insertCp\"]",ic:"ti-circle-plus",t:"Insérer dans l'appro",d:"Les articles s'ajoutent. Le catalogue reste ouvert pour enchaîner sans le rouvrir.",action:"next"},
-      {before:_tutoNeedCatalogue,sel:".cp-kit,.cp-tile,.cp-row",ic:"ti-box-multiple",t:"Les kits",d:"Un kit ajoute d'un coup tous les articles d'un métier. Multipliez-le par le nombre d'équipes.",action:"next"},
-      {before:_tutoNeedAppro,sel:".kit-band,.cin-d",ic:"ti-package-off",t:"Retirer un kit",d:"Dans l'appro, un kit est groupé sous un bandeau. Le bouton « Retirer » enlève tous ses articles d'un coup.",action:"next"}
+      {before:_tutoNeedCatalogue,sel:".cp-tile,.cp-row",ic:"ti-checkbox",t:"Cochez vos articles",d:"Cochez la case d'un article pour le sélectionner. Vous pouvez en cocher plusieurs d'affilée.",action:"next"},
+      {before:_tutoNeedCatalogue,sel:".btn-kit",ic:"ti-box-multiple",t:"Les kits",d:"« Ajouter le kit » insère d'un coup tous les articles d'un métier. Le champ × permet de le multiplier par le nombre d'équipes.",action:"next"},
+      {before:_tutoNeedCatalogue,sel:".btn-ins,#cp-n",ic:"ti-circle-plus",t:"Insérer dans l'appro",d:"Ce bouton ajoute les articles cochés à votre appro. Le catalogue reste ouvert pour enchaîner sans le rouvrir.",action:"next"},
+      {before:_tutoNeedCatalogue,sel:".btn-cp-close",ic:"ti-arrow-back-up",t:"Revenir à l'appro",d:"Fermez le catalogue quand vous avez fini : vos articles insérés apparaissent alors groupés dans l'appro, prêts à ajuster.",action:"next"}
     ];
   }},
 
@@ -7359,6 +7378,30 @@ function _tourClearWaits(){
   if(_tourClickWait){try{_tourClickWait.el.removeEventListener("click",_tourClickWait.fn,true);}catch(e){}_tourClickWait=null;}
   if(_tourMissTimer){clearTimeout(_tourMissTimer);clearInterval(_tourMissTimer);_tourMissTimer=null;}
 }
+function _tourInSidebar(sel){
+  if(!sel)return false;
+  var sb=document.getElementById("sidebar");if(!sb)return false;
+  var el=null;try{el=document.querySelector(sel);}catch(e){}
+  if(el)return sb.contains(el);
+  // cible pas encore trouvée : on déduit des sélecteurs de menu connus
+  return /#btn-|\.btn-new-sb|#srch|\.sb-/.test(sel);
+}
+function _tourIsMobile(){return window.innerWidth<900;}
+function _tourSyncSidebar(step){
+  // sur mobile, ouvrir la sidebar quand la cible s'y trouve, la fermer sinon
+  if(!_tourIsMobile())return;
+  var inSb=_tourInSidebar(step.sel);
+  try{
+    if(inSb){if(typeof openSidebar==="function")openSidebar();}
+    else{if(typeof closeSidebar==="function")closeSidebar();}
+  }catch(e){}
+  // la sidebar mobile est à z-index 1000 : on la remonte AU-DESSUS du voile du tuto
+  var sb=document.getElementById("sidebar"),ov=document.getElementById("sb-overlay");
+  var ovOn=document.getElementById("tour-ov");
+  if(ovOn)ovOn.classList.toggle("tour-over-sb",inSb);
+  if(sb)sb.classList.toggle("tour-lift",inSb&&_tourIsMobile());
+  if(ov)ov.classList.toggle("tour-lift-ov",inSb&&_tourIsMobile());
+}
 function _tourShow(){
   _tourClearWaits();
   var step=_tourSteps[_tourIdx];if(!step){_tourModuleComplete();return;}
@@ -7366,8 +7409,8 @@ function _tourShow(){
   var bubble=document.getElementById("tour-bubble");
   if(!hole||!bubble)return;
   if(step.before){try{step.before();}catch(e){}}
-  // sur mobile, ouvrir la sidebar pour viser un bouton de menu
-  if(window.innerWidth<900&&step.sel&&step.sel.indexOf("#btn-")===0&&typeof openSidebar==="function"){try{openSidebar();}catch(e){}}
+  // sur mobile : ouvrir/fermer la sidebar selon que la cible s'y trouve, et la remonter au-dessus du voile
+  _tourSyncSidebar(step);
   var target=step.sel?document.querySelector(step.sel):null;
   var visible=_tourVisible(target);
   var dots="";for(var i=0;i<_tourSteps.length;i++)dots+="<span class=\"tour-dot"+(i===_tourIdx?" on":"")+"\"></span>";
@@ -7413,7 +7456,16 @@ function _tourShow(){
     hole.style.display="none";
     _tourMaskFull();
     bubble.style.left="50%";bubble.style.top="50%";bubble.style.transform="translate(-50%,-50%)";
-    if(step.sel){_tourMissTimer=setTimeout(function(){var t2=document.querySelector(step.sel);if(_tourVisible(t2))_tourShow();},1200);}
+    /* cible pas encore visible (ex. sidebar mobile en cours d'ouverture) : on re-tente vite,
+       puis à intervalle jusqu'à 6 s, sans jamais bloquer. */
+    if(step.sel){
+      var rtries=0;
+      _tourMissTimer=setInterval(function(){
+        var t2=document.querySelector(step.sel);
+        if(_tourVisible(t2)){clearInterval(_tourMissTimer);_tourMissTimer=null;_tourShow();return;}
+        if(++rtries>20){clearInterval(_tourMissTimer);_tourMissTimer=null;_tourNav(1);}
+      },300);
+    }
   }
 }
 /* offsetParent est null pour tout \u00e9l\u00e9ment position:fixed (ex. #cp-fab) : ce test le croyait cach\u00e9.
@@ -7555,6 +7607,10 @@ function endTour(){
   _tourStopTrack();
   window.removeEventListener("resize",_tourPosition);
   window.removeEventListener("scroll",_tourPosition,true);
+  // nettoyage mobile : retirer les remontées de z-index et refermer la sidebar
+  var sb=document.getElementById("sidebar");if(sb)sb.classList.remove("tour-lift");
+  var sbo=document.getElementById("sb-overlay");if(sbo)sbo.classList.remove("tour-lift-ov");
+  if(_tourIsMobile()&&typeof closeSidebar==="function"){try{closeSidebar();}catch(e){}}
   _tourSteps=[];_tourModule=null;
 }
 function maybeAutoTour(){
@@ -7581,7 +7637,7 @@ function enterApp(){
   var btk=document.getElementById("btn-tickets");if(btk)btk.style.display=canManage()?"flex":"none";
   var bpe=document.getElementById("btn-perso");if(bpe)bpe.style.display=(currentUser.role==="admin")?"flex":"none";
   var bter=document.getElementById("btn-terrain");if(bter)bter.style.display=(isField())?"flex":"none";
-  var bbl=document.getElementById("btn-biblio");if(bbl)bbl.style.display=(currentUser.role==="depot")?"none":"flex";
+  var bbl=document.getElementById("btn-biblio");if(bbl)bbl.style.display=isField()?"none":"flex";
   // currentRole pilote l'affichage (conducteur/depot)
   currentRole=(currentUser.role==="depot")?"depot":"conducteur";
   document.getElementById("auth-screen").style.display="none";
