@@ -3191,12 +3191,21 @@ function switchTab(t){
 /* ═══ MES APPROS — page d\u00e9di\u00e9e (les appros en cours de l'utilisateur) ═══ */
 var _maFilter="cours"; // cours | brouillons | toutes
 function setMaFilter(f){_maFilter=f;renderMesAppros();}
+/* Ouvre directement la page « Mes appros » sur le filtre Brouillons. */
+function goDrafts(){
+  if(typeof closeSidebar==="function")closeSidebar();
+  _maFilter="brouillons";currentTab="mes";cur=null;
+  if(typeof setActiveNav==="function")setActiveNav("btn-home");
+  renderMesAppros();
+}
 function _maMine(){
   return (sheets||[]).filter(function(s){
     if(!_techVisible(s))return false;
     if(canManage())return true;                     /* admin + d\u00e9p\u00f4t : tout */
-    var me=(currentUser&&(currentUser.name||currentUser.username))||"";
-    return _normEq(s.conducteur||s.chargeAffaires||"")===_normEq(me);
+    var me=_normEq((currentUser&&(currentUser.name||currentUser.username))||"");
+    if(!me)return true;
+    /* mon nom sur l'un des champs (conducteur, charg\u00e9 d'affaires ou team leader) */
+    return [s.conducteur,s.chargeAffaires,s.tlName].some(function(n){return _normEq(n||"")===me;});
   });
 }
 function _maEnCours(s){return !s.draft&&s.statut!=="sortie";}
@@ -3364,7 +3373,7 @@ function _libSection(label,dot,list){
 }
 function libCardHTML(s){
   var isUrgent=(s.priorite&&s.priorite!=="normale");var avg=avgNote(s);var fav=!!s.favorite;
-  var canDel=(currentUser&&s._createdBy)?(s._createdBy===currentUser.id||currentUser.role==="admin"):false;
+  var canDel=_isMyAppro(s)||(currentUser&&currentUser.role==="admin");
   var cl={dot:_condKey(s)?_condColor(_condKey(s)):"#CBD5E1"};
   var h="<div class=\"lib-card\" data-id=\""+s.id+"\" data-fav=\""+(s.favorite?"1":"0")+"\" style=\"--type:"+cl.dot+"\" onclick=\"openFromLib('"+s.id+"')\">";
   h+="<div class=\"sc-aff\"><i class=\"ti ti-hash\"></i>"+esc(s.noAffaire||"Sans N\u00b0 d'affaire")+"</div>";
@@ -3383,7 +3392,7 @@ function libCardHTML(s){
 function libRowHTML(s){
   var isUrgent=(s.priorite&&s.priorite!=="normale");var avg=avgNote(s);var fav=!!s.favorite;
   var cl={dot:_condKey(s)?_condColor(_condKey(s)):"#CBD5E1"};
-  var canDel=(currentUser&&s._createdBy)?(s._createdBy===currentUser.id||currentUser.role==="admin"):false;
+  var canDel=_isMyAppro(s)||(currentUser&&currentUser.role==="admin");
   var h="<div class=\"lib-row\" onclick=\"openFromLib('"+s.id+"')\">";
   h+="<span class=\"lib-row-dot\" style=\"background:"+cl.dot+"\" title=\""+esc(_condKey(s)||"Sans conducteur")+"\"></span>";
   h+="<div class=\"lib-row-main\"><div class=\"lib-row-name\"><span style=\"overflow:hidden;text-overflow:ellipsis;white-space:nowrap\">"+esc(s.nomChantier||"Sans titre")+"</span>"+(fav?"<i class=\"ti ti-pin-filled\" style=\"color:#F59E0B;font-size:12px;flex-shrink:0\"></i>":"")+""+"</div><div class=\"lib-row-sub\">"+(esc(s.conducteur||s.chargeAffaires)||"\u2014")+(s.reference?" \u00b7 "+esc(s.reference):"")+(s.dateCreation?" \u00b7 "+esc(s.dateCreation):"")+"</div></div>";
@@ -3602,7 +3611,7 @@ function renderWelcome(){
     h+=stat(nEnPrep,"En pr\u00e9paration","ti-clock","#FFF7ED","#D97706","goStatut('preparation')");
     h+=stat(nPretes,"Pr\u00eates au d\u00e9p\u00f4t","ti-package","#ECFDF5","#059669","goStatut('prete')");
     h+=stat(nChantier,"Sur chantier","ti-tool","#EFF2FF","#4F46E5","goStatut('chantier')");
-    h+=stat(nDrafts,"Brouillons","ti-file-pencil","#F5F3FF","#7C3AED","goStatut('brouillon')");
+    h+=stat(nDrafts,"Brouillons","ti-file-pencil","#F5F3FF","#7C3AED","goDrafts()");
   }
   h+="</div>";
   h+=statutChipsHTML();
@@ -3618,7 +3627,7 @@ function renderWelcome(){
     h+="<button class=\"qa liv\" onclick=\"goDepotOrList()\"><div class=\"qa-ic\" style=\"background:#ECFDF5;color:#059669\"><i class=\"ti ti-package-import\"></i></div><div><div class=\"qa-t\">Vue d\u00e9p\u00f4t</div><div class=\"qa-d\">Pr\u00e9parer et suivre les appros</div></div></button>";
   }
   if(nDrafts&&!field){
-    h+="<button class=\"qa liv\" onclick=\"setDraftView(true);switchTab('mes')\"><div class=\"qa-ic\" style=\"background:#FEF9C3;color:#A16207\"><i class=\"ti ti-pencil\"></i></div><div><div class=\"qa-t\">Brouillons ("+nDrafts+")</div><div class=\"qa-d\">Finir et envoyer en production</div></div></button>";
+    h+="<button class=\"qa liv\" onclick=\"goDrafts()\"><div class=\"qa-ic\" style=\"background:#FEF9C3;color:#A16207\"><i class=\"ti ti-pencil\"></i></div><div><div class=\"qa-t\">Brouillons ("+nDrafts+")</div><div class=\"qa-d\">Finir et envoyer en production</div></div></button>";
   }
   h+="</div>";
 
@@ -3902,7 +3911,7 @@ function renderForm(){
   }).join("");
 
   var h="<div class=\"fv\">";
-  var canDelCur=(cur&&cur.id&&typeof sheets!=="undefined"&&sheets.some(function(x){return x.id===cur.id;})&&currentUser&&currentUser.role!=="team_leader"&&(currentUser.role==="admin"||currentUser.role==="depot"||!cur._createdBy||cur._createdBy===currentUser.id));
+  var canDelCur=(cur&&cur.id&&typeof sheets!=="undefined"&&sheets.some(function(x){return x.id===cur.id;})&&currentUser&&currentUser.role!=="team_leader"&&(currentUser.role==="admin"||currentUser.role==="depot"||!cur._createdBy||_isMyAppro(cur)));
   var delBtn=canDelCur?"<button class=\"tbi\" style=\"color:#DC2626\" title=\"Supprimer cette appro\" onclick=\"delS(cur.id)\"><i class=\"ti ti-trash\"></i></button>":"";
   h+="<div class=\"topbar\"><button class=\"btn-back\" onclick=\"goBack()\"><i class=\"ti ti-arrow-left\" style=\"font-size:13px\"></i> Retour</button><div class=\"tb-right\"><button class=\"tbi\" style=\"color:#6D28D9\" title=\"Catalogue\" onclick=\"showCp()\"><i class=\"ti ti-package\"></i></button>"+addBtn+"<button class=\"tbi\" style=\"color:#B91C1C\" title=\"Exporter en PDF\" onclick=\"doPDF()\"><i class=\"ti ti-file-type-pdf\"></i></button>"+delBtn+shareBtn+saveBtn+"</div></div>";
   _mountCpFab();
@@ -6607,6 +6616,21 @@ function _dashHeader(title,sub){
 function _dashStat(val,label,ic,tone,action){
   var click=action?(" onclick=\""+action+"\" role=\"button\" tabindex=\"0\""):"";
   return "<div class=\"dstat liv"+(action?" dstat-click":"")+" tone-"+tone+"\""+click+"><div class=\"dstat-top\"><div class=\"dstat-ic\"><i class=\"ti "+ic+"\"></i></div>"+(action?"<i class=\"ti ti-chevron-right dstat-arw\"></i>":"")+"</div><div class=\"dstat-num\" data-count=\""+val+"\">0</div><div class=\"dstat-lbl\">"+esc(label)+"</div></div>";
+}
+/* Une appro « m'appartient » si mon NOM figure dessus (conducteur, chargé
+   d'affaires ou team leader), OU si mon compte l'a créée. Le nom prime :
+   même appro faite depuis un autre compte, si c'est mon nom dessus, elle est à moi.
+   Admin et dépôt ont accès à tout. */
+function _isMyAppro(s){
+  if(!s||!currentUser)return false;
+  if(currentUser.role==="admin"||currentUser.role==="depot")return true;
+  var me=_stripAccents((currentUser.name||"").toLowerCase());
+  if(me){
+    var names=[s.conducteur,s.chargeAffaires,s.tlName];
+    if(names.some(function(n){return _stripAccents((n||"").toLowerCase())===me;}))return true;
+  }
+  if(s._createdBy&&s._createdBy===currentUser.id)return true;
+  return false;
 }
 function _sheetsMine(){
   var S=(typeof sheets!=="undefined"&&sheets)?sheets:[];
