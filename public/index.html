@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="AppRO"/>
-<link rel="apple-touch-icon" href="/pwa-icon.svg"/>
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1757,6 +1757,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
           <button class="btn-theme" id="amb-btn" onclick="event.stopPropagation();toggleAmbPop()" title="Ambiance couleur"><i class="ti ti-palette" style="font-size:15px"></i></button>
         </div>
         <button class="btn-theme" id="help-btn" onclick="startTour()" title="Aide / visite guid&#233;e"><i class="ti ti-help-circle" style="font-size:16px"></i></button>
+        <button class="btn-theme" id="pwa-install-btn" onclick="pwaInstall()" title="Installer l'application" style="display:none;background:rgba(109,40,217,.14);color:#6D28D9"><i class="ti ti-download" style="font-size:15px"></i></button>
         <button class="btn-theme" id="theme-btn" onclick="toggleTheme()" title="Th&#232;me clair / sombre"><i class="ti ti-moon" style="font-size:15px"></i></button>
         <button class="btn-logout" onclick="doLogout()" title="D\u00e9connexion"><i class="ti ti-logout" style="font-size:13px"></i></button>
       </div>
@@ -7754,6 +7755,7 @@ function maybeAutoTour(){
 function enterApp(){
   // Configure sidebar selon le r\u00f4le
   var ri=ROLE_INFO[currentUser.role]||ROLE_INFO.conducteur;
+  try{_syncInstallBtn();}catch(e){}
   var initials=currentUser.name.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();
   var av=document.getElementById("sb-avatar");
   av.style.background=ri.bg;av.style.color=ri.color;av.textContent=initials;
@@ -8078,8 +8080,11 @@ function _isPwaInstalled(){
   return (window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches)||window.navigator.standalone===true;
 }
 function _syncInstallBtn(){
-  var b=document.getElementById("pwa-install-row");if(!b)return;
-  b.style.display=(window._pwaPrompt&&!_isPwaInstalled())?"flex":"none";
+  var installed=_isPwaInstalled();
+  var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  var canShow=(!!window._pwaPrompt||isIOS)&&!installed;
+  var b=document.getElementById("pwa-install-row");if(b)b.style.display=canShow?"flex":"none";
+  var hb=document.getElementById("pwa-install-btn");if(hb)hb.style.display=canShow?"flex":"none";
 }
 function pwaInstall(){
   if(window._pwaPrompt){
