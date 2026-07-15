@@ -1757,7 +1757,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
           <button class="btn-theme" id="amb-btn" onclick="event.stopPropagation();toggleAmbPop()" title="Ambiance couleur"><i class="ti ti-palette" style="font-size:15px"></i></button>
         </div>
         <button class="btn-theme" id="help-btn" onclick="startTour()" title="Aide / visite guid&#233;e"><i class="ti ti-help-circle" style="font-size:16px"></i></button>
-        <button class="btn-theme" id="pwa-install-btn" onclick="pwaInstall()" title="Installer l'application" style="display:none;background:rgba(109,40,217,.14);color:#6D28D9"><i class="ti ti-download" style="font-size:15px"></i></button>
+        <button class="btn-theme" id="pwa-install-btn" onclick="pwaInstall()" title="Installer l'application" style="background:rgba(109,40,217,.14);color:#6D28D9"><i class="ti ti-download" style="font-size:15px"></i></button>
         <button class="btn-theme" id="theme-btn" onclick="toggleTheme()" title="Th&#232;me clair / sombre"><i class="ti ti-moon" style="font-size:15px"></i></button>
         <button class="btn-logout" onclick="doLogout()" title="D\u00e9connexion"><i class="ti ti-logout" style="font-size:13px"></i></button>
       </div>
@@ -8081,20 +8081,45 @@ function _isPwaInstalled(){
 }
 function _syncInstallBtn(){
   var installed=_isPwaInstalled();
-  var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  var canShow=(!!window._pwaPrompt||isIOS)&&!installed;
-  var b=document.getElementById("pwa-install-row");if(b)b.style.display=canShow?"flex":"none";
-  var hb=document.getElementById("pwa-install-btn");if(hb)hb.style.display=canShow?"flex":"none";
+  // bouton toujours visible SAUF si l'app est déjà installée
+  var b=document.getElementById("pwa-install-row");if(b)b.style.display=installed?"none":"flex";
+  var hb=document.getElementById("pwa-install-btn");if(hb)hb.style.display=installed?"none":"flex";
 }
 function pwaInstall(){
+  if(_isPwaInstalled()){
+    if(typeof toast==="function")toast("L'application est déjà installée","ti-circle-check");
+    return;
+  }
+  var ua=navigator.userAgent||"";
+  var isIOS=/iphone|ipad|ipod/i.test(ua);
   if(window._pwaPrompt){
     window._pwaPrompt.prompt();
     window._pwaPrompt.userChoice.finally(function(){window._pwaPrompt=null;_syncInstallBtn();});
-  } else if(/iphone|ipad|ipod/i.test(navigator.userAgent)){
-    if(typeof toast==="function")toast("Sur iPhone : Partager puis « Sur l'écran d'accueil »","ti-share");
+  } else if(isIOS){
+    _pwaShowIosHelp();
+  } else if(/android/i.test(ua)){
+    if(typeof toast==="function")toast("Menu du navigateur (⋮) → « Installer l'application » / « Ajouter à l'écran d'accueil »","ti-download");
   } else {
-    if(typeof toast==="function")toast("Utilisez le menu du navigateur pour installer","ti-download");
+    if(typeof toast==="function")toast("Dans Chrome/Edge : icône d'installation dans la barre d'adresse, ou menu ⋮ → Installer","ti-download");
   }
+}
+function _pwaShowIosHelp(){
+  // petite fenêtre d'aide illustrée pour iPhone (pas de prompt natif sur iOS)
+  var ov=document.createElement("div");
+  ov.style.cssText="position:fixed;inset:0;z-index:9998;background:rgba(15,23,42,.55);display:flex;align-items:flex-end;justify-content:center;padding:0";
+  ov.onclick=function(e){if(e.target===ov)ov.remove();};
+  ov.innerHTML="<div style=\"background:#fff;border-radius:18px 18px 0 0;max-width:440px;width:100%;padding:22px 20px 30px;animation:tourPop .3s var(--spring)\">"+
+    "<div style=\"width:44px;height:5px;border-radius:3px;background:#E2E8F0;margin:0 auto 16px\"></div>"+
+    "<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:14px\"><div style=\"width:40px;height:40px;border-radius:11px;background:rgba(109,40,217,.12);color:#6D28D9;display:flex;align-items:center;justify-content:center\"><i class=\"ti ti-device-mobile\" style=\"font-size:20px\"></i></div><div style=\"font-size:17px;font-weight:800;color:#0F172A\">Installer sur iPhone</div></div>"+
+    "<p style=\"font-size:13.5px;color:#64748B;line-height:1.6;margin-bottom:16px\">Safari ne propose pas de bouton automatique. En 3 étapes :</p>"+
+    "<div style=\"display:flex;flex-direction:column;gap:12px\">"+
+    "<div style=\"display:flex;align-items:center;gap:12px\"><div style=\"width:26px;height:26px;border-radius:50%;background:#6D28D9;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0\">1</div><div style=\"font-size:13.5px;color:#334155\">Touchez <b>Partager</b> <i class=\"ti ti-share\" style=\"color:#0EA5E9\"></i> en bas de Safari</div></div>"+
+    "<div style=\"display:flex;align-items:center;gap:12px\"><div style=\"width:26px;height:26px;border-radius:50%;background:#6D28D9;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0\">2</div><div style=\"font-size:13.5px;color:#334155\">Choisissez <b>« Sur l'écran d'accueil »</b> <i class=\"ti ti-square-plus\" style=\"color:#334155\"></i></div></div>"+
+    "<div style=\"display:flex;align-items:center;gap:12px\"><div style=\"width:26px;height:26px;border-radius:50%;background:#6D28D9;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0\">3</div><div style=\"font-size:13.5px;color:#334155\">Ouvrez AppROVISIO depuis sa <b>nouvelle icône</b> : plein écran !</div></div>"+
+    "</div>"+
+    "<button onclick=\"this.closest('div[style*=fixed]').remove()\" style=\"margin-top:20px;width:100%;background:#6D28D9;color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer\">J'ai compris</button>"+
+    "</div>";
+  document.body.appendChild(ov);
 }
 </script>
 </body>
