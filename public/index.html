@@ -2,8 +2,15 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <title>AppROVISIO — JARNIAS</title>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#6D28D9"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="AppRO"/>
+<link rel="apple-touch-icon" href="/pwa-icon.svg"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -411,6 +418,13 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .sc-client i{font-size:12px;color:#94A3B8;flex-shrink:0}
 /* --- Appro sur 2 colonnes en grand écran (les tableaux restent pleine largeur) --- */
 .info-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.autosave-ind{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:#94A3B8;margin-right:10px;white-space:nowrap}
+.autosave-ind[data-state="saved"]{color:#16A34A}
+.autosave-ind[data-state="saving"]{color:#6D28D9}
+.autosave-ind[data-state="dirty"]{color:#B45309}
+.autosave-ind .spin{animation:aspin .8s linear infinite;display:inline-block}
+@keyframes aspin{to{transform:rotate(360deg)}}
+@media print{.autosave-ind{display:none!important}}
 /* ═══ Parcours visuel de l'appro (guider un débutant) ═══ */
 .appro-steps{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #E8EDF4;border-radius:14px;padding:11px 14px;margin-bottom:16px;overflow-x:auto;box-shadow:0 3px 14px -8px rgba(15,23,42,.2)}
 .astep{display:flex;align-items:center;gap:8px;flex:1;min-width:max-content}
@@ -3209,6 +3223,13 @@ function _maMine(){
   });
 }
 function _maEnCours(s){return !s.draft&&s.statut!=="sortie";}
+/* Ouvre la page « Mes appros » filtrée sur un état précis (raccourci des cartes d'accueil). */
+function goMaStatut(f){
+  if(typeof closeSidebar==="function")closeSidebar();
+  _maFilter=f;currentTab="mes";cur=null;
+  if(typeof setActiveNav==="function")setActiveNav("btn-home");
+  renderMesAppros();
+}
 function renderMesAppros(){
   try{setActiveNav("btn-home");}catch(e){}
   if(typeof _unmountCpFab==="function")_unmountCpFab();
@@ -3218,15 +3239,27 @@ function renderMesAppros(){
   var mine=_maMine();
   var cours=mine.filter(_maEnCours);
   var brouillons=mine.filter(function(s){return s.draft;});
-  var list=(_maFilter==="brouillons")?brouillons:(_maFilter==="toutes"?mine.filter(function(s){return s.statut!=="sortie";}):cours);
+  var list;
+  if(_maFilter==="brouillons")list=brouillons;
+  else if(_maFilter==="toutes")list=mine.filter(function(s){return s.statut!=="sortie";});
+  else if(_maFilter==="preparation")list=cours.filter(function(s){return s.statut==="en_attente";});
+  else if(_maFilter==="prete")list=cours.filter(function(s){return s.statut==="prete";});
+  else if(_maFilter==="chantier")list=cours.filter(function(s){return s.statut==="sur_chantier";});
+  else list=cours;
 
   var h="<div class=\"ma-wrap\">";
   h+=tabsBarHTML();
   h+="<div class=\"ma-in\">";
   h+=_dashHeader("Mes appros",canManage()?"Toutes les appros en cours.":"Les appros dont vous \u00eates le conducteur.");
 
+  var nPrep=cours.filter(function(s){return s.statut==="en_attente";}).length;
+  var nPr=cours.filter(function(s){return s.statut==="prete";}).length;
+  var nCh=cours.filter(function(s){return s.statut==="sur_chantier";}).length;
   h+="<div class=\"ma-chips\">";
   h+="<button class=\"ma-chip liv"+(_maFilter==="cours"?" on":"")+"\" onclick=\"setMaFilter('cours')\"><i class=\"ti ti-progress\"></i> En cours <b>"+cours.length+"</b></button>";
+  h+="<button class=\"ma-chip liv"+(_maFilter==="preparation"?" on":"")+"\" onclick=\"setMaFilter('preparation')\"><i class=\"ti ti-clock\"></i> En préparation <b>"+nPrep+"</b></button>";
+  h+="<button class=\"ma-chip liv"+(_maFilter==="prete"?" on":"")+"\" onclick=\"setMaFilter('prete')\"><i class=\"ti ti-package\"></i> Prêtes <b>"+nPr+"</b></button>";
+  h+="<button class=\"ma-chip liv"+(_maFilter==="chantier"?" on":"")+"\" onclick=\"setMaFilter('chantier')\"><i class=\"ti ti-tool\"></i> Sur chantier <b>"+nCh+"</b></button>";
   h+="<button class=\"ma-chip liv"+(_maFilter==="brouillons"?" on":"")+"\" onclick=\"setMaFilter('brouillons')\"><i class=\"ti ti-file-pencil\"></i> Brouillons <b>"+brouillons.length+"</b></button>";
   h+="<button class=\"ma-chip liv"+(_maFilter==="toutes"?" on":"")+"\" onclick=\"setMaFilter('toutes')\"><i class=\"ti ti-list\"></i> Toutes <b>"+mine.filter(function(s){return s.statut!=="sortie";}).length+"</b></button>";
   h+="</div>";
@@ -3234,6 +3267,9 @@ function renderMesAppros(){
   if(!list.length){
     var msg=(_maFilter==="brouillons")?["Aucun brouillon","Vos appros non envoy\u00e9es en production appara\u00eetront ici."]
           :(_maFilter==="toutes")?["Aucune appro","Cr\u00e9ez votre premi\u00e8re appro depuis le bouton \u00ab Nouvelle appro \u00bb."]
+          :(_maFilter==="preparation")?["Aucune appro en pr\u00e9paration","Les appros envoy\u00e9es au d\u00e9p\u00f4t mais pas encore pr\u00eates appara\u00eetront ici."]
+          :(_maFilter==="prete")?["Aucune appro pr\u00eate","Les appros pr\u00eates au d\u00e9p\u00f4t appara\u00eetront ici."]
+          :(_maFilter==="chantier")?["Aucune appro sur chantier","Les appros parties sur le terrain appara\u00eetront ici."]
           :["Aucune appro en cours","Les appros en pr\u00e9paration, pr\u00eates ou sur chantier appara\u00eetront ici."];
     h+="<div class=\"home-empty\" style=\"margin-top:18px\"><i class=\"ti ti-clipboard-off\"></i><div class=\"home-empty-t\">"+msg[0]+"</div><div class=\"home-empty-d\">"+msg[1]+"</div>";
     h+="<button class=\"qa liv\" style=\"margin-top:14px;max-width:260px\" onclick=\"openNew()\"><i class=\"ti ti-plus\"></i> Nouvelle appro</button></div>";
@@ -3610,9 +3646,9 @@ function renderWelcome(){
     h+=stat(nATraiter,"\u00c0 traiter","ti-progress-alert","#FFF7ED","#D97706","goDepotOrList()");
   } else {
     /* Conducteur : pas d'"Appros au total", pas d'"\u00c0 traiter" (c'est le job du d\u00e9p\u00f4t). */
-    h+=stat(nEnPrep,"En pr\u00e9paration","ti-clock","#FFF7ED","#D97706","goStatut('preparation')");
-    h+=stat(nPretes,"Pr\u00eates au d\u00e9p\u00f4t","ti-package","#ECFDF5","#059669","goStatut('prete')");
-    h+=stat(nChantier,"Sur chantier","ti-tool","#EFF2FF","#4F46E5","goStatut('chantier')");
+    h+=stat(nEnPrep,"En pr\u00e9paration","ti-clock","#FFF7ED","#D97706","goMaStatut('preparation')");
+    h+=stat(nPretes,"Pr\u00eates au d\u00e9p\u00f4t","ti-package","#ECFDF5","#059669","goMaStatut('prete')");
+    h+=stat(nChantier,"Sur chantier","ti-tool","#EFF2FF","#4F46E5","goMaStatut('chantier')");
     h+=stat(nDrafts,"Brouillons","ti-file-pencil","#F5F3FF","#7C3AED","goDrafts()");
   }
   h+="</div>";
@@ -3892,9 +3928,12 @@ function renderForm(){
     ?"<div class=\"add-banner\" style=\"background:"+ac.bg+";border-color:"+ac.left+"\"><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"width:10px;height:10px;border-radius:50%;background:"+ac.left+";flex-shrink:0;display:inline-block\"></span><div><strong style=\"font-size:13px;color:"+ac.text+"\">Mode Ajout actif</strong><div style=\"font-size:11px;color:"+ac.text+";opacity:.8\">Nouvelles lignes en "+ac.label+" &#8212; "+fdB(addDate)+"</div></div></div><button style=\"background:rgba(0,0,0,.12);border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:"+ac.text+"\" onclick=\"togAdd()\">Terminer</button></div>"
     :"";
   var tplNotice=tpl?"<div class=\"notice\"><i class=\"ti ti-copy\" style=\"font-size:15px\"></i> Bas&#233;e sur <strong style=\"margin-left:3px\">"+esc(tpl)+"</strong> &#8212; l&#39;original n&#39;a pas &#233;t&#233; modifi&#233;</div>":"";
+  var _showAuto=!isField()&&(cur.draft||cur.statut==="en_attente"||!cur.statut);
+  var autoInd=_showAuto?"<span id=\"autosave-ind\" class=\"autosave-ind\" data-state=\""+(saved?"saved":"dirty")+"\">"+(saved?"<i class=\"ti ti-cloud-check\"></i> Enregistr\u00e9":"<i class=\"ti ti-cloud\"></i> Brouillon")+"</span>":"";
   var saveBtn=saved
     ?"<button class=\"btn-save saved\" disabled><i class=\"ti ti-check\"></i> Enregistr&#233;</button>"
     :"<button class=\"btn-save\" onclick=\"doSave()\">Enregistrer</button>";
+  saveBtn=autoInd+saveBtn;
   var shareBtn=(cur&&cur._id)?"<button class=\"tbi\" style=\"color:#9A3412\" title=\"Partager (lien + QR code)\" onclick=\"showShare()\"><i class=\"ti ti-qrcode\"></i></button>":"";
   var aiBanner="";
   var aiErr=window._err?"<div class=\"err-box\"><i class=\"ti ti-alert-circle\" style=\"font-size:14px\"></i> "+esc(window._err)+"</div>":"";
@@ -4016,6 +4055,47 @@ function togComment(sec,i){
     var inp=tr.querySelector(".td-c .cin");if(inp)setTimeout(function(){inp.focus();},50);
   }
 }
+// ═══ Sauvegarde automatique du brouillon ═══
+var _autosaveTimer=null,_autosaveLastLocal=0;
+function _autosaveKey(){return "appro_autosave_"+((cur&&cur.id)||"new");}
+function _autosaveLocal(){
+  if(!cur)return;
+  try{localStorage.setItem(_autosaveKey(),JSON.stringify({t:Date.now(),data:cur}));}catch(e){}
+}
+function _autosaveClearLocal(id){
+  try{localStorage.removeItem("appro_autosave_"+(id||(cur&&cur.id)||"new"));}catch(e){}
+}
+function _setSaveState(state){
+  // state : "saving" | "saved" | "dirty"
+  var el=document.getElementById("autosave-ind");if(!el)return;
+  if(state==="saving")el.innerHTML="<i class=\"ti ti-loader-2 spin\"></i> Enregistrement\u2026";
+  else if(state==="saved")el.innerHTML="<i class=\"ti ti-cloud-check\"></i> Enregistr\u00e9 \u00e0 "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  else el.innerHTML="<i class=\"ti ti-cloud\"></i> Modifications non enregistr\u00e9es";
+  el.setAttribute("data-state",state);
+}
+function _scheduleAutosave(){
+  if(!cur)return;
+  if(isField())return;                 // le terrain ne modifie pas les brouillons
+  if(cur.statut&&cur.statut!=="en_attente"&&!cur.draft)return; // pas d'autosave sur appro déjà en circulation
+  // 1) snapshot local immédiat (léger throttle)
+  var now=Date.now();
+  if(now-_autosaveLastLocal>600){_autosaveLocal();_autosaveLastLocal=now;}
+  _setSaveState("dirty");
+  // 2) save serveur débounce (uniquement si l'appro existe déjà en base)
+  if(_autosaveTimer)clearTimeout(_autosaveTimer);
+  _autosaveTimer=setTimeout(function(){
+    if(!cur)return;
+    var existing=null;sheets.forEach(function(x){if(x.id===cur.id)existing=x;});
+    if(existing&&existing._id){
+      _setSaveState("saving");
+      apiCall("PUT","/appros/"+existing._id,cur).then(function(){
+        for(var i=0;i<sheets.length;i++){if(sheets[i].id===cur.id){sheets[i]=JSON.parse(JSON.stringify(cur));break;}}
+        saved=true;_autosaveClearLocal();_setSaveState("saved");
+      }).catch(function(){_setSaveState("dirty");});
+    }
+    // si pas encore en base : le snapshot local suffit jusqu'au 1er enregistrement explicite
+  },2000);
+}
 function upF(f,v){
   if(!cur)return;cur[f]=v;cur.dateMiseAJour=new Date().toLocaleDateString("fr-FR");saved=false;
   if(f==="typeChantier")cur.typeConfirmed=true;
@@ -4023,6 +4103,7 @@ function upF(f,v){
   var dm=document.getElementById("datemaj");if(dm)dm.textContent=cur.dateMiseAJour;
   var sb=document.querySelector(".btn-save");
   if(sb&&sb.classList.contains("saved")){sb.innerHTML="Enregistrer";sb.classList.remove("saved");sb.disabled=false;sb.onclick=doSave;}
+  _scheduleAutosave();
 }
 function upR(sec,i,f,v){
   if(!cur)return;cur[sec][i][f]=v;
@@ -4055,6 +4136,7 @@ function upR(sec,i,f,v){
   var heads=document.querySelectorAll(".card-hd-n");
   var idx=["consommables","fournitures","outillage"].indexOf(sec);
   if(heads[idx])heads[idx].textContent=cnt+" article"+(cnt!==1?"s":"");
+  _scheduleAutosave();
 }
 function addR(sec){
   if(!cur)return;var r=mkR();
@@ -4151,8 +4233,27 @@ function openSheet(id){
   if(!s)return;
   var cardRect=null;try{var c=document.querySelector('.sc[data-id="'+id+'"]');if(c&&c.getBoundingClientRect)cardRect=c.getBoundingClientRect();}catch(e){}
   _techMarkOpened(s.id);_techMarkOpened(s._id);
-  cur=JSON.parse(JSON.stringify(s));saved=false;aiSug=null;tpl=null;window._err=null;addMode=false;addDate=null;renderForm();
+  cur=JSON.parse(JSON.stringify(s));saved=false;aiSug=null;tpl=null;window._err=null;addMode=false;addDate=null;
+  _maybeRestoreLocal();
+  renderForm();
   _magicOpenFx(cardRect);
+}
+/* Si un brouillon local non enregistré, plus récent, existe pour cette appro : proposer de le reprendre. */
+function _maybeRestoreLocal(){
+  if(!cur||isField())return;
+  try{
+    var raw=localStorage.getItem("appro_autosave_"+cur.id);
+    if(!raw)return;
+    var snap=JSON.parse(raw);
+    if(!snap||!snap.data)return;
+    // ne proposer que si le contenu diffère de ce qu'on vient de charger
+    if(JSON.stringify(snap.data)===JSON.stringify(cur)){_autosaveClearLocal(cur.id);return;}
+    if(confirm("Une version non enregistr\u00e9e de cette appro a \u00e9t\u00e9 retrouv\u00e9e sur cet appareil.\n\nReprendre vos modifications non enregistr\u00e9es ?")){
+      cur=snap.data;saved=false;
+    } else {
+      _autosaveClearLocal(cur.id);
+    }
+  }catch(e){}
 }
 function delS(id){
   if(!confirm("Supprimer cette appro d\u00e9finitivement ?"))return;
@@ -4267,6 +4368,8 @@ function doSave(){
   }
   p.then(function(){
     saved=true;tpl=null;
+    if(_autosaveTimer){clearTimeout(_autosaveTimer);_autosaveTimer=null;}
+    _autosaveClearLocal();_setSaveState("saved");
     if(typeof syncApproCommandes==="function"&&syncApproCommandes(cur)){saveCommandes();}
     var sb2=document.querySelector(".btn-save");
     if(sb2){sb2.innerHTML="<i class=\"ti ti-check\"></i> Enregistr\u00e9";sb2.classList.add("saved");sb2.disabled=true;} /* enregistrement = action courante : le bouton suffit */
@@ -6200,6 +6303,11 @@ function renderPersonnalisation(){try{setActiveNav('btn-perso');}catch(e){}
     h+="<button class=\"perso-amb-opt "+swClass+(_curAmb===a[0]?" sel":"")+"\" onclick=\"setAmbianceFromPerso('"+a[0]+"')\">"+(a[0]==="none"?"<i class=\"ti ti-ban\"></i> ":"")+a[1]+tag+"</button>";
   });
   h+="</div><div id=\"perso-amb-cur\" style=\"margin-top:11px;font-size:12px;color:#6D28D9;font-weight:600\"><i class=\"ti ti-check\"></i> Th\u00e8me actuel : "+esc(_ambNames[_curAmb]||_curAmb)+"</div></div></div>";
+  // Installer l'application (PWA)
+  h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-device-mobile\" style=\"color:#6D28D9\"></i> Application mobile</div>";
+  h+="<div style=\"padding:14px\"><p style=\"font-size:12.5px;color:#64748B;margin:0 0 12px;line-height:1.55\">Installez AppROVISIO comme une vraie application : une ic\u00f4ne sur l'\u00e9cran d'accueil, un d\u00e9marrage en plein \u00e9cran, et un acc\u00e8s plus rapide. Id\u00e9al sur le t\u00e9l\u00e9phone, sur chantier.</p>";
+  h+="<button class=\"jbtn\" onclick=\"pwaInstall()\" style=\"display:inline-flex;align-items:center;gap:8px\"><i class=\"ti ti-download\"></i> Installer l'application</button>";
+  h+="<div style=\"font-size:11.5px;color:#94A3B8;margin-top:9px\">Sur iPhone : bouton <b>Partager</b> puis <b>\u00ab Sur l'\u00e9cran d'accueil \u00bb</b>. Sur Android : le bouton ci-dessus (ou le menu du navigateur).</div></div></div>";
   // Notifications par email (admin uniquement — déjà dans cette page réservée admin)
   var mailOn=(CONFIG.mailNotifs!==false);
   h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-mail\" style=\"color:#6D28D9\"></i> Notifications par email</div>";
@@ -7184,8 +7292,7 @@ var TUTO_MODULES={
       {before:_navDepot,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
     ]:[
       {before:_navHome,sel:".home-hero",ic:"ti-home",t:"Votre accueil",d:"Le point de d\u00e9part. Vous y voyez l'\u00e9tat de vos appros d'un coup d'\u0153il.",action:"next"},
-      {before:_navHome,sel:".home-stats",ic:"ti-chart-bar",t:"Vos chiffres",d:"Chaque carte est un raccourci : cliquez dessus pour filtrer la liste sur cet \u00e9tat.",action:"next"},
-      {before:_navHome,sel:".st-chips",ic:"ti-filter",t:"Les pastilles de statut",d:"Brouillons, en pr\u00e9paration, pr\u00eates, sur chantier. Un clic filtre, un second annule.",action:"next"},
+      {before:_navHome,sel:".home-stats",ic:"ti-chart-bar",t:"Vos chiffres",d:"En préparation, prêtes, sur chantier, brouillons. Chaque carte est cliquable : elle ouvre la liste filtrée sur cet état.",action:"next"},
       {before:_navHome,sel:".tabs-bar",ic:"ti-layout-navbar",t:"Deux onglets",d:"\u00ab Mes appros \u00bb liste vos chantiers en cours. \u00ab Biblioth\u00e8que \u00bb sert \u00e0 r\u00e9utiliser une ancienne appro.",action:"next"},
       {before:_navHome,sel:".qa-primary",ic:"ti-plus",t:"Nouvelle appro",d:"Le bouton principal : il cr\u00e9e une feuille de chantier vierge.",action:"next"},
       {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherchez par chantier, client, N\u00b0 d'affaire\u2026 ou m\u00eame par le nom d'un article contenu dans l'appro.",action:"next"},
@@ -7920,6 +8027,70 @@ function _qrTechMode(){
     if(pendingAppro)_qrTechMode();
   }
 })();
+// ── PWA : enregistrement du service worker + gestion de l'installation ──
+(function(){
+  if("serviceWorker" in navigator){
+    window.addEventListener("load",function(){
+      navigator.serviceWorker.register("/sw.js").then(function(reg){
+        // détecter une nouvelle version prête et proposer de recharger
+        reg.addEventListener("updatefound",function(){
+          var nw=reg.installing;if(!nw)return;
+          nw.addEventListener("statechange",function(){
+            if(nw.state==="installed"&&navigator.serviceWorker.controller){
+              _pwaUpdateReady(reg);
+            }
+          });
+        });
+      }).catch(function(){});
+      var refreshing=false;
+      navigator.serviceWorker.addEventListener("controllerchange",function(){
+        if(refreshing)return;refreshing=true;location.reload();
+      });
+    });
+  }
+  // Capture de l'invite d'installation (Android/desktop Chrome)
+  window._pwaPrompt=null;
+  window.addEventListener("beforeinstallprompt",function(e){
+    e.preventDefault();window._pwaPrompt=e;
+    try{_syncInstallBtn();}catch(_){}
+  });
+  window.addEventListener("appinstalled",function(){
+    window._pwaPrompt=null;try{_syncInstallBtn();}catch(_){}
+    if(typeof toast==="function")toast("Application installée","ti-circle-check");
+  });
+})();
+function _pwaUpdateReady(reg){
+  if(typeof toast!=="function")return;
+  // toast persistant avec action "Recharger"
+  try{
+    var t=document.getElementById("toast");
+    if(t){
+      t.innerHTML="<i class=\"ti ti-refresh\"></i> Nouvelle version disponible <button onclick=\"_pwaDoUpdate()\" style=\"margin-left:8px;background:#fff;color:#0F172A;border:none;border-radius:7px;padding:4px 10px;font-weight:700;cursor:pointer;font-family:inherit\">Recharger</button>";
+      t.classList.add("show");t.style.opacity="1";
+      window.__pwaReg=reg;
+    }
+  }catch(e){}
+}
+function _pwaDoUpdate(){
+  try{var reg=window.__pwaReg;if(reg&&reg.waiting)reg.waiting.postMessage("skipWaiting");else location.reload();}catch(e){location.reload();}
+}
+function _isPwaInstalled(){
+  return (window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches)||window.navigator.standalone===true;
+}
+function _syncInstallBtn(){
+  var b=document.getElementById("pwa-install-row");if(!b)return;
+  b.style.display=(window._pwaPrompt&&!_isPwaInstalled())?"flex":"none";
+}
+function pwaInstall(){
+  if(window._pwaPrompt){
+    window._pwaPrompt.prompt();
+    window._pwaPrompt.userChoice.finally(function(){window._pwaPrompt=null;_syncInstallBtn();});
+  } else if(/iphone|ipad|ipod/i.test(navigator.userAgent)){
+    if(typeof toast==="function")toast("Sur iPhone : Partager puis « Sur l'écran d'accueil »","ti-share");
+  } else {
+    if(typeof toast==="function")toast("Utilisez le menu du navigateur pour installer","ti-download");
+  }
+}
 </script>
 </body>
 </html>
