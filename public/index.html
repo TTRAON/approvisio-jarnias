@@ -8525,23 +8525,43 @@ function _tourPlaceBubble(bubble,r){
 
   // ── Cas 3 : desktop → droite, gauche, dessous, dessus (1er qui tient sans déborder) ──
   var bw=bubble.offsetWidth||320,bh=bubble.offsetHeight||160;
+  /* Si un panneau latéral est ouvert (catalogue), on retire sa zone de l'espace utile :
+     la bulle ne doit pas passer dessous/dessus lui (illisible). */
+  var panel=document.querySelector(".cp-panel");
+  var panelOpen=panel&&(panel.style.display==="flex"||panel.style.display==="block"||panel.classList.contains("open")||getComputedStyle(panel).display!=="none");
+  var rightLimit=vw-m; // bord droit exploitable
+  if(panelOpen){
+    var pr=panel.getBoundingClientRect();
+    if(pr.width>0 && pr.right>=vw-2){ rightLimit=Math.min(rightLimit, pr.left-8); } // panneau collé à droite
+  }
+  var usableW=rightLimit-m; // largeur exploitable à gauche du panneau
+  // si la bulle ne tient pas dans l'espace libre, on la rétrécit
+  if(bw>usableW-m){ var nw=Math.max(240,usableW-m); bubble.style.width=nw+"px"; bw=bubble.offsetWidth||nw; bh=bubble.offsetHeight||bh; }
+  function clampX(x){return Math.max(m,Math.min(x,rightLimit-bw));}
   var cands=[
+    {l:r.left-gap-bw, t:_clamp(r.top,m,vh-bh-m)},   // à gauche de la cible en priorité si panneau à droite
     {l:r.right+gap, t:_clamp(r.top,m,vh-bh-m)},
-    {l:r.left-gap-bw, t:_clamp(r.top,m,vh-bh-m)},
-    {l:_clamp(r.left,m,vw-bw-m), t:r.bottom+gap},
-    {l:_clamp(r.left,m,vw-bw-m), t:r.top-gap-bh}
+    {l:clampX(r.left), t:r.bottom+gap},
+    {l:clampX(r.left), t:r.top-gap-bh}
   ];
-  function fits(c){return c.l>=m&&c.t>=m&&c.l+bw<=vw-m&&c.t+bh<=vh-m
+  if(!panelOpen){ // sans panneau : on garde l'ordre habituel (droite d'abord)
+    cands=[
+      {l:r.right+gap, t:_clamp(r.top,m,vh-bh-m)},
+      {l:r.left-gap-bw, t:_clamp(r.top,m,vh-bh-m)},
+      {l:clampX(r.left), t:r.bottom+gap},
+      {l:clampX(r.left), t:r.top-gap-bh}
+    ];
+  }
+  function fits(c){return c.l>=m&&c.t>=m&&c.l+bw<=rightLimit&&c.t+bh<=vh-m
     && (c.l+bw<=r.left+1||c.l>=r.right-1||c.t+bh<=r.top+1||c.t>=r.bottom-1);} // ne recouvre pas la cible
   var pick=null;
   for(var i=0;i<cands.length;i++){if(fits(cands[i])){pick=cands[i];break;}}
   if(!pick){
-    // aucun côté parfait : on prend la plus grande zone libre (dessous/dessus) et on borne
     var below=vh-r.bottom, above=r.top;
-    pick=(below>=above)?{l:_clamp(r.left,m,vw-bw-m),t:Math.min(r.bottom+gap,vh-bh-m)}
-                       :{l:_clamp(r.left,m,vw-bw-m),t:Math.max(m,r.top-gap-bh)};
+    pick=(below>=above)?{l:clampX(r.left),t:Math.min(r.bottom+gap,vh-bh-m)}
+                       :{l:clampX(r.left),t:Math.max(m,r.top-gap-bh)};
   }
-  bubble.style.left=_clamp(pick.l,m,vw-bw-m)+"px";
+  bubble.style.left=clampX(pick.l)+"px";
   bubble.style.top=_clamp(pick.t,m,vh-bh-m)+"px";
 }
 function _clamp(v,lo,hi){return Math.max(lo,Math.min(v,hi));}
