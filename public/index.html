@@ -8283,7 +8283,26 @@ function resetTuto(){
 }
 // ---- Centre d'aide (liste des modules) ----
 function startTour(){openHelpCenter();}
+/* Le statut Alobees n'est r\u00e9cup\u00e9r\u00e9 QU'UNE FOIS, au d\u00e9marrage (enterApp). Si ce fetch
+   \u00e9choue (r\u00e9seau capricieux sur chantier), window.alobeesOn tombe \u00e0 false et le module
+   d'aide « L'import Alobees » dispara\u00eet jusqu'au prochain rechargement complet.
+   On rev\u00e9rifie donc \u00e0 l'ouverture du centre d'aide, et on redessine si la r\u00e9ponse change. */
+function _refreshAlobeesStatus(cb){
+  if(!window.authToken)return;
+  try{
+    fetch("/api/alobees/status",{headers:{Authorization:"Bearer "+authToken}})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        var v=!!(d&&d.configured);
+        if(v!==window.alobeesOn){window.alobeesOn=v;if(cb)cb();}
+      }).catch(function(){});
+  }catch(e){}
+}
 function openHelpCenter(){
+  /* ne redessine que si la valeur a CHANG\u00c9 : pas de boucle */
+  _refreshAlobeesStatus(function(){
+    if(document.querySelector(".help-card"))openHelpCenter();
+  });
   var mods=_tutoModulesForRole();
   var done=mods.filter(_tutoModuleDone).length;
   var ov=_tourOverlay();
