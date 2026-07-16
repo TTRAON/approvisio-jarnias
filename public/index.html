@@ -759,7 +759,7 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
    (.tour-lift, 6105) passerait alors AU-DESSUS de l'anneau ET de la bulle.
    Sans z-index (auto), aucun contexte n'est créé : les enfants s'empilent globalement
    et la sidebar peut s'insérer entre les masques et l'anneau, comme voulu. */
-.tour-ov{position:fixed;inset:0;display:none;pointer-events:none}
+.tour-ov{position:fixed;inset:0;display:none;pointer-events:none;z-index:6100}
 .tour-ov.on{display:block}
 .tour-ov>*{pointer-events:auto}
 .tour-ov>.tour-hole{pointer-events:none}
@@ -783,17 +783,17 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
 .tour-scrim{position:fixed;inset:0;z-index:6100;pointer-events:auto;background:rgba(15,23,42,.40)}
 .tour-mask{position:fixed;z-index:6100;background:rgba(15,23,42,.40);pointer-events:auto}
 .tour-target{position:relative;z-index:6105}
-.tour-hole{position:fixed;z-index:6110;border-radius:12px;pointer-events:none;box-shadow:0 0 0 3px #fff,0 0 0 6px var(--accent,#6D28D9),0 0 0 10px rgba(109,40,217,.22),0 10px 30px -8px rgba(15,23,42,.35)}
+.tour-hole{position:fixed;z-index:6180;border-radius:12px;pointer-events:none;box-shadow:0 0 0 3px #fff,0 0 0 6px var(--accent,#6D28D9),0 0 0 10px rgba(109,40,217,.22),0 10px 30px -8px rgba(15,23,42,.35)}
 /* transition uniquement au CHANGEMENT d'étape : pendant le suivi, on colle à la cible. */
 .tour-ov.tour-anim .tour-mask,.tour-ov.tour-anim .tour-hole{transition:left .26s var(--ease),top .26s var(--ease),width .26s var(--ease),height .26s var(--ease)}
 /* bulle */
-.tour-bubble{position:fixed;z-index:6120;pointer-events:auto;background:#fff;border-radius:16px;padding:18px 20px 16px;width:352px;max-width:calc(100vw - 28px);box-shadow:0 20px 50px rgba(0,0,0,.3);animation:tourPop .3s var(--spring)}
+.tour-bubble{position:fixed;z-index:6300;pointer-events:auto;background:#fff;border-radius:16px;padding:18px 20px 16px;width:352px;max-width:calc(100vw - 28px);box-shadow:0 20px 50px rgba(0,0,0,.3);animation:tourPop .3s var(--spring)}
 /* ═══ Mobile : le tuto vise un élément du menu déroulant ═══
    La sidebar mobile est un tiroir (position:fixed; z-index:1000) qui glisse.
    Elle doit passer AU-DESSUS du voile du tuto (pour rester lisible et cliquable),
    mais SOUS l'anneau de surlignage et la bulle — sinon elle les recouvre.
    Pile : masques 6100 < sidebar 6105 < anneau 6110 < bulle 6120. */
-.sidebar.tour-lift{z-index:6105!important}
+.sidebar.tour-lift{z-index:6150!important}
 /* Le voile propre à la sidebar ferait doublon avec celui du tuto (fond deux fois plus sombre),
    et un appui dessus refermerait le menu en plein milieu d'une étape. */
 .sb-overlay.tour-lift-ov{display:none!important}
@@ -4139,7 +4139,15 @@ function _unmountCpFab(){
 }
 /* ═══ Scanner QR intégré (tous rôles) — reste dans l'app, ouvre l'appro scannée ═══ */
 var _scanStream=null,_scanRAF=null,_scanDetector=null,_scanActive=false;
+function _isMobileDevice(){
+  // appareil tactile OU petit écran : le scanner caméra n'a de sens que là.
+  var touch=("ontouchstart" in window)||(navigator.maxTouchPoints>0);
+  var small=window.innerWidth<=1024;
+  var mob=/android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent||"");
+  return mob||(touch&&small);
+}
 function _mountScanFab(){
+  if(!_isMobileDevice()){var ex=document.getElementById("scan-fab");if(ex)ex.style.display="none";return;} // pas de scanner caméra sur PC
   var b=document.getElementById("scan-fab");
   if(!b){b=document.createElement("button");b.id="scan-fab";b.className="scan-fab liv";b.title="Scanner une appro";
     b.innerHTML="<i class=\"ti ti-qrcode\"></i><span class=\"scan-fab-t\">Scanner</span>";
@@ -8255,12 +8263,22 @@ function openHelpCenter(){
 }
 function startTutoModule(m){
   var mod=TUTO_MODULES[m];if(!mod)return;
+  // nettoyage complet de tout tour précédent (évite bulles/écouteurs en double)
+  _tourClearWaits();
+  window.removeEventListener("resize",_tourPosition);
+  window.removeEventListener("scroll",_tourPosition,true);
+  var _oh=document.getElementById("tour-hole");if(_oh)_oh.remove();
+  var _ob=document.getElementById("tour-bubble");if(_ob)_ob.remove();
   _tourModule=m;
   _tourSteps=(typeof mod.etapes==="function")?mod.etapes():mod.etapes;
   _tourIdx=0;
   var ov=_tourOverlay();ov.classList.add("on");
-  ov.innerHTML="<div class=\"tour-mask\" id=\"tm-t\"></div><div class=\"tour-mask\" id=\"tm-b\"></div><div class=\"tour-mask\" id=\"tm-l\"></div><div class=\"tour-mask\" id=\"tm-r\"></div>"+
-    "<div class=\"tour-hole\" id=\"tour-hole\"></div><div class=\"tour-bubble\" id=\"tour-bubble\"></div>";
+  ov.innerHTML="<div class=\"tour-mask\" id=\"tm-t\"></div><div class=\"tour-mask\" id=\"tm-b\"></div><div class=\"tour-mask\" id=\"tm-l\"></div><div class=\"tour-mask\" id=\"tm-r\"></div>";
+  // L'anneau et la bulle vivent DIRECTEMENT dans le body (pas dans tour-ov) :
+  // ainsi ils ne sont pas prisonniers du contexte d'empilement de l'overlay,
+  // et passent toujours au-dessus de la sidebar liftée sur mobile.
+  var hole=document.createElement("div");hole.className="tour-hole";hole.id="tour-hole";document.body.appendChild(hole);
+  var bub=document.createElement("div");bub.className="tour-bubble";bub.id="tour-bubble";document.body.appendChild(bub);
   window.addEventListener("resize",_tourPosition);
   window.addEventListener("scroll",_tourPosition,true);
   _tourShow();
@@ -8370,7 +8388,12 @@ function _tourRender(step){
   } else {
     hole.style.display="none";
     _tourMaskFull();
-    bubble.style.left="50%";bubble.style.top="50%";bubble.style.transform="translate(-50%,-50%)";
+    // cible absente : bulle centrée proprement (largeur réinitialisée, pas de transform résiduel ailleurs)
+    bubble.style.width="";
+    var _bw=bubble.offsetWidth||320,_bh=bubble.offsetHeight||160;
+    bubble.style.transform="none";
+    bubble.style.left=Math.round((window.innerWidth-_bw)/2)+"px";
+    bubble.style.top=Math.round((window.innerHeight-_bh)/2)+"px";
     /* cible pas encore visible (ex. sidebar mobile en cours d'ouverture) : on re-tente vite,
        puis à intervalle jusqu'à 6 s, sans jamais bloquer. */
     if(step.sel){
@@ -8457,61 +8480,71 @@ function _tourPosition(){
 }
 function _tourPlaceBubble(bubble,r){
   bubble.style.transform="none";
-  var bw=bubble.offsetWidth||290,bh=bubble.offsetHeight||150;
-  var gap=14,vw=window.innerWidth,vh=window.innerHeight,m=10;
+  /* On réinitialise TOUJOURS la largeur avant de mesurer, sinon la bulle garde
+     les dimensions de l'étape précédente → mauvais placement / chevauchement. */
+  bubble.style.width="";
+  var gap=14,vw=window.innerWidth,vh=window.innerHeight,m=12;
   var mobile=_tourIsMobile();
-  /* Cas spécial : sur mobile, si le menu (sidebar) est OUVERT et que la cible est dedans,
-     la bulle se place dans la bande LIBRE à droite du menu, au-dessus de tout. */
   var sb=document.getElementById("sidebar");
   var sbOpen=sb&&sb.classList.contains("open")&&mobile;
+
+  // ── Cas 1 : mobile + menu ouvert + cible dans le menu ──
   if(sbOpen){
     var sbRect=sb.getBoundingClientRect();
     var spaceRight=vw-sbRect.right-m;
-    if(spaceRight>=210){
-      // assez de place : bulle dans la bande à droite du menu, centrée sur la cible
-      var w=Math.min(bw,spaceRight);bubble.style.width=w+"px";bw=w;
-      var left=sbRect.right+8;
-      var top=Math.max(m,Math.min(r.top+r.height/2-bh/2,vh-bh-m));
-      bubble.style.left=left+"px";bubble.style.top=top+"px";
+    if(spaceRight>=230){
+      var w1=Math.min(340,spaceRight);bubble.style.width=w1+"px";
+      var bh1=bubble.offsetHeight||160;
+      var top1=Math.max(m,Math.min(r.top+r.height/2-bh1/2,vh-bh1-m));
+      bubble.style.left=(sbRect.right+8)+"px";bubble.style.top=top1+"px";
     } else {
-      // écran étroit (téléphone) : bulle ancrée EN BAS, pleine largeur, AU-DESSUS du menu.
-      // La cible reste surlignée dans le menu ; la bulle ne la recouvre pas.
-      bubble.style.width="";
-      var bw2=Math.min(vw-2*m,360);bubble.style.width=bw2+"px";
+      // téléphone étroit : barre en bas, pleine largeur, au-dessus du menu
+      var w2=Math.min(vw-2*m,360);bubble.style.width=w2+"px";
       var bh2=bubble.offsetHeight||160;
-      bubble.style.left=Math.round((vw-bw2)/2)+"px";
-      bubble.style.top=(vh-bh2-m-14)+"px";
+      bubble.style.left=Math.round((vw-w2)/2)+"px";
+      bubble.style.top=(vh-bh2-m-8)+"px";
     }
     return;
   }
-  bubble.style.width=""; // réinitialise la largeur si on n'est pas dans le cas menu
-  bw=bubble.offsetWidth||290;
-  /* Sur mobile (menu fermé) : dessous puis dessus — jamais les côtés. Desktop : droite/gauche d'abord. */
-  var cands=mobile?[
-    {l:Math.min(r.left,vw-bw-m), t:r.bottom+gap},
-    {l:Math.min(r.left,vw-bw-m), t:r.top-gap-bh}
-  ]:[
-    {l:r.right+gap,        t:r.top},
-    {l:r.left-gap-bw,      t:r.top},
-    {l:r.left,             t:r.bottom+gap},
-    {l:r.left,             t:r.top-gap-bh}
+
+  // ── Cas 2 : mobile menu fermé → barre en bas ou en haut selon la cible ──
+  if(mobile){
+    var w3=Math.min(vw-2*m,360);bubble.style.width=w3+"px";
+    var bh3=bubble.offsetHeight||160;
+    var left3=Math.round((vw-w3)/2);
+    // si la cible est dans la moitié basse, on met la bulle en HAUT, sinon en BAS
+    var targetMid=r.top+r.height/2;
+    var top3=(targetMid>vh/2)?m:(vh-bh3-m-8);
+    // éviter tout chevauchement avec la cible
+    if(top3<r.bottom+gap && top3+bh3>r.top-gap){
+      top3=(vh-r.bottom>=r.top)?Math.min(r.bottom+gap,vh-bh3-m):Math.max(m,r.top-gap-bh3);
+    }
+    bubble.style.left=left3+"px";bubble.style.top=Math.max(m,Math.min(top3,vh-bh3-m))+"px";
+    return;
+  }
+
+  // ── Cas 3 : desktop → droite, gauche, dessous, dessus (1er qui tient sans déborder) ──
+  var bw=bubble.offsetWidth||320,bh=bubble.offsetHeight||160;
+  var cands=[
+    {l:r.right+gap, t:_clamp(r.top,m,vh-bh-m)},
+    {l:r.left-gap-bw, t:_clamp(r.top,m,vh-bh-m)},
+    {l:_clamp(r.left,m,vw-bw-m), t:r.bottom+gap},
+    {l:_clamp(r.left,m,vw-bw-m), t:r.top-gap-bh}
   ];
-  function fits(c){return c.l>=m&&c.t>=m&&c.l+bw<=vw-m&&c.t+bh<=vh-m;}
+  function fits(c){return c.l>=m&&c.t>=m&&c.l+bw<=vw-m&&c.t+bh<=vh-m
+    && (c.l+bw<=r.left+1||c.l>=r.right-1||c.t+bh<=r.top+1||c.t>=r.bottom-1);} // ne recouvre pas la cible
   var pick=null;
   for(var i=0;i<cands.length;i++){if(fits(cands[i])){pick=cands[i];break;}}
   if(!pick){
+    // aucun côté parfait : on prend la plus grande zone libre (dessous/dessus) et on borne
     var below=vh-r.bottom, above=r.top;
-    pick=(below>=above)?{l:r.left,t:r.bottom+gap}:{l:r.left,t:r.top-gap-bh};
+    pick=(below>=above)?{l:_clamp(r.left,m,vw-bw-m),t:Math.min(r.bottom+gap,vh-bh-m)}
+                       :{l:_clamp(r.left,m,vw-bw-m),t:Math.max(m,r.top-gap-bh)};
   }
-  var left=Math.max(m,Math.min(pick.l,vw-bw-m));
-  var top=Math.max(m,Math.min(pick.t,vh-bh-m));
-  var overlap=!(left+bw<r.left-2||left>r.right+2||top+bh<r.top-2||top>r.bottom+2);
-  if(overlap){
-    if(vh-r.bottom>=r.top)top=Math.min(r.bottom+gap,vh-bh-m);
-    else top=Math.max(m,r.top-gap-bh);
-  }
-  bubble.style.left=left+"px";bubble.style.top=top+"px";
+  bubble.style.left=_clamp(pick.l,m,vw-bw-m)+"px";
+  bubble.style.top=_clamp(pick.t,m,vh-bh-m)+"px";
 }
+function _clamp(v,lo,hi){return Math.max(lo,Math.min(v,hi));}
 
 function _tourNav(d){
   _tourClearWaits();
@@ -8525,6 +8558,11 @@ function _tourModuleComplete(){
   if(_tourModule){try{localStorage.setItem(_tutoDoneKey(_tourModule),"1");}catch(e){}}
   _tourClearWaits();
   _tourStopTrack();
+  // retirer l'anneau et la bulle (dans le body) avant l'écran de fin
+  var h=document.getElementById("tour-hole");if(h)h.remove();
+  var b=document.getElementById("tour-bubble");if(b)b.remove();
+  var sb=document.getElementById("sidebar");if(sb)sb.classList.remove("tour-lift");
+  if(_tourIsMobile()&&typeof closeSidebar==="function"){try{closeSidebar();}catch(e){}}
   window.removeEventListener("resize",_tourPosition);
   window.removeEventListener("scroll",_tourPosition,true);
   // propose le module suivant non terminé du rôle
@@ -8547,6 +8585,9 @@ function _tourModuleComplete(){
 function endTour(){
   _tourClearWaits();
   var ov=document.getElementById("tour-ov");if(ov){ov.classList.remove("on");ov.innerHTML="";}
+  // l'anneau et la bulle vivent dans le body : on les retire explicitement
+  var h=document.getElementById("tour-hole");if(h)h.remove();
+  var b=document.getElementById("tour-bubble");if(b)b.remove();
   _tourStopTrack();
   window.removeEventListener("resize",_tourPosition);
   window.removeEventListener("scroll",_tourPosition,true);
