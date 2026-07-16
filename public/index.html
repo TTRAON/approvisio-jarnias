@@ -4669,6 +4669,164 @@ function isLongAppro(s){
   var n=0;["consommables","fournitures","outillage"].forEach(function(k){(s[k]||[]).forEach(function(r){if(r.designation&&(""+r.designation).trim())n++;});});
   return n>20;
 }
+/* ═══ Sections d'articles pour l'intérieur du livret (kits repliés en 1 ligne) ═══ */
+function _bkSections(s){
+  var secs=[{k:"consommables",l:"Consommables",c:"#1D4ED8"},{k:"fournitures",l:"Fournitures",c:"#B45309"},{k:"outillage",l:"Outillage",c:"#0F766E"}];
+  var out=[],retTotal=0;
+  secs.forEach(function(sec){
+    var allRows=(s[sec.k]||[]).filter(function(r){return r.designation;});if(!allRows.length)return;
+    var shownRows=allRows.filter(function(r){return r.returned!==true;});
+    retTotal+=(allRows.length-shownRows.length);
+    if(!shownRows.length)return;
+    var kitRun={};(function(){var i=0;while(i<shownRows.length){var kk=shownRows[i].kit||null;if(kk){var j=i;while(j<shownRows.length&&(shownRows[j].kit||null)===kk)j++;kitRun[i]=j-i;i=j;}else i++;}})();
+    var rH="",shown=0;
+    shownRows.forEach(function(r,idx){
+      if(r.kit){
+        if(kitRun[idx]){shown++;rH+="<tr class=\"bk-kit\"><td colspan=\"4\"><b style=\"color:#4C1D95;font-size:10.5px\">\u25AA KIT "+esc(r.kit).toUpperCase()+"</b> <span style=\"color:#6D28D9;font-weight:700;font-size:9px\">\u00b7 "+kitRun[idx]+" \u00e9l\u00e9ment"+(kitRun[idx]>1?"s":"")+"</span></td></tr>";}
+        return;
+      }
+      shown++;
+      var dt=r.disponibilite?"<span class=\"bk-badge\" style=\"background:"+(DB[r.disponibilite]||"#F1F5F9")+";color:"+(DC[r.disponibilite]||"#64748B")+"\">"+esc(r.disponibilite)+"</span>":"\u2014";
+      var qd=(esc(r.quantite)||"\u2014");
+      if(r.truckQ){var qn=_qtyNum(r.quantite),net=Math.max(0,qn-r.truckQ);qd="<b style=\"color:#15803D\">"+net+"</b><div style=\"font-size:7.5px;color:#A16207;font-weight:600\">\uD83D\uDE9A "+r.truckQ+" au camion</div>";}
+      rH+="<tr><td>"+esc(r.designation)+"</td><td class=\"q\">"+qd+"</td><td>"+dt+"</td><td style=\"color:#94A3B8\">"+(esc(r.commentaire||"")||"\u2014")+"</td></tr>";
+    });
+    if(!shown)return;
+    out.push({sec:sec,shown:shown,rows:rH});
+  });
+  return {sections:out,retTotal:retTotal};
+}
+function _bkSecHTML(o){
+  return "<div class=\"bk-sec\"><div class=\"bk-sec-t\"><span class=\"dot\" style=\"background:"+o.sec.c+"\"></span> "+o.sec.l+" <span class=\"cnt\">"+o.shown+" article"+(o.shown>1?"s":"")+"</span></div>"+
+    "<table class=\"bk-tbl\"><thead><tr><th style=\"width:40%\">D\u00e9signation</th><th style=\"width:13%;text-align:center\">Qt\u00e9</th><th style=\"width:24%\">Disponibilit\u00e9</th><th style=\"width:23%\">Comm.</th></tr></thead><tbody>"+o.rows+"</tbody></table></div>";
+}
+/* ═══ Livret A3 plié : couverture B (extérieur) + double page détail (intérieur) ═══ */
+function buildBooklet(s){
+  var _qr=s._id?qrDataURL(window.location.origin+"/?appro="+s._id):"";
+  var qrImg=_qr?"<img src=\""+_qr+"\" alt=\"QR\"/>":"<div style=\"font-size:9px;color:#94A3B8;padding:20px\">QR indisponible<br>(appro non enregistr\u00e9e)</div>";
+  var jlogo="<div class=\"bk-jmk\"><img src=\"data:image/png;base64,"+LB64+"\" alt=\"JARNIAS\"/></div>";
+  var tagline=(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.tagline)?esc(CONFIG.tagline):"Les experts de la hauteur";
+  var d=_bkSections(s);
+  // répartir les sections : gauche = consommables+fournitures, droite = outillage (comme la maquette)
+  var leftSecs="",rightSecs="";
+  d.sections.forEach(function(o){
+    if(o.sec.k==="outillage")rightSecs+=_bkSecHTML(o);
+    else leftSecs+=_bkSecHTML(o);
+  });
+  if(!leftSecs)leftSecs="<div style=\"color:#94A3B8;font-size:11px;padding:16px;text-align:center;border:1px dashed #E2E8F0;border-radius:8px\">Aucun consommable ni fourniture</div>";
+  var retH=d.retTotal>0?"<div class=\"bk-ret\"><span style=\"font-size:14px\">\u21A9</span><span><b>"+d.retTotal+" article"+(d.retTotal>1?"s":"")+" rendu"+(d.retTotal>1?"s":"")+" au d\u00e9p\u00f4t</b> \u2014 d\u00e9duit"+(d.retTotal>1?"s":"")+" du stock, non d\u00e9taill\u00e9"+(d.retTotal>1?"s":"")+".</span></div>":"";
+  var camH=s.camionSujet?"<div class=\"bk-ret\" style=\"border-color:#FCA5A5;background:#FEF2F2\"><span style=\"font-size:14px\">\u26A0</span><span><b>Sujet camion</b> \u2014 "+(s.camionSujetNote?esc(s.camionSujetNote):"technicien sans camion, solution \u00e0 trouver.")+"</span></div>":"";
+  var obsH=s.observation?"<div class=\"bk-sec\" style=\"margin-top:14px\"><div class=\"bk-obs\"><div class=\"h\">Observations</div>"+esc(s.observation)+"</div></div>":"";
+  var dLimite=s.dateAppro?fd(s.dateAppro):"\u2014",dChantier=s.dateChantier?fd(s.dateChantier):"\u2014";
+
+  // ── FACE EXTÉRIEURE : dos (gauche) + couverture B (droite) ──
+  var exterior=
+    "<div class=\"bk-a3\">"+
+      "<div class=\"bk-a4 bk-back\">"+
+        "<div class=\"bk-back-top\">"+jlogo+"</div>"+
+        "<div class=\"bk-back-note\">Dos du livret</div>"+
+        "<div class=\"bk-back-foot\">JARNIAS \u00b7 AppROVISIO \u00b7 "+tagline+"</div>"+
+      "</div>"+
+      "<div class=\"bk-a4 bk-cov\">"+
+        "<div class=\"bk-cov-rail\"></div>"+
+        "<div class=\"bk-cov-hd\">"+jlogo+"<div><div class=\"nm\">JARNIAS</div><div class=\"tg\">"+tagline+"</div></div></div>"+
+        "<div class=\"bk-cov-doc\"><div class=\"k\">Feuille d'approvisionnement</div><div class=\"r\">"+esc(s.reference||"")+"</div></div>"+
+        "<div class=\"bk-cov-mid\">"+
+          "<div class=\"col\">"+
+            "<div class=\"bk-cov-ch\"><div class=\"l\">Chantier</div><div class=\"nm\">"+(esc(s.nomChantier)||"\u2014")+"</div>"+(s.clientSite?"<div class=\"cli\">"+esc(s.clientSite)+"</div>":"")+"</div>"+
+            "<div class=\"bk-cov-flist\">"+
+              "<div class=\"fi\"><div class=\"l\">N\u00b0 Affaire</div><div class=\"v\">"+(esc(s.noAffaire)||"\u2014")+"</div></div>"+
+              (s.conducteur?"<div class=\"fi\"><div class=\"l\">Conducteur de travaux</div><div class=\"v\">"+esc(s.conducteur)+"</div></div>":"")+
+              "<div class=\"fi\"><div class=\"l\">Limite appro / Chantier</div><div class=\"v\"><span style=\"color:#C2410C\">"+dLimite+"</span> \u00b7 <span style=\"color:#1D4ED8\">"+dChantier+"</span></div></div>"+
+              (s.adresseChantier?"<div class=\"fi\"><div class=\"l\">Adresse</div><div class=\"v\" style=\"font-weight:600;font-size:12px\">"+esc(s.adresseChantier)+"</div></div>":"")+
+            "</div>"+
+          "</div>"+
+          "<div class=\"bk-cov-qr\"><div class=\"qr\">"+qrImg+"</div><div class=\"cap\">Scannez pour suivre<br>l'appro en temps r\u00e9el</div></div>"+
+        "</div>"+
+        "<div class=\"bk-cov-foot\"><span>Cr\u00e9\u00e9 le "+esc(s.dateCreation||"")+"</span>"+(s.chargeAffaires?"<span>Charg\u00e9 d'affaires : "+esc(s.chargeAffaires)+"</span>":"")+"</div>"+
+      "</div>"+
+    "</div>";
+
+  // ── FACE INTÉRIEURE : double page détail ──
+  var interior=
+    "<div class=\"bk-a3\">"+
+      "<div class=\"bk-a4 bk-in\">"+
+        "<div class=\"bk-band\"><span class=\"t\">D\u00e9tail de l'appro</span><span class=\"ref\">"+(esc(s.noAffaire)||"")+(s.reference?" \u00b7 "+esc(s.reference):"")+"</span></div>"+
+        "<div class=\"bk-planning\">"+
+          "<div class=\"bk-pill\" style=\"background:#FFF7ED;border:1px solid #FED7AA\"><div class=\"l\" style=\"color:#C2410C\">\u23F1 Limite appro</div><div class=\"v\" style=\"color:#C2410C\">"+dLimite+"</div></div>"+
+          "<div class=\"bk-pill\" style=\"background:#EFF6FF;border:1px solid #BFDBFE\"><div class=\"l\" style=\"color:#1D4ED8\">\uD83C\uDFD7 D\u00e9but chantier</div><div class=\"v\" style=\"color:#1D4ED8\">"+dChantier+"</div></div>"+
+        "</div>"+
+        camH+leftSecs+
+      "</div>"+
+      "<div class=\"bk-a4 bk-in\">"+
+        (rightSecs||"")+retH+obsH+
+        "<div class=\"bk-foot\">"+
+          "<div class=\"bk-sign\"><div class=\"ln\"></div><div class=\"lb\">Charg\u00e9 d'affaires</div></div>"+
+          "<div class=\"bk-sign\"><div class=\"ln\"></div><div class=\"lb\">Chef de d\u00e9p\u00f4t</div></div>"+
+          "<div class=\"bk-sign\"><div class=\"ln\"></div><div class=\"lb\">Visa client</div></div>"+
+        "</div>"+
+      "</div>"+
+    "</div>";
+
+  return {exterior:exterior,interior:interior};
+}
+function _bookletCSS(){
+  return "*{box-sizing:border-box;margin:0;padding:0}"+
+  "body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1E293B;font-size:11px}"+
+  "*{-webkit-print-color-adjust:exact;print-color-adjust:exact}"+
+  "@media print{@page{size:A3 landscape;margin:0}}"+
+  ".bk-a3{display:flex;width:420mm;height:297mm;page-break-after:always}"+
+  ".bk-a3:last-child{page-break-after:auto}"+
+  ".bk-a4{width:210mm;height:297mm;padding:16mm 15mm;position:relative;overflow:hidden}"+
+  /* dos */
+  ".bk-back{display:flex;flex-direction:column;justify-content:space-between;background:#FAFBFC}"+
+  ".bk-back-top{text-align:center;opacity:.4;margin-top:40mm}"+
+  ".bk-back-note{text-align:center;color:#CBD5E1;font-size:12px}"+
+  ".bk-back-foot{text-align:center;color:#94A3B8;font-size:10px;border-top:1px solid #E8EDF4;padding-top:10px}"+
+  /* couverture B */
+  ".bk-cov{display:flex;flex-direction:column;padding:0}"+
+  ".bk-cov-rail{height:12px;background:linear-gradient(90deg,#6D28D9,#DB2777)}"+
+  ".bk-cov-hd{padding:16mm 15mm 0;display:flex;align-items:center;gap:14px}"+
+  ".bk-cov-hd .nm{font-size:22px;font-weight:900;color:#0F172A;letter-spacing:.5px}"+
+  ".bk-cov-hd .tg{font-size:11px;color:#94A3B8;font-style:italic}"+
+  ".bk-cov-doc{padding:9mm 15mm 0}.bk-cov-doc .k{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#6D28D9}.bk-cov-doc .r{font-size:17px;font-weight:900;color:#0F172A;margin-top:2px}"+
+  ".bk-cov-mid{flex:1;padding:10mm 15mm;display:flex;gap:14mm;align-items:center}.bk-cov-mid .col{flex:1}"+
+  ".bk-cov-ch .l{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#94A3B8;font-weight:700}"+
+  ".bk-cov-ch .nm{font-size:26px;font-weight:900;color:#0F172A;line-height:1.15;margin:6px 0 5px}"+
+  ".bk-cov-ch .cli{font-size:14px;color:#64748B}"+
+  ".bk-cov-flist{margin-top:22px;display:flex;flex-direction:column;gap:14px}"+
+  ".bk-cov-flist .fi .l{font-size:10px;text-transform:uppercase;color:#A0AEC0;font-weight:700;letter-spacing:.3px}"+
+  ".bk-cov-flist .fi .v{font-size:15px;font-weight:700;color:#1E293B}"+
+  ".bk-cov-qr{width:52mm;flex-shrink:0;text-align:center}"+
+  ".bk-cov-qr .qr{width:52mm;height:52mm;border:2px solid #0F172A;border-radius:14px;padding:5mm;background:#fff;display:flex;align-items:center;justify-content:center}"+
+  ".bk-cov-qr .qr img{width:100%;height:100%}"+
+  ".bk-cov-qr .cap{font-size:11px;color:#64748B;margin-top:9px;line-height:1.4}"+
+  ".bk-cov-foot{padding:10px 15mm;border-top:1px solid #E8EDF4;display:flex;justify-content:space-between;font-size:11px;color:#94A3B8}"+
+  ".bk-jmk{width:56px;height:56px;background:#0F172A;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}"+
+  ".bk-jmk img{width:38px;border-radius:5px}"+
+  ".bk-back-top .bk-jmk{margin:0 auto;background:#CBD5E1}"+
+  /* intérieur */
+  ".bk-in{display:flex;flex-direction:column}"+
+  ".bk-band{background:#0F172A;color:#fff;border-radius:9px;padding:9px 15px;display:flex;align-items:center;gap:10px;margin-bottom:14px}"+
+  ".bk-band .t{font-size:14px;font-weight:800}.bk-band .ref{margin-left:auto;font-size:11px;color:#94A3B8}"+
+  ".bk-planning{display:flex;gap:10px;margin-bottom:14px}"+
+  ".bk-pill{flex:1;border-radius:8px;padding:9px 13px}.bk-pill .l{font-size:9.5px;text-transform:uppercase;font-weight:700;letter-spacing:.3px}.bk-pill .v{font-size:15px;font-weight:800;margin-top:1px}"+
+  ".bk-sec{margin-bottom:15px}"+
+  ".bk-sec-t{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:#0F172A;padding-bottom:6px;border-bottom:2px solid #E8EDF4}"+
+  ".bk-sec-t .dot{width:9px;height:9px;border-radius:50%}.bk-sec-t .cnt{margin-left:auto;font-size:10.5px;font-weight:600;color:#94A3B8}"+
+  ".bk-tbl{width:100%;border-collapse:collapse}"+
+  ".bk-tbl th{text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.3px;color:#94A3B8;font-weight:700;padding:7px 6px 5px}"+
+  ".bk-tbl td{padding:7px 6px;font-size:12px;border-top:1px solid #F1F5F9;vertical-align:top}"+
+  ".bk-tbl .q{text-align:center;font-weight:800}"+
+  ".bk-tbl tr{break-inside:avoid;page-break-inside:avoid}"+
+  ".bk-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}"+
+  ".bk-kit td{background:#FAF7FF;border-left:3px solid #7C3AED}"+
+  ".bk-obs{border:1px solid #E8EDF4;border-radius:8px;padding:11px 13px;font-size:12px;color:#475569;min-height:44px;background:#FCFCFD;white-space:pre-wrap}"+
+  ".bk-obs .h{font-size:9.5px;text-transform:uppercase;letter-spacing:.3px;color:#94A3B8;font-weight:700;margin-bottom:4px}"+
+  ".bk-ret{border:1px dashed #FCA5A5;background:#FFF5F5;border-radius:8px;padding:9px 13px;font-size:11px;color:#B91C1C;margin-top:12px;display:flex;gap:8px;align-items:center}"+
+  ".bk-foot{margin-top:auto;display:flex;justify-content:space-between;gap:24px;border-top:1px solid #E8EDF4;padding-top:16px}"+
+  ".bk-sign{text-align:center;flex:1}.bk-sign .ln{border-top:1px solid #94A3B8;margin-bottom:5px;margin-top:24px}.bk-sign .lb{font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:.3px}";
+}
 function doPrint(){
   if(!cur){toast("Ouvrez une appro","ti-alert-circle");return;}
   var long=isLongAppro(cur);
@@ -4685,18 +4843,14 @@ function doPrint(){
 }
 function doPDF(){
   if(!cur){toast("Ouvrez une appro","ti-alert-circle");return;}
-  var inner=buildPZ(cur);
-  var long=isLongAppro(cur);
-  var pageStyle=long
-    ?"@media print{@page{size:A3 landscape;margin:11mm}}.pz-secwrap{display:flex;gap:10mm;align-items:flex-start}.pz-secwrap>.pz-sec{flex:1 1 0;min-width:0;margin-bottom:0}.pz-tbl tr{-webkit-column-break-inside:avoid;break-inside:avoid;page-break-inside:avoid}.pz-tbl thead{display:table-header-group}"
-    :"@media print{@page{size:A4;margin:10mm 12mm}}";
-  var body=inner;
-  var h="<!DOCTYPE html><html lang=\"fr\"><head><meta charset=\"UTF-8\"><title>"+(cur.nomChantier||"Appro")+" &#8212; JARNIAS</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1E293B;font-size:11px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}.pz-hd{background:"+_accentCol()+";padding:12px 16px;display:flex;align-items:center;justify-content:space-between}.pz-hd img{width:90px;border-radius:7px}.pz-hd-l{display:flex;align-items:center;gap:9px}.pz-hd-c{flex:1;text-align:center;padding:0 12px}.pz-hd-flag{flex-shrink:0}.pz-hd-r{text-align:right}.pz-hd-title{font-size:14px;font-weight:700;color:#F1F5F9}.pz-hd-sub{font-size:10px;color:#64748B;margin-top:2px}.pz-ref{background:#1E293B;padding:7px 16px;display:flex;gap:20px;margin-bottom:10px}.pz-ri{display:flex;flex-direction:column}.pz-rl{font-size:9px;color:#64748B;text-transform:uppercase}.pz-rv{font-size:11px;color:#E2E8F0;font-weight:600}.pz-bt{padding:4px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#fff;background:var(--accent,#0F172A);border-radius:6px 6px 0 0;margin-top:10px}.pz-info{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;background:#F8FAFC;border:1px solid #E2E8F0;border-top:none;border-radius:0 0 6px 6px;padding:10px 14px}.pz-dates{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:10px;border:1px solid #FDE68A;border-top:none;background:#FFFBEB;border-radius:0 0 6px 6px;padding:8px 14px}.pz-fi label{font-size:9px;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:1px}.pz-fi span{font-size:12px;font-weight:600;color:#0F172A}.pz-sec{margin-bottom:14px;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden}.pz-sec-t{background:#1E293B;color:#fff;padding:6px 11px;font-size:11px;font-weight:600;text-transform:uppercase}.pz-tbl{width:100%;border-collapse:collapse}.pz-tbl th{background:#F1F5F9;padding:5px 8px;font-size:10px;text-transform:uppercase;color:#475569;text-align:left;border-bottom:1px solid #E2E8F0;font-weight:600}.pz-tbl td{padding:5px 8px;font-size:11px;border-bottom:1px solid #F1F5F9}.pz-tbl tr:last-child td{border-bottom:none}.pz-obs{border:1px solid #E2E8F0;padding:8px 10px;font-size:11px;min-height:36px;white-space:pre-wrap;border-radius:0 0 4px 4px}.pz-foot{margin-top:16px;display:flex;justify-content:flex-end;gap:36px;border-top:1px solid #E2E8F0;padding-top:10px}.pz-sign label{font-size:9px;text-transform:uppercase;color:#94A3B8;display:block;margin-bottom:20px;text-align:center}.pz-sign-line{border-top:1px solid #CBD5E1;width:120px;margin:0 auto}"+pageStyle+"</style></head><body>"+body+"<script>window.onload=function(){window.print();}<\/script></body></html>";
+  var bk=buildBooklet(cur);
+  var body=bk.exterior+bk.interior;
+  var h="<!DOCTYPE html><html lang=\"fr\"><head><meta charset=\"UTF-8\"><title>"+(cur.nomChantier||"Appro")+" &#8212; JARNIAS</title><style>"+_bookletCSS()+"</style></head><body>"+body+"<script>window.onload=function(){setTimeout(function(){window.print();},250);}<\/script></body></html>";
   var blob=new Blob([h],{type:"text/html;charset=utf-8"});
   var url=URL.createObjectURL(blob);
-  var win=window.open(url,"_blank","width=820,height=900");
+  var win=window.open(url,"_blank","width=1100,height=820");
   if(!win)toast("Autorisez les popups pour le PDF","ti-alert-circle");
-  else toast("Fen&#234;tre PDF &#8212; choisissez Enregistrer en PDF","ti-file-type-pdf");
+  else toast("Livret A3 \u2014 imprimez en A3, puis pliez au milieu","ti-file-type-pdf");
 }
 
 // ═══════════════ AUTHENTIFICATION ═══════════════
@@ -7761,7 +7915,7 @@ var TUTO_MODULES={
       {before:_tutoNeedAppro,sel:"#cp-fab",ic:"ti-package",t:"Ou passez par le catalogue",d:"Ce bouton reste accessible en bas à droite, même quand vous faites défiler la page.",action:"next"},
       {before:_tutoNeedAppro,sel:".next-step",ic:"ti-arrow-right",t:"Que faire maintenant ?",d:"Ce bandeau vous dit toujours la prochaine action à faire. En cas de doute, suivez-le.",action:"next"},
       {before:_tutoNeedAppro,sel:".btn-save",ic:"ti-device-floppy",t:"Enregistrer",d:"À faire régulièrement. Tant que l'appro est un brouillon, le dépôt ne la voit pas.",action:"next"},
-      {before:_tutoNeedAppro,sel:".tbi[title*='PDF'],button[onclick=\"doPDF()\"]",ic:"ti-file-type-pdf",t:"Exporter en PDF",d:"Pour imprimer la feuille ou l'envoyer par mail. Les kits sont repliés pour tenir sur une page.",action:"next"},
+      {before:_tutoNeedAppro,sel:".tbi[title*='PDF'],button[onclick=\"doPDF()\"]",ic:"ti-file-type-pdf",t:"Exporter en livret",d:"Génère un livret A3 : imprimez-le puis pliez-le en deux. La couverture porte les infos et le QR de suivi, l'intérieur le détail de l'appro.",action:"next"},
       {before:_tutoNeedAppro,sel:"button[onclick=\"sendToProduction()\"],.next-step",ic:"ti-send",t:"Envoyer en production",d:"C'est le moment clé : le chef dépôt reçoit l'appro et peut la préparer.",action:"next"},
       {before:_tutoNeedAppro,sel:"#hist-chev,#hist-box",ic:"ti-history",t:"L'historique",d:"Qui a modifié quoi, et quand. Utile quand on est plusieurs sur une affaire.",action:"next"}
     ];
