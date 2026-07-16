@@ -775,9 +775,15 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
 .tour-ov.tour-anim .tour-mask,.tour-ov.tour-anim .tour-hole{transition:left .26s var(--ease),top .26s var(--ease),width .26s var(--ease),height .26s var(--ease)}
 /* bulle */
 .tour-bubble{position:fixed;z-index:6120;pointer-events:auto;background:#fff;border-radius:16px;padding:18px 20px 16px;width:352px;max-width:calc(100vw - 28px);box-shadow:0 20px 50px rgba(0,0,0,.3);animation:tourPop .3s var(--spring)}
-/* mobile : quand le tuto vise la sidebar, on la remonte au-dessus du voile pour la rendre cliquable */
-.sidebar.tour-lift{z-index:6115!important}
-.sb-overlay.tour-lift-ov{z-index:6099!important;opacity:1}
+/* ═══ Mobile : le tuto vise un élément du menu déroulant ═══
+   La sidebar mobile est un tiroir (position:fixed; z-index:1000) qui glisse.
+   Elle doit passer AU-DESSUS du voile du tuto (pour rester lisible et cliquable),
+   mais SOUS l'anneau de surlignage et la bulle — sinon elle les recouvre.
+   Pile : masques 6100 < sidebar 6105 < anneau 6110 < bulle 6120. */
+.sidebar.tour-lift{z-index:6105!important}
+/* Le voile propre à la sidebar ferait doublon avec celui du tuto (fond deux fois plus sombre),
+   et un appui dessus refermerait le menu en plein milieu d'une étape. */
+.sb-overlay.tour-lift-ov{display:none!important}
 .tour-bubble h3{font-size:15px;font-weight:800;color:#0F172A;margin-bottom:6px;display:flex;align-items:center;gap:7px}
 .tour-bubble h3 i{color:var(--accent,#6D28D9);font-size:18px}
 .tour-bubble p{font-size:13px;color:#64748B;line-height:1.55}
@@ -1113,6 +1119,52 @@ table.at tr.kit-row td.td-d{position:relative}
 .td-rep{font-size:12px;color:#9A3412;background:#FFF7ED;border:1px solid #FED7AA;border-radius:9px;padding:7px 11px;margin-top:8px}
 .td-ok{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#15803D;background:#F0FDF4;border-radius:9px;padding:7px 11px;margin-top:8px;font-weight:600}
 @media(max-width:640px){.td-wrap{padding:16px 12px 30px}.td-send{width:100%;justify-content:center}}
+
+/* ═══ SÉLECTEUR DE CHANTIER ALOBEES ═══ */
+#alo-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:18px}
+.alo-modal{background:#fff;border-radius:18px;max-width:520px;width:100%;max-height:82vh;display:flex;flex-direction:column;box-shadow:0 24px 60px -12px rgba(15,23,42,.45);overflow:hidden}
+.alo-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px 12px;border-bottom:1px solid #F1F5F9}
+.alo-title{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:800;color:#0F172A;letter-spacing:-.2px}
+.alo-title-ic{width:32px;height:32px;border-radius:9px;background:#EFF6FF;color:#1D4ED8;display:flex;align-items:center;justify-content:center;font-size:17px}
+.alo-x{background:none;border:none;color:#94A3B8;font-size:19px;cursor:pointer;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background .16s,color .16s}
+.alo-x:hover{background:#F1F5F9;color:#0F172A}
+.alo-sw{position:relative;margin:12px 18px 0}
+.alo-sw-ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:16px;pointer-events:none}
+.alo-sw input{width:100%;border:1px solid #E2E8F0;border-radius:11px;padding:11px 38px 11px 36px;font-size:14px;font-family:inherit;color:#0F172A;background:#F8FAFC;transition:border-color .16s,background .16s,box-shadow .16s}
+.alo-sw input:focus{outline:none;border-color:#1D4ED8;background:#fff;box-shadow:0 0 0 3px rgba(29,78,216,.12)}
+.alo-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:#E2E8F0;border:none;color:#475569;width:22px;height:22px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
+.alo-clear:hover{background:#CBD5E1}
+.alo-hint{display:flex;align-items:center;gap:6px;font-size:10.5px;color:#B6C2D2;padding:7px 18px 0}
+.alo-dbg{margin:8px 18px 0;font-size:11px;color:#64748B;background:none;border:none;cursor:pointer;text-decoration:underline;padding:0;text-align:left;font-family:inherit}
+.alo-list{overflow-y:auto;padding:8px 10px 6px;margin-top:4px;flex:1;min-height:120px}
+.alo-row{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:11px;cursor:pointer;border:1px solid transparent;transition:background .14s,border-color .14s}
+.alo-row.on{background:#F8FAFC;border-color:#E2E8F0}
+.alo-row.on .alo-ch{opacity:1;transform:translateX(0)}
+.alo-row.on .alo-ic{background:#EFF6FF;color:#1D4ED8}
+.alo-ic{width:36px;height:36px;border-radius:10px;background:#F1F5F9;color:#94A3B8;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;transition:background .14s,color .14s}
+.alo-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.alo-nom{font-size:14px;font-weight:700;color:#0F172A;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.alo-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:11px;color:#94A3B8;min-width:0}
+.alo-meta i{font-size:12px}
+.alo-ref{display:inline-flex;align-items:center;gap:2px;background:#F1F5F9;color:#475569;border-radius:20px;padding:1px 8px;font-weight:700;font-size:10.5px}
+.alo-m{display:inline-flex;align-items:center;gap:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
+.alo-ch{color:#CBD5E1;font-size:16px;opacity:0;transform:translateX(-4px);transition:opacity .16s,transform .16s;flex-shrink:0}
+.alo-hi{background:#FEF08A;color:#713F12;border-radius:3px;padding:0 1px;font-weight:700}
+.alo-foot{border-top:1px solid #F1F5F9;padding:9px 18px;font-size:11px;color:#94A3B8;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.alo-msg{text-align:center;padding:34px 18px;color:#94A3B8}
+.alo-msg i{font-size:30px;color:#CBD5E1}
+.alo-msg-t{font-size:13.5px;font-weight:700;color:#475569;margin-top:9px}
+.alo-msg-d{font-size:12px;margin-top:3px;line-height:1.5}
+.alo-err i{color:#FCA5A5}
+.alo-err .alo-msg-t{color:#B91C1C}
+.alo-sk{display:flex;align-items:center;gap:11px;padding:10px 11px}
+.alo-sk-ic{width:36px;height:36px;border-radius:10px;flex-shrink:0}
+.alo-sk-l{height:10px;border-radius:5px;margin-bottom:6px}
+.alo-sk-s{height:8px;margin-bottom:0}
+.alo-sk-ic,.alo-sk-l{background:linear-gradient(90deg,#F1F5F9 25%,#E8EDF4 37%,#F1F5F9 63%);background-size:400% 100%;animation:aloSk 1.3s ease infinite}
+@keyframes aloSk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+@media(prefers-reduced-motion:reduce){.alo-sk-ic,.alo-sk-l{animation:none}}
+@media(max-width:520px){.alo-modal{max-height:88vh}.alo-m{max-width:120px}.alo-hint{display:none}}
 
 /* ═══ MES APPROS — page dédiée ═══ */
 .ma-in{max-width:1000px;margin:0 auto;padding:22px 18px 40px}
@@ -1571,6 +1623,10 @@ table.at tr.kit-row td.td-d{position:relative}
 .spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .ti-loader-2{display:inline-block;animation:spin .8s linear infinite}
+#btn-refresh i{display:inline-block;transition:transform .2s var(--ease)}
+#btn-refresh:hover i{transform:rotate(-25deg)}
+#btn-refresh.spin i{animation:spin .8s linear infinite}
+#btn-refresh.spin{pointer-events:none;opacity:.75}
 /* ===== THEME SOMBRE (inversion intelligente) ===== */
 html{transition:filter .35s var(--ease),background .35s var(--ease)}
 html.dark{filter:invert(0.91) hue-rotate(180deg);background:#0f172a;}
@@ -1760,6 +1816,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
         <div id="amb-btn-wrap" style="position:relative;display:inline-block">
           <button class="btn-theme" id="amb-btn" onclick="event.stopPropagation();toggleAmbPop()" title="Ambiance couleur"><i class="ti ti-palette" style="font-size:15px"></i></button>
         </div>
+        <button class="btn-theme" id="btn-refresh" onclick="refreshFromServer()" title="Mettre &#224; jour les donn&#233;es"><i class="ti ti-refresh" style="font-size:15px"></i></button>
         <button class="btn-theme" id="help-btn" onclick="startTour()" title="Aide / visite guid&#233;e"><i class="ti ti-help-circle" style="font-size:16px"></i></button>
         <button class="btn-theme" id="pwa-install-btn" onclick="pwaInstall()" title="Installer l'application" style="background:rgba(109,40,217,.14);color:#6D28D9"><i class="ti ti-download" style="font-size:15px"></i></button>
         <button class="btn-theme" id="theme-btn" onclick="toggleTheme()" title="Th&#232;me clair / sombre"><i class="ti ti-moon" style="font-size:15px"></i></button>
@@ -2353,10 +2410,84 @@ function apiCall(method,path,body){
   });
 }
 // Charge les appros depuis le serveur (avec retry si le serveur se r\u00e9veille)
+/* ═══ Mise à jour des données depuis le serveur ═══
+   Manuelle (bouton) ou automatique quand l'application revient à l'écran. */
+var _refreshBusy=false,_lastRefreshAt=0;
+
+/* Re-dessine l'écran courant après un rechargement.
+   Les écrans de réglages sont volontairement exclus : les re-rendre ferait perdre
+   un tri en cours de glissement ou un champ à moitié saisi. */
+function _rerenderCurrent(){
+  try{
+    if(typeof cur!=="undefined"&&cur)return;   /* une appro est ouverte : on n'y touche pas */
+    var t=(typeof currentTab!=="undefined"&&currentTab)||"";
+    if(t==="uisettings"||t==="perso"||t==="alosettings")return;
+    if(t==="depot")renderDepot();
+    else if(t==="biblio")renderLibrary();
+    else if(t==="dashboard")renderDashboard();
+    else if(t==="commande")renderCommandes();
+    else if(t==="tickets")_renderTicketsView();
+    else if(t==="trucks")renderTrucksSettings();
+    else if(t==="annonces")renderAnnonces();
+    else if(t==="terrain")renderTerrainDemande();
+    else if(t==="mes")renderMesAppros();
+    else renderWelcome();
+  }catch(e){}
+}
+
+function refreshFromServer(opts){
+  opts=opts||{};
+  var silent=!!opts.silent;
+  if(!authToken){if(!silent)toast("Vous n'\u00eates pas connect\u00e9","ti-alert-circle");return Promise.resolve(false);}
+  if(_refreshBusy)return Promise.resolve(false);
+  /* GARDE-FOU : une appro ouverte avec des modifications non enregistr\u00e9es.
+     Recharger remplacerait les donn\u00e9es sous les doigts de l'utilisateur : on refuse. */
+  if(typeof cur!=="undefined"&&cur&&typeof saved!=="undefined"&&!saved){
+    if(!silent)toast("Enregistrez vos modifications avant de mettre \u00e0 jour","ti-alert-circle");
+    return Promise.resolve(false);
+  }
+  _refreshBusy=true;
+  var btn=document.getElementById("btn-refresh");
+  if(btn)btn.classList.add("spin");
+  var ok1=false,ok2=false;
+  return Promise.all([
+    loadSheetsFromServer(1).then(function(){ok1=true;}).catch(function(){}),
+    (typeof loadLists==="function"?loadLists():Promise.resolve()).then(function(){ok2=_listsOk;}).catch(function(){})
+  ]).then(function(){
+    /* Rien n'a abouti = pas de r\u00e9seau. On le dit, plut\u00f4t que d'annoncer \u00ab \u00e0 jour \u00bb \u00e0 tort. */
+    if(!ok1&&!ok2){if(!silent)toast("Mise \u00e0 jour impossible \u2014 v\u00e9rifiez la connexion","ti-alert-circle");return false;}
+    _lastRefreshAt=Date.now();
+    _rerenderCurrent();
+    try{if(typeof updateTicketBadge==="function")updateTicketBadge();}catch(e){}
+    try{if(typeof renderDeadlineBanner==="function")renderDeadlineBanner();}catch(e){}
+    if(!silent)toast("Donn\u00e9es \u00e0 jour","ti-check");
+    return true;
+  }).then(function(r){
+    _refreshBusy=false;
+    if(btn)btn.classList.remove("spin");
+    return r;
+  });
+}
+
+/* L'application revient \u00e0 l'\u00e9cran : onglet r\u00e9activ\u00e9, t\u00e9l\u00e9phone d\u00e9verrouill\u00e9,
+   retour depuis une autre app. On remet \u00e0 jour sans rien demander, et sans bruit.
+   Brid\u00e9 \u00e0 une fois toutes les 30 s pour ne pas marteler le serveur. */
+var _REFRESH_MIN_MS=30000;
+function _onBackToScreen(){
+  if(document.visibilityState!=="visible")return;
+  if(!authToken)return;
+  if(Date.now()-_lastRefreshAt<_REFRESH_MIN_MS)return;
+  refreshFromServer({silent:true});
+}
+document.addEventListener("visibilitychange",_onBackToScreen);
+/* iOS restaure parfois la page depuis son cache sans \u00e9v\u00e9nement de visibilit\u00e9. */
+window.addEventListener("pageshow",function(e){if(e&&e.persisted)_onBackToScreen();});
+
 function loadSheetsFromServer(retries){
   if(retries===undefined)retries=3;
   return apiCall("GET","/appros").then(function(data){
     sheets=(data||[]).map(function(s){return mig(s);});
+    _lastRefreshAt=Date.now();   /* tout chargement r\u00e9ussi compte : \u00e9vite un refresh inutile juste apr\u00e8s l'ouverture */
     try{if(currentTab==="dash"&&typeof renderDashboard==="function")renderDashboard();
          else if(currentTab==="depot"&&typeof renderDepot==="function")renderDepot();}catch(e){}
     return sheets;
@@ -3586,21 +3717,22 @@ function togC(cid,key){
 }
 
 // WELCOME
+/* « mine » = les appros qui ME concernent, d'après le NOM inscrit sur l'appro
+   (conducteur / chargé d'affaires / team leader), et non parce que c'est mon compte
+   qui l'a créée. Le dépôt/admin voit tout.
+   Globale : l'accueil ET le tuto doivent appliquer EXACTEMENT la même règle. */
+function _isMineSheet(s){
+  var meN=_stripAccents((currentUser&&currentUser.name||"").toLowerCase());
+  if(!meN)return true;
+  if(currentRole==="depot"||(typeof isAdmin==="function"&&isAdmin()))return true;
+  var noms=[s.conducteur,s.chargeAffaires,s.tlName];
+  return noms.some(function(n){return _stripAccents((n||"").toLowerCase())===meN;});
+}
 function renderWelcome(){
   /* L'accueil ne sert pas au chef d\u00e9p\u00f4t : son \u00e9cran de travail, c'est la vue d\u00e9p\u00f4t. */
   if(currentRole==="depot"&&typeof renderDepot==="function"){renderDepot();return;}
   if(typeof _unmountCpFab==="function")_unmountCpFab();
   cur=null;saved=false;aiSug=null;addMode=false;addDate=null;currentTab="mes";
-  var _meN=_stripAccents((currentUser&&currentUser.name||"").toLowerCase());
-  /* « mine » = les appros qui ME concernent, d'après le NOM inscrit sur l'appro
-     (conducteur / chargé d'affaires / team leader), et non parce que c'est mon
-     compte qui l'a créée. Le dépôt/admin voit tout. */
-  function _isMineSheet(s){
-    if(!_meN)return true;
-    if(currentRole==="depot"||(typeof isAdmin==="function"&&isAdmin()))return true;
-    var noms=[s.conducteur,s.chargeAffaires,s.tlName];
-    return noms.some(function(n){return _stripAccents((n||"").toLowerCase())===_meN;});
-  }
   var mine=sheets.filter(function(s){return !s.draft&&_isMineSheet(s);});
   var ctb=mine.reduce(function(a,s){getTypes(s).forEach(function(t){a[t]=(a[t]||0)+1;});return a;},{});
   var mx=Math.max.apply(null,Object.values(ctb).concat([1]));
@@ -4709,7 +4841,11 @@ function _getListsWithRetry(n){
     throw e;
   });
 }
+/* loadLists() n'\u00e9choue jamais (catch silencieux voulu au d\u00e9marrage) : ce t\u00e9moin dit
+   si le dernier chargement a r\u00e9ellement abouti, pour ne pas annoncer \u00ab \u00e0 jour \u00bb \u00e0 tort. */
+var _listsOk=false;
 function loadLists(){
+  _listsOk=false;
   if(!authToken)return Promise.resolve();
   return _getListsWithRetry(3).then(function(d){
     d=d||{};
@@ -4735,7 +4871,8 @@ function loadLists(){
     if(typeof applyConfig==="function")applyConfig();
     setTimeout(function(){if(typeof showAnnoncePopups==="function")showAnnoncePopups();},700);
     if(typeof updateTicketBadge==="function")updateTicketBadge();
-  }).catch(function(){});
+    _listsOk=true;
+  }).catch(function(){_listsOk=false;});
 }
 // Recalcule l'ordre des cat\u00e9gories du catalogue (au cas o\u00f9 de nouvelles cat\u00e9gories apparaissent)
 
@@ -6541,42 +6678,134 @@ function showShare(){
 function hideShare(){var ov=document.getElementById("share-ov");if(ov)ov.style.display="none";}
 var _alobeesSites=[];
 var _aloTimer=null;
+/* Alobees stocke le nom au format « adresse - nom du chantier ».
+   Une seule fonction pour la liste ET l'import : pas de risque de divergence. */
+function _aloSplitName(raw){
+  var nm=(""+(raw||"")).trim();
+  var parts=nm.split(" - ");
+  if(parts.length>=2)return {nom:parts.slice(1).join(" - ").trim(),adresse:parts[0].trim()};
+  return {nom:nm,adresse:""};
+}
+/* Surligne les mots cherchés (le texte est échappé AVANT : aucune injection possible). */
+function _aloHi(txt,q){
+  var out=esc(""+(txt||""));
+  var words=(""+(q||"")).trim().split(/\s+/).filter(Boolean);
+  if(!words.length)return out;
+  words.forEach(function(w){
+    var rx=new RegExp("("+w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","ig");
+    out=out.replace(rx,"<mark class=\"alo-hi\">$1</mark>");
+  });
+  return out;
+}
+function _aloSkeleton(){
+  var h="";
+  for(var i=0;i<5;i++)h+="<div class=\"alo-sk\"><div class=\"alo-sk-ic\"></div><div style=\"flex:1\"><div class=\"alo-sk-l\" style=\"width:"+(52+i*7)+"%\"></div><div class=\"alo-sk-l alo-sk-s\" style=\"width:"+(30+i*5)+"%\"></div></div></div>";
+  return h;
+}
 function showAlobeesPicker(){
   var ov=document.getElementById("alo-ov");
   if(!ov){
     ov=document.createElement("div");ov.id="alo-ov";
-    ov.style.cssText="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:18px";
     ov.onclick=function(e){if(e.target===ov)hideAlobees();};
     document.body.appendChild(ov);
   }
-  ov.innerHTML="<div style=\"background:#fff;border-radius:16px;max-width:460px;width:100%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.3)\"><div style=\"padding:18px 20px 12px\"><div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:4px\"><div style=\"font-size:17px;font-weight:700;color:#0F172A\"><i class=\"ti ti-cloud-download\" style=\"color:#1D4ED8\"></i> Chantiers Alobees</div><button onclick=\"hideAlobees()\" style=\"background:none;border:none;font-size:22px;color:#94A3B8;cursor:pointer;line-height:1\">&times;</button></div><input id=\"alo-search\" placeholder=\"Nom de chantier ou N\u00b0 d'affaire...\" oninput=\"filterAlobees(this.value)\" style=\"width:100%;border:1px solid #E2E8F0;border-radius:8px;padding:9px 12px;font-size:14px;margin-top:6px\"/>"+(isAdmin()?"<button onclick=\"showAloDebug()\" style=\"margin-top:8px;font-size:11px;color:#64748B;background:none;border:none;cursor:pointer;text-decoration:underline;padding:0\"><i class=\"ti ti-bug\"></i> Voir les champs bruts Alobees (debug)</button>":"")+"</div><div id=\"alo-list\" style=\"overflow-y:auto;padding:0 12px 14px\"><div style=\"text-align:center;color:#94A3B8;padding:24px;font-size:13px\">Chargement...</div></div></div>";
-  ov.style.display="flex";ov.classList.add("j-scrim");if(ov.firstElementChild)ov.firstElementChild.classList.add("j-card");
+  ov.innerHTML=
+    "<div class=\"alo-modal\">"+
+      "<div class=\"alo-hd\">"+
+        "<div class=\"alo-title\"><span class=\"alo-title-ic\"><i class=\"ti ti-cloud-download\"></i></span> Chantiers Alobees</div>"+
+        "<button class=\"alo-x\" onclick=\"hideAlobees()\" title=\"Fermer\"><i class=\"ti ti-x\"></i></button>"+
+      "</div>"+
+      "<div class=\"alo-sw\">"+
+        "<i class=\"ti ti-search alo-sw-ic\"></i>"+
+        "<input id=\"alo-search\" autocomplete=\"off\" placeholder=\"Nom, N\u00b0 d'affaire, client ou ville\u2026\" oninput=\"filterAlobees(this.value)\" onkeydown=\"_aloKey(event)\"/>"+
+        "<button class=\"alo-clear\" id=\"alo-clear\" onclick=\"_aloClear()\" title=\"Effacer\" style=\"display:none\"><i class=\"ti ti-x\"></i></button>"+
+      "</div>"+
+      "<div class=\"alo-hint\"><i class=\"ti ti-keyboard\"></i> Fl\u00e8ches pour parcourir, Entr\u00e9e pour choisir</div>"+
+      (isAdmin()?"<button class=\"alo-dbg\" onclick=\"showAloDebug()\"><i class=\"ti ti-bug\"></i> Voir les champs bruts Alobees (debug)</button>":"")+
+      "<div id=\"alo-list\" class=\"alo-list\">"+_aloSkeleton()+"</div>"+
+      "<div id=\"alo-foot\" class=\"alo-foot\"></div>"+
+    "</div>";
+  ov.style.display="flex";ov.classList.add("j-scrim");
+  if(ov.firstElementChild)ov.firstElementChild.classList.add("j-card");
+  _aloQ="";_aloCur=-1;
   loadAlobees("");
+  setTimeout(function(){var i=document.getElementById("alo-search");if(i)try{i.focus();}catch(e){}},60);
+}
+var _aloQ="",_aloCur=-1;
+function _aloClear(){
+  var i=document.getElementById("alo-search");
+  if(i){i.value="";try{i.focus();}catch(e){}}
+  filterAlobees("");
 }
 function loadAlobees(q){
-  apiCall("GET","/alobees/sites?limit=30"+(q?"&q="+encodeURIComponent(q):"")).then(function(d){
+  _aloQ=(q||"").trim();
+  var el=document.getElementById("alo-list");
+  if(el)el.innerHTML=_aloSkeleton();
+  var cl=document.getElementById("alo-clear");if(cl)cl.style.display=_aloQ?"flex":"none";
+  apiCall("GET","/alobees/sites?limit=30"+(_aloQ?"&q="+encodeURIComponent(_aloQ):"")).then(function(d){
     _alobeesSites=(d&&d.sites)||[];
     renderAlobeesList(_alobeesSites,d&&d.total,d&&d.grandTotal);
   }).catch(function(e){
-    var el=document.getElementById("alo-list");
-    if(el)el.innerHTML="<div style=\"text-align:center;color:#DC2626;padding:24px;font-size:13px\">"+esc(e.message||"Erreur de connexion \u00e0 Alobees")+"</div>";
+    var el2=document.getElementById("alo-list");
+    if(el2)el2.innerHTML="<div class=\"alo-msg alo-err\"><i class=\"ti ti-plug-off\"></i><div class=\"alo-msg-t\">Connexion \u00e0 Alobees impossible</div><div class=\"alo-msg-d\">"+esc(e.message||"R\u00e9essayez dans un instant.")+"</div></div>";
+    var f=document.getElementById("alo-foot");if(f)f.innerHTML="";
   });
 }
 function renderAlobeesList(list,total,grandTotal){
   var el=document.getElementById("alo-list");if(!el)return;
-  if(!list.length){el.innerHTML="<div style=\"text-align:center;color:#94A3B8;padding:24px;font-size:13px\">Aucun chantier trouv\u00e9</div>";return;}
+  var foot=document.getElementById("alo-foot");
+  _aloCur=-1;
+  if(!list.length){
+    el.innerHTML="<div class=\"alo-msg\"><i class=\"ti ti-search-off\"></i><div class=\"alo-msg-t\">Aucun chantier trouv\u00e9</div><div class=\"alo-msg-d\">"+(_aloQ?"Essayez avec moins de mots, ou un N\u00b0 d'affaire.":"Aucun chantier n'est disponible.")+"</div></div>";
+    if(foot)foot.innerHTML="";
+    return;
+  }
   var h="";
   list.forEach(function(s,idx){
-    h+="<div onclick=\"pickAlobeesSite("+idx+")\" style=\"padding:11px 12px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:10px\" onmouseover=\"this.style.background='#F1F5F9'\" onmouseout=\"this.style.background='none'\"><i class=\"ti ti-building\" style=\"font-size:17px;color:#94A3B8;flex-shrink:0\"></i><div style=\"min-width:0\"><div style=\"font-size:14px;font-weight:600;color:#0F172A\">"+esc(s.display_name||s.name||s.nom||"Sans nom")+"</div>"+((s.reference||s.ref)?"<div style=\"font-size:11px;color:#64748B;margin-top:1px\"><i class=\"ti ti-hash\" style=\"font-size:11px\"></i> N\u00b0 "+esc(s.reference||s.ref)+"</div>":"")+"</div></div>";
+    var sp=_aloSplitName(s.display_name||s.name||s.nom||"");
+    var nom=sp.nom||"Sans nom";
+    var ref=s.reference||s.ref||"";
+    var adr=[s.address,((""+(s.zipCode||""))+" "+(""+(s.city||""))).trim()].filter(function(a){return a&&(""+a).trim();}).join(", ")||sp.adresse;
+    h+="<div class=\"alo-row\" data-i=\""+idx+"\" onclick=\"pickAlobeesSite("+idx+")\" onmousemove=\"_aloHover("+idx+")\">"+
+         "<span class=\"alo-ic\"><i class=\"ti ti-building-community\"></i></span>"+
+         "<span class=\"alo-body\">"+
+           "<span class=\"alo-nom\">"+_aloHi(nom,_aloQ)+"</span>"+
+           "<span class=\"alo-meta\">"+
+             (ref?"<span class=\"alo-ref\"><i class=\"ti ti-hash\"></i>"+_aloHi(ref,_aloQ)+"</span>":"")+
+             (s.customer?"<span class=\"alo-m\"><i class=\"ti ti-briefcase\"></i> "+_aloHi(s.customer,_aloQ)+"</span>":"")+
+             (adr?"<span class=\"alo-m\"><i class=\"ti ti-map-pin\"></i> "+_aloHi(adr,_aloQ)+"</span>":"")+
+           "</span>"+
+         "</span>"+
+         "<i class=\"ti ti-chevron-right alo-ch\"></i>"+
+       "</div>";
   });
-  if(total&&total>list.length)h+="<div style=\"text-align:center;color:#94A3B8;padding:10px;font-size:12px\">"+list.length+" sur "+total+" \u2014 affinez votre recherche</div>";
   el.innerHTML=h;
+  if(foot){
+    if(total&&total>list.length)foot.innerHTML="<i class=\"ti ti-info-circle\"></i> "+list.length+" chantiers sur "+total+" \u2014 pr\u00e9cisez votre recherche";
+    else foot.innerHTML="<i class=\"ti ti-check\"></i> "+list.length+" chantier"+(list.length>1?"s":"")+(grandTotal&&!_aloQ?" sur "+grandTotal:"");
+  }
+}
+function _aloHover(i){_aloCur=i;_aloMark();}
+function _aloMark(){
+  var rows=document.querySelectorAll("#alo-list .alo-row");
+  rows.forEach(function(r,i){r.classList.toggle("on",i===_aloCur);});
+}
+/* Clavier : fl\u00e8ches pour parcourir, Entr\u00e9e pour choisir, \u00c9chap pour fermer. */
+function _aloKey(e){
+  var rows=document.querySelectorAll("#alo-list .alo-row");
+  if(e.key==="Escape"){hideAlobees();return;}
+  if(!rows.length)return;
+  if(e.key==="ArrowDown"){e.preventDefault();_aloCur=(_aloCur+1)%rows.length;_aloMark();rows[_aloCur].scrollIntoView({block:"nearest"});}
+  else if(e.key==="ArrowUp"){e.preventDefault();_aloCur=(_aloCur<=0?rows.length:_aloCur)-1;_aloMark();rows[_aloCur].scrollIntoView({block:"nearest"});}
+  else if(e.key==="Enter"){e.preventDefault();var i=_aloCur<0?0:_aloCur;pickAlobeesSite(i);}
 }
 function filterAlobees(q){
   if(_aloTimer)clearTimeout(_aloTimer);
+  var cl=document.getElementById("alo-clear");if(cl)cl.style.display=(q||"").trim()?"flex":"none";
   _aloTimer=setTimeout(function(){loadAlobees((q||"").trim());},280);
 }
 function hideAlobees(){var ov=document.getElementById("alo-ov");if(ov)ov.style.display="none";}
+
 function showAloDebug(){
   _aloDebugMode=!_aloDebugMode;
   var el=document.getElementById("alo-list");
@@ -6598,10 +6827,8 @@ function pickAlobeesSite(idx){
     // N\u00b0 affaire
     if(x.reference)cur.noAffaire=x.reference;
     // Nom + adresse depuis "name" (format "adresse - nom du chantier")
-    var nm=(""+(x.name||s.name||"")).trim();
-    var parts=nm.split(" - ");
-    var adresseName="",nomCh=nm;
-    if(parts.length>=2){adresseName=parts[0].trim();nomCh=parts.slice(1).join(" - ").trim();}
+    var _sp=_aloSplitName(x.name||s.name||"");
+    var adresseName=_sp.adresse,nomCh=_sp.nom;
     if(nomCh)cur.nomChantier=nomCh;
     // Client
     if(x.customer)cur.clientSite=x.customer;
@@ -7274,6 +7501,15 @@ function _tutoNeedCatalogue(){
   _tutoNeedAppro();
   try{ if(!document.getElementById("cp-search")&&typeof showCp==="function")showCp(); }catch(e){}
 }
+/* L'accueil bascule en \u00e9tat vide quand l'utilisateur n'a aucune appro :
+   m\u00eame r\u00e8gle que renderWelcome (mine.length===0 && !isField()).
+   Lit uniquement les donn\u00e9es, jamais le DOM : l'audit des modules reste fiable. */
+function _tutoHomeVide(){
+  try{
+    if(typeof isField==="function"&&isField())return false;
+    return (sheets||[]).filter(function(x){return !x.draft&&_isMineSheet(x);}).length===0;
+  }catch(e){return false;}
+}
 function _navHome(){if(currentRole==="depot"){_navDepot();return;}_tutoEnsure(".hstat",function(){renderWelcome();});}
 function _navBiblio(){_tutoEnsure(".lib-card,.lib-empty,.lib-wrap",function(){renderLibrary();});}
 function _navDepot(){_tutoEnsure(".depot-col-hd",function(){renderDepot();});}
@@ -7293,14 +7529,27 @@ var TUTO_MODULES={
       {before:_navDepot,sel:".dc-prep",ic:"ti-clipboard-list",t:"\u00c0 pr\u00e9parer",d:"La colonne de gauche : les appros que les conducteurs vous ont envoy\u00e9es.",action:"next"},
       {before:_navDepot,sel:".dc-ready",ic:"ti-package",t:"Au d\u00e9p\u00f4t",d:"La colonne de droite : ce qui est pr\u00eat \u00e0 partir sur chantier.",action:"next"},
       {before:_navDepot,sel:"#btn-biblio",ic:"ti-books",t:"La biblioth\u00e8que",d:"Toutes les appros de l'entreprise, pour retrouver un ancien chantier.",action:"next"},
+      {before:_navDepot,sel:"#btn-refresh",ic:"ti-refresh",t:"Mettre \u00e0 jour",d:"Ce bouton recharge les donn\u00e9es du serveur. L'appli le fait d\u00e9j\u00e0 toute seule quand vous y revenez.",action:"next"},
       {before:_navDepot,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous pr\u00e9vient : nouvelle appro \u00e0 pr\u00e9parer, demande du terrain, annonce.",action:"next"},
       {before:_navDepot,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
+    ]:_tutoHomeVide()?[
+      /* Nouvel utilisateur : l'accueil bascule en \u00e9tat vide (ni chiffres, ni actions rapides).
+         Viser .home-stats / .qa-primary ne surlignerait RIEN \u2014 or c'est justement lui qui suit le tuto. */
+      {before:_navHome,sel:".home-hero",ic:"ti-home",t:"Votre accueil",d:"Le point de d\u00e9part. Vous y verrez l'\u00e9tat de vos appros d'un coup d'\u0153il.",action:"next"},
+      {before:_navHome,sel:".home-empty",ic:"ti-clipboard-plus",t:"Aucune appro pour l'instant",d:"C'est normal : vous n'en avez pas encore cr\u00e9\u00e9. D\u00e8s la premi\u00e8re, vos chiffres s'afficheront ici.",action:"next"},
+      {before:_navHome,sel:".home-empty .btn-cta",ic:"ti-plus",t:"Cr\u00e9er la premi\u00e8re",d:"Ce bouton ouvre une feuille de chantier vierge. C'est le point de d\u00e9part de tout le reste.",action:"next"},
+      {before:_navHome,sel:".tabs-bar",ic:"ti-layout-navbar",t:"Deux onglets",d:"\u00ab Mes appros \u00bb listera vos chantiers en cours. \u00ab Biblioth\u00e8que \u00bb sert \u00e0 r\u00e9utiliser une ancienne appro.",action:"next"},
+      {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherchez par chantier, client, N\u00b0 d'affaire\u2026 ou m\u00eame par le nom d'un article contenu dans l'appro.",action:"next"},
+      {before:_navHome,sel:"#btn-refresh",ic:"ti-refresh",t:"Mettre \u00e0 jour",d:"Ce bouton recharge les donn\u00e9es du serveur. L'appli le fait d\u00e9j\u00e0 toute seule quand vous y revenez.",action:"next"},
+      {before:_navHome,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous pr\u00e9vient : appro pr\u00eate, demande trait\u00e9e, annonce de l'\u00e9quipe.",action:"next"},
+      {before:_navHome,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
     ]:[
       {before:_navHome,sel:".home-hero",ic:"ti-home",t:"Votre accueil",d:"Le point de d\u00e9part. Vous y voyez l'\u00e9tat de vos appros d'un coup d'\u0153il.",action:"next"},
       {before:_navHome,sel:".home-stats",ic:"ti-chart-bar",t:"Vos chiffres",d:"En préparation, prêtes, sur chantier, brouillons. Chaque carte est cliquable : elle ouvre la liste filtrée sur cet état.",action:"next"},
       {before:_navHome,sel:".tabs-bar",ic:"ti-layout-navbar",t:"Deux onglets",d:"\u00ab Mes appros \u00bb liste vos chantiers en cours. \u00ab Biblioth\u00e8que \u00bb sert \u00e0 r\u00e9utiliser une ancienne appro.",action:"next"},
       {before:_navHome,sel:".qa-primary",ic:"ti-plus",t:"Nouvelle appro",d:"Le bouton principal : il cr\u00e9e une feuille de chantier vierge.",action:"next"},
       {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherchez par chantier, client, N\u00b0 d'affaire\u2026 ou m\u00eame par le nom d'un article contenu dans l'appro.",action:"next"},
+      {before:_navHome,sel:"#btn-refresh",ic:"ti-refresh",t:"Mettre \u00e0 jour",d:"Ce bouton recharge les donn\u00e9es du serveur. L'appli le fait d\u00e9j\u00e0 toute seule quand vous y revenez.",action:"next"},
       {before:_navHome,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous pr\u00e9vient : appro pr\u00eate, demande trait\u00e9e, annonce de l'\u00e9quipe.",action:"next"},
       {before:_navHome,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
     ];
@@ -7523,7 +7772,11 @@ function _tourInSidebar(sel){
   // cible pas encore trouvée : on déduit des sélecteurs de menu connus
   return /#btn-|\.btn-new-sb|#srch|\.sb-/.test(sel);
 }
-function _tourIsMobile(){return window.innerWidth<900;}
+function _tourIsMobile(){
+  /* Doit correspondre EXACTEMENT au @media(max-width:768px) qui transforme
+     la sidebar en tiroir : sinon on ouvre/ferme un menu qui n'est pas un tiroir. */
+  try{return window.matchMedia("(max-width:768px)").matches;}catch(e){return window.innerWidth<=768;}
+}
 function _tourSyncSidebar(step){
   // sur mobile, ouvrir la sidebar quand la cible s'y trouve, la fermer sinon
   if(!_tourIsMobile())return;
@@ -7534,10 +7787,9 @@ function _tourSyncSidebar(step){
   }catch(e){}
   // la sidebar mobile est à z-index 1000 : on la remonte AU-DESSUS du voile du tuto
   var sb=document.getElementById("sidebar"),ov=document.getElementById("sb-overlay");
-  var ovOn=document.getElementById("tour-ov");
-  if(ovOn)ovOn.classList.toggle("tour-over-sb",inSb);
-  if(sb)sb.classList.toggle("tour-lift",inSb&&_tourIsMobile());
-  if(ov)ov.classList.toggle("tour-lift-ov",inSb&&_tourIsMobile());
+  var lift=inSb&&_tourIsMobile();
+  if(sb)sb.classList.toggle("tour-lift",lift);
+  if(ov)ov.classList.toggle("tour-lift-ov",lift);
 }
 function _tourShow(){
   _tourClearWaits();
