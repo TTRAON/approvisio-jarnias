@@ -1120,6 +1120,66 @@ table.at tr.kit-row td.td-d{position:relative}
 .td-ok{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#15803D;background:#F0FDF4;border-radius:9px;padding:7px 11px;margin-top:8px;font-weight:600}
 @media(max-width:640px){.td-wrap{padding:16px 12px 30px}.td-send{width:100%;justify-content:center}}
 
+/* ═══ CAMIONS — liste repliable + vue par état ═══ */
+.tv-tog{display:inline-flex;gap:3px;background:#F1F5F9;border-radius:11px;padding:3px;margin-bottom:12px}
+.tv-tb{display:inline-flex;align-items:center;gap:6px;border:none;background:none;font-family:inherit;font-size:12.5px;font-weight:700;color:#64748B;padding:8px 15px;border-radius:8px;cursor:pointer;transition:background .16s,color .16s,box-shadow .16s}
+.tv-tb:hover{color:#0F172A}
+.tv-tb.on{background:#fff;color:var(--accent,#6D28D9);box-shadow:0 2px 8px -3px rgba(15,23,42,.2)}
+.tv-list{background:#fff;border:1px solid #E8EDF4;border-radius:14px;overflow:hidden;box-shadow:0 4px 18px -14px rgba(15,23,42,.4)}
+.tv-item{border-bottom:1px solid #F1F5F9}
+.tv-item:last-child{border-bottom:none}
+.tv-row{display:flex;align-items:center;gap:10px;padding:0 13px;min-height:52px;cursor:pointer;transition:background .14s;position:relative}
+.tv-row:hover{background:#F8FAFC}
+.tv-row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tc,#94A3B8);opacity:0;transition:opacity .16s}
+.tv-item.open .tv-row::before{opacity:1}
+.tv-item.open .tv-row{background:#F8FAFC}
+.tv-dot{width:8px;height:8px;border-radius:50%;background:var(--tc,#94A3B8);flex-shrink:0}
+.tv-main{min-width:0;flex:1;display:flex;flex-direction:column;gap:1px}
+.tv-nm{font-size:13.5px;font-weight:700;color:#0F172A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tv-lent{color:#C2410C;font-weight:700;font-size:10.5px}
+.tv-sub{display:flex;align-items:center;gap:8px}
+.tv-pl{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#64748B;letter-spacing:.4px}
+.tv-ty{font-size:11px;color:#94A3B8}
+.tv-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tv-pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.tv-ch{background:#FEF3C7;color:#92400E}
+.tv-dp{background:#DBEAFE;color:#1E40AF}
+.tv-rv{background:#F3E8FF;color:#6B21A8}
+.tv-eq{font-size:11px;color:#94A3B8;font-weight:600;display:inline-flex;align-items:center;gap:3px}
+.tv-chev{color:#CBD5E1;font-size:16px;transition:transform .22s var(--ease)}
+.tv-item.open .tv-chev{transform:rotate(90deg);color:var(--accent,#6D28D9)}
+/* Repli : visibility:hidden en plus de max-height — sinon les commandes du dépli
+   restent « visibles » pour le tuto et le clavier alors qu'elles sont masquées. */
+.tv-body{max-height:0;overflow:hidden;visibility:hidden;background:#FBFCFE;transition:max-height .3s var(--ease),visibility 0s .3s}
+.tv-item.open .tv-body{max-height:420px;visibility:visible;transition:max-height .3s var(--ease),visibility 0s}
+.tv-d{padding:14px;border-top:1px solid #F1F5F9}
+.tv-dg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tv-f{display:flex;flex-direction:column;gap:4px}
+.tv-l{font-size:10.5px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:.4px}
+.tv-in{border:1px solid #E2E8F0;border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;background:#fff;width:100%;color:#0F172A}
+.tv-in:focus{outline:none;border-color:var(--accent,#6D28D9);box-shadow:0 0 0 3px rgba(109,40,217,.1)}
+.tv-in.plaque{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.5px}
+.tv-acts{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px;padding-top:11px;border-top:1px solid #EEF2F7;align-items:center}
+.tv-del{display:inline-flex;align-items:center;gap:5px;margin-left:auto;background:#fff;border:1px solid #FECACA;color:#DC2626;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .16s,transform .14s var(--ease)}
+.tv-del:hover{background:#FEF2F2;transform:translateY(-1px)}
+.tv-empty{text-align:center;padding:38px 16px;color:#94A3B8;font-size:13px;background:#fff;border:1px dashed #E2E8F0;border-radius:14px}
+.tv-empty i{font-size:30px;color:#CBD5E1;display:block;margin-bottom:8px}
+/* vue groupée */
+.tvg{margin-bottom:14px}
+.tvg-hd{display:flex;align-items:center;gap:9px;padding:11px 14px;border-radius:12px;font-size:13px;font-weight:800;margin-bottom:7px}
+.tvg-hd i{font-size:17px}
+.tvg-n{margin-left:auto;background:rgba(255,255,255,.72);border-radius:20px;padding:1px 9px;font-size:11.5px}
+.tvg-ch{background:linear-gradient(135deg,#FFF7ED,#FFEDD5);color:#9A3412;border:1px solid #FED7AA}
+.tvg-dp{background:linear-gradient(135deg,#EFF6FF,#DBEAFE);color:#1E40AF;border:1px solid #BFDBFE}
+.tvg-rv{background:linear-gradient(135deg,#FAF5FF,#F3E8FF);color:#6B21A8;border:1px solid #E9D5FF}
+.tvg-empty{padding:16px;text-align:center;color:#CBD5E1;font-size:12.5px;background:#fff;border:1px dashed #E8EDF4;border-radius:12px}
+@media(max-width:640px){
+  .tv-dg{grid-template-columns:1fr}
+  .tv-ty,.tv-eq{display:none}
+  .tv-row{padding:0 10px;gap:8px}
+  .tv-del{margin-left:0;width:100%;justify-content:center}
+}
+
 /* ═══ SÉLECTEUR DE CHANTIER ALOBEES ═══ */
 #alo-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:18px}
 .alo-modal{background:#fff;border-radius:18px;max-width:520px;width:100%;max-height:82vh;display:flex;flex-direction:column;box-shadow:0 24px 60px -12px rgba(15,23,42,.45);overflow:hidden}
@@ -5523,46 +5583,123 @@ function _truckMatch(t){var q=_stripAccents((window._truckSearch||"").toLowerCas
 function _truckSearchBar(){return "<div style=\"position:relative;margin-bottom:14px\"><i class=\"ti ti-search\" style=\"position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:15px\"></i><input id=\"truck-search\" value=\""+esc(window._truckSearch||"")+"\" oninput=\"setTruckSearch(this.value)\" placeholder=\"Rechercher un camion (nom, plaque, type)...\" style=\"width:100%;box-sizing:border-box;padding:9px 12px 9px 33px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;font-family:inherit\"/></div>";}
 function setTruckSearch(v){window._truckSearch=v;renderTrucksSettings();setTimeout(function(){var e=document.getElementById("truck-search");if(e){e.focus();try{e.setSelectionRange(e.value.length,e.value.length);}catch(x){}}},0);}
 function _truckTypeColor(ty){return ty==="Master"?"#7C3AED":(ty==="Trafic"?"#1D4ED8":(ty==="Camionnette"?"#0891B2":"#94A3B8"));}
+/* ═══ VUE CAMIONS ═══
+   Liste repliable (défaut) + bascule « Par état » pour voir d'un coup d'œil
+   ce qui est en révision / au dépôt / sur chantier.
+   Toutes les actions re-rendent l'écran : _tvOpen est gardé pour que la ligne
+   dépliée le reste après un changement. */
+var _tvView=(function(){try{return localStorage.getItem("appro_trucks_view")||"liste";}catch(e){return "liste";}})();
+var _tvOpen=null;
+function setTrucksView(v){
+  _tvView=v;_tvOpen=null;
+  try{localStorage.setItem("appro_trucks_view",v);}catch(e){}
+  renderTrucksSettings();
+}
+function tvTog(i){
+  _tvOpen=(_tvOpen===i)?null:i;
+  document.querySelectorAll(".tv-item").forEach(function(el){
+    el.classList.toggle("open",parseInt(el.getAttribute("data-i"),10)===_tvOpen);
+  });
+}
+function _tvEtatPill(t){
+  var e=t.etat||"chantier";
+  if(e==="depot")return "<span class=\"tv-pill tv-dp\"><i class=\"ti ti-building-warehouse\"></i> D\u00e9p\u00f4t</span>";
+  if(e==="revision")return "<span class=\"tv-pill tv-rv\"><i class=\"ti ti-tool\"></i> R\u00e9vision</span>";
+  return "<span class=\"tv-pill tv-ch\"><i class=\"ti ti-cone\"></i> Chantier</span>";
+}
+/* Le contenu du dépli réutilise les classes existantes (.etat-seg2, .tpret, .trev, .tequip) :
+   leur CSS et leurs fonctions restent inchangés. */
+function _tvDetail(t,ti,names){
+  var _TT=["Camionnette","Trafic","Master"];
+  var ch=(!t.etat||t.etat==="chantier"),d=t.etat==="depot",r=t.etat==="revision";
+  var _rvs=_revStatus(t.nextRevision);
+  var nEquip=(t.items?t.items.length:0);
+  var topts="<option value=\"\">Type\u2026</option>";
+  _TT.forEach(function(x){topts+="<option value=\""+x+"\""+(t.type===x?" selected":"")+">"+x+"</option>";});
+  var h="<div class=\"tv-d\">";
+  h+="<div class=\"tv-dg\">";
+  h+="<div class=\"tv-f\"><span class=\"tv-l\">Team Leader</span><input class=\"tv-in\" value=\""+esc(t.tl||"")+"\" onchange=\"setTruckTl("+ti+",this.value)\" placeholder=\"Team Leader\"/></div>";
+  h+="<div class=\"tv-f\"><span class=\"tv-l\">Plaque</span><input class=\"tv-in plaque\" value=\""+esc(t.plaque||"")+"\" onchange=\"setTruckPlaque("+ti+",this.value)\" placeholder=\"AB-123-CD\"/></div>";
+  h+="<div class=\"tv-f\"><span class=\"tv-l\">Type</span><select class=\"tv-in\" style=\"cursor:pointer\" onchange=\"setTruckType("+ti+",this.value)\">"+topts+"</select></div>";
+  h+="<div class=\"tv-f\"><span class=\"tv-l\">\u00c9tat</span><div class=\"etat-seg2\">";
+  h+="<button class=\"etat-b"+(ch?" on-ch":"")+"\" onclick=\"setTruckEtat("+ti+",'chantier')\"><i class=\"ti ti-cone\"></i> Chantier</button>";
+  h+="<button class=\"etat-b"+(d?" on-dp":"")+"\" onclick=\"setTruckEtat("+ti+",'depot')\"><i class=\"ti ti-building-warehouse\"></i> D\u00e9p\u00f4t</button>";
+  h+="<button class=\"etat-b"+(r?" on-rv":"")+"\" onclick=\"setTruckEtat("+ti+",'revision')\"><i class=\"ti ti-tool\"></i> R\u00e9v.</button>";
+  h+="</div></div>";
+  h+="</div>";
+  if(t.pret&&t.pret.to){
+    h+="<div class=\"tpret lent\"><i class=\"ti ti-arrows-exchange\"></i> Pr\u00eat\u00e9 \u00e0 "+esc(t.pret.to)+"<button class=\"tpret-btn tpret-back\" onclick=\"endPret("+ti+")\"><i class=\"ti ti-arrow-back-up\"></i> R\u00e9cup\u00e9rer</button></div>";
+  } else {
+    var opts="<option value=\"\">Pr\u00eater \u00e0\u2026</option>";
+    names.forEach(function(nm){if(nm!==t.tl)opts+="<option value=\""+esc(nm)+"\">"+esc(nm)+"</option>";});
+    h+="<div class=\"tpret athome\"><i class=\"ti ti-user-check\"></i> Chez le titulaire<select onchange=\"quickLend("+ti+",this.value)\" class=\"tpret-btn tpret-lend\" style=\"cursor:pointer\">"+opts+"</select></div>";
+  }
+  h+="<div class=\"tv-acts\">";
+  h+="<button class=\"trev\" style=\"background:"+_rvs.bg+";color:"+_rvs.c+"\" onclick=\"openTruckRevision("+ti+")\"><i class=\"ti "+_rvs.ic+"\"></i> R\u00e9vision : "+_rvs.label+"</button>";
+  h+="<button class=\"tequip\" onclick=\"openTruckEquip("+ti+")\"><i class=\"ti ti-package\"></i> \u00c9quipement ("+nEquip+")</button>";
+  h+="<button class=\"tv-del\" onclick=\"delTruck("+ti+")\"><i class=\"ti ti-trash\"></i> Supprimer</button>";
+  h+="</div></div>";
+  return h;
+}
+function _tvRow(t,ti,names){
+  var _rvs=_revStatus(t.nextRevision);
+  var nEquip=(t.items?t.items.length:0);
+  var loaned=t.pret&&t.pret.to;
+  var h="<div class=\"tv-item"+(_tvOpen===ti?" open":"")+"\" data-i=\""+ti+"\" style=\"--tc:"+_truckTypeColor(t.type)+"\">";
+  h+="<div class=\"tv-row\" onclick=\"tvTog("+ti+")\">";
+  h+="<span class=\"tv-dot\"></span>";
+  h+="<span class=\"tv-main\">";
+  h+="<span class=\"tv-nm\">"+esc(t.tl||"Sans nom")+(loaned?"<span class=\"tv-lent\"> \u00b7 pr\u00eat\u00e9 \u00e0 "+esc(t.pret.to)+"</span>":"")+"</span>";
+  h+="<span class=\"tv-sub\"><span class=\"tv-pl\">"+(t.plaque?esc(t.plaque):"pas de plaque")+"</span>"+(t.type?"<span class=\"tv-ty\">"+esc(t.type)+"</span>":"")+"</span>";
+  h+="</span>";
+  h+="<span class=\"tv-right\">";
+  h+=_tvEtatPill(t);
+  h+="<span class=\"tv-pill\" style=\"background:"+_rvs.bg+";color:"+_rvs.c+"\" title=\"R\u00e9vision : "+_rvs.label+"\"><i class=\"ti "+_rvs.ic+"\"></i> "+_rvs.short+"</span>";
+  h+="<span class=\"tv-eq\"><i class=\"ti ti-package\"></i> "+nEquip+"</span>";
+  h+="<i class=\"ti ti-chevron-right tv-chev\"></i>";
+  h+="</span></div>";
+  h+="<div class=\"tv-body\">"+_tvDetail(t,ti,names)+"</div>";
+  h+="</div>";
+  return h;
+}
+function _tvToggleBar(){
+  var h="<div class=\"tv-tog\">";
+  h+="<button class=\"tv-tb"+(_tvView==="liste"?" on":"")+"\" onclick=\"setTrucksView('liste')\"><i class=\"ti ti-list\"></i> Liste</button>";
+  h+="<button class=\"tv-tb"+(_tvView==="etat"?" on":"")+"\" onclick=\"setTrucksView('etat')\"><i class=\"ti ti-layout-list\"></i> Par \u00e9tat</button>";
+  h+="</div>";
+  return h;
+}
 function trucksGrid(){
   if(!TRUCKS.length)return "";
   var names=_allAssignNames();
-  var _TT=["Camionnette","Trafic","Master"];
-  var shown=0;
-  var h="<div class=\"trucks-grid stagger\">";
-  TRUCKS.forEach(function(t,ti){
-    if(!_truckMatch(t))return;
-    shown++;
-    var loaned=t.pret&&t.pret.to;
-    var ch=(!t.etat||t.etat==="chantier"),d=t.etat==="depot",r=t.etat==="revision";
-    var _rvs=_revStatus(t.nextRevision);
-    var topts="<option value=\"\">Type\u2026</option>";_TT.forEach(function(x){topts+="<option value=\""+x+"\""+(t.type===x?" selected":"")+">"+x+"</option>";});
-    var nEquip=(t.items?t.items.length:0);
-    h+="<div class=\"tcard\" style=\"--tc:"+_truckTypeColor(t.type)+"\">";
-    // header : nom éditable + suppr
-    h+="<div class=\"tcard-hd\"><div class=\"tcard-tl\"><div class=\"tcard-ava\"><i class=\"ti ti-truck\"></i></div><div style=\"min-width:0;flex:1\"><input class=\"tcard-name-in\" value=\""+esc(t.tl||"")+"\" onchange=\"setTruckTl("+ti+",this.value)\" placeholder=\"Team Leader\"/><div class=\"tcard-sub\">"+(t.type?esc(t.type):"Type non d\u00e9fini")+"</div></div></div><button class=\"tcard-del\" onclick=\"delTruck("+ti+")\" title=\"Supprimer le camion\"><i class=\"ti ti-trash\" style=\"font-size:16px\"></i></button></div>";
-    // type + plaque
-    h+="<div class=\"tcard-row\"><span class=\"tcard-row-l\">Type</span><select class=\"tcard-in\" style=\"cursor:pointer\" onchange=\"setTruckType("+ti+",this.value)\">"+topts+"</select></div>";
-    h+="<div class=\"tcard-row\"><span class=\"tcard-row-l\">Plaque</span><input class=\"tcard-in plaque\" value=\""+esc(t.plaque||"")+"\" onchange=\"setTruckPlaque("+ti+",this.value)\" placeholder=\"AB-123-CD\"/></div>";
-    // état segmenté
-    h+="<div class=\"tcard-row\"><span class=\"tcard-row-l\">\u00c9tat</span><div class=\"etat-seg2\">";
-    h+="<button class=\"etat-b"+(ch?" on-ch":"")+"\" onclick=\"setTruckEtat("+ti+",'chantier')\"><i class=\"ti ti-cone\"></i> Chantier</button>";
-    h+="<button class=\"etat-b"+(d?" on-dp":"")+"\" onclick=\"setTruckEtat("+ti+",'depot')\"><i class=\"ti ti-building-warehouse\"></i> D\u00e9p\u00f4t</button>";
-    h+="<button class=\"etat-b"+(r?" on-rv":"")+"\" onclick=\"setTruckEtat("+ti+",'revision')\"><i class=\"ti ti-tool\"></i> R\u00e9v.</button>";
-    h+="</div></div>";
-    // prêt
-    if(loaned){
-      h+="<div class=\"tpret lent\"><i class=\"ti ti-arrows-exchange\"></i> Pr\u00eat\u00e9 \u00e0 "+esc(t.pret.to)+"<button class=\"tpret-btn tpret-back\" onclick=\"endPret("+ti+")\"><i class=\"ti ti-arrow-back-up\"></i> R\u00e9cup\u00e9rer</button></div>";
-    } else {
-      var opts="<option value=\"\">Pr\u00eater \u00e0\u2026</option>";names.forEach(function(nm){if(nm!==t.tl)opts+="<option value=\""+esc(nm)+"\">"+esc(nm)+"</option>";});
-      h+="<div class=\"tpret athome\"><i class=\"ti ti-user-check\"></i> Chez le titulaire<select onchange=\"quickLend("+ti+",this.value)\" class=\"tpret-btn tpret-lend\" style=\"cursor:pointer\">"+opts+"</select></div>";
-    }
-    // pied : révision + équipement
-    h+="<div class=\"tcard-foot\"><button class=\"trev\" style=\"background:"+_rvs.bg+";color:"+_rvs.c+"\" onclick=\"openTruckRevision("+ti+")\" title=\"R\u00e9vision : "+_rvs.label+"\"><i class=\"ti "+_rvs.ic+"\"></i> "+_rvs.short+"</button>";
-    h+="<button class=\"tequip\" onclick=\"openTruckEquip("+ti+")\"><i class=\"ti ti-package\"></i> \u00c9quipement ("+nEquip+")</button></div>";
-    h+="</div>";
-  });
+  var vis=[];
+  TRUCKS.forEach(function(t,ti){if(_truckMatch(t))vis.push({t:t,i:ti});});
+  var h=_tvToggleBar();
+  if(!vis.length)return h+"<div class=\"tv-empty\"><i class=\"ti ti-search-off\"></i><div>Aucun camion ne correspond \u00e0 la recherche</div></div>";
+
+  if(_tvView==="etat"){
+    var GR=[
+      {k:"revision",t:"En r\u00e9vision",ic:"ti-tool",c:"tvg-rv"},
+      {k:"depot",t:"Au d\u00e9p\u00f4t",ic:"ti-building-warehouse",c:"tvg-dp"},
+      {k:"chantier",t:"Sur chantier",ic:"ti-cone",c:"tvg-ch"}
+    ];
+    GR.forEach(function(g){
+      var list=vis.filter(function(x){return (x.t.etat||"chantier")===g.k;});
+      h+="<div class=\"tvg\">";
+      h+="<div class=\"tvg-hd "+g.c+"\"><i class=\"ti "+g.ic+"\"></i> "+g.t+"<span class=\"tvg-n\">"+list.length+"</span></div>";
+      if(!list.length){h+="<div class=\"tvg-empty\">Aucun camion</div>";}
+      else{
+        h+="<div class=\"tv-list stagger\">";
+        list.forEach(function(x){h+=_tvRow(x.t,x.i,names);});
+        h+="</div>";
+      }
+      h+="</div>";
+    });
+    return h;
+  }
+  h+="<div class=\"tv-list stagger\">";
+  vis.forEach(function(x){h+=_tvRow(x.t,x.i,names);});
   h+="</div>";
-  if(!shown)return "<div style=\"text-align:center;padding:40px;color:#94A3B8;font-size:14px\"><i class=\"ti ti-search-off\" style=\"font-size:32px\"></i><div style=\"margin-top:8px\">Aucun camion ne correspond \u00e0 la recherche</div></div>";
   return h;
 }
 function openTruckEquip(ti){
@@ -7515,7 +7652,17 @@ function _navBiblio(){_tutoEnsure(".lib-card,.lib-empty,.lib-wrap",function(){re
 function _navDepot(){_tutoEnsure(".depot-col-hd",function(){renderDepot();});}
 function _navCmd(){_tutoEnsure("#cmd-prod",function(){renderCommandes();});}
 function _navTickets(){_tutoEnsure(".tk-wrap",function(){_renderTicketsView();});}
-function _navTrucks(){_tutoEnsure(".tcard",function(){renderTrucksSettings();});}
+function _navTrucks(){_tutoEnsure(".tv-row",function(){renderTrucksSettings();});}
+/* Les r\u00e9glages d'un camion vivent dans le dépli : sans l'ouvrir, l'\u00e9tape
+   surlignerait un \u00e9l\u00e9ment masqu\u00e9 (et l'utilisateur ne pourrait pas l'ouvrir,
+   l'overlay bloquant les clics). */
+function _navTruckOpen(){
+  _navTrucks();
+  try{
+    var first=document.querySelector(".tv-item");
+    if(first&&!first.classList.contains("open"))tvTog(parseInt(first.getAttribute("data-i"),10));
+  }catch(e){}
+}
 function _navAnnonces(){_tutoEnsure(".ann-wrap",function(){renderAnnonces();});}
 function _navTerrain(){_tutoEnsure(".td-wrap",function(){renderTerrainDemande();});}
 function _navReglages(){_tutoEnsure("#cat-grid",function(){renderUISettings();});}
@@ -7642,14 +7789,16 @@ var TUTO_MODULES={
 
   camions:{titre:"Les camions",ic:"ti-truck",roles:["depot"],etapes:function(){
     return [
-      {sel:"#btn-trucks",ic:"ti-truck",t:"Gestion des camions",d:"L'état de la flotte, en un écran.",action:"click"},
-      {before:_navTrucks,sel:"#truck-search",ic:"ti-search",t:"Retrouver un camion",d:"Par nom, plaque, ou team leader attitré.",action:"next"},
-      {before:_navTrucks,sel:".tcard",ic:"ti-id",t:"Une fiche camion",d:"Nom, plaque, team leader. Tout est modifiable directement dans la carte.",action:"next"},
-      {before:_navTrucks,sel:".etat-seg2",ic:"ti-cone",t:"Où est-il ?",d:"Sur chantier, au dépôt, ou en révision. Trois états, un clic.",action:"next"},
-      {before:_navTrucks,sel:".tpret",ic:"ti-user-check",t:"Prêter un camion",d:"Un camion peut être prêté à un autre team leader. L'appli garde la trace du prêt.",action:"next"},
-      {before:_navTrucks,sel:".trev",ic:"ti-calendar-off",t:"La révision",d:"Renseignez la prochaine révision : une pastille vous alerte quand la date approche.",action:"next"},
-      {before:_navTrucks,sel:".tequip",ic:"ti-package",t:"L'équipement embarqué",d:"La liste du matériel qui reste dans le camion. Pratique avant de partir sur un chantier.",action:"next"},
-      {before:_navTrucks,sel:"#btn-imp-trucks",ic:"ti-file-import",t:"Import Excel",d:"Vous pouvez importer toute la flotte depuis un fichier, plutôt que la saisir à la main.",action:"next"}
+      {sel:"#btn-trucks",ic:"ti-truck",t:"Gestion des camions",d:"L'\u00e9tat de la flotte, en un \u00e9cran.",action:"click"},
+      {before:_navTrucks,sel:"#truck-search",ic:"ti-search",t:"Retrouver un camion",d:"Par nom, plaque, ou type de v\u00e9hicule.",action:"next"},
+      {before:_navTrucks,sel:".tv-tog",ic:"ti-layout-list",t:"Deux fa\u00e7ons de regarder",d:"\u00ab Liste \u00bb pour tout voir d'un bloc. \u00ab Par \u00e9tat \u00bb regroupe les camions en r\u00e9vision, au d\u00e9p\u00f4t et sur chantier.",action:"next"},
+      {before:_navTrucks,sel:".tv-row",ic:"ti-id",t:"Une ligne = un camion",d:"Team leader, plaque, \u00e9tat, r\u00e9vision et nombre d'\u00e9quipements, sans rien ouvrir.",action:"next"},
+      {before:_navTrucks,sel:".tv-chev",ic:"ti-chevron-right",t:"D\u00e9plier pour modifier",d:"Un clic sur la ligne ouvre les r\u00e9glages du camion. Un second la referme.",action:"next"},
+      {before:_navTruckOpen,sel:".etat-seg2",ic:"ti-cone",t:"O\u00f9 est-il ?",d:"Sur chantier, au d\u00e9p\u00f4t, ou en r\u00e9vision. Trois \u00e9tats, un clic.",action:"next"},
+      {before:_navTruckOpen,sel:".tpret",ic:"ti-user-check",t:"Pr\u00eater un camion",d:"Un camion peut \u00eatre pr\u00eat\u00e9 \u00e0 un autre team leader. L'appli garde la trace du pr\u00eat.",action:"next"},
+      {before:_navTruckOpen,sel:".trev",ic:"ti-calendar-off",t:"La r\u00e9vision",d:"Renseignez la prochaine r\u00e9vision : une pastille vous alerte quand la date approche.",action:"next"},
+      {before:_navTruckOpen,sel:".tequip",ic:"ti-package",t:"L'\u00e9quipement embarqu\u00e9",d:"La liste du mat\u00e9riel qui reste dans le camion. Pratique avant de partir sur un chantier.",action:"next"},
+      {before:_navTrucks,sel:"#btn-imp-trucks",ic:"ti-file-import",t:"Import Excel",d:"Vous pouvez importer toute la flotte depuis un fichier, plut\u00f4t que la saisir \u00e0 la main.",action:"next"}
     ];
   }},
 
