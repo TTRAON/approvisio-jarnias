@@ -499,25 +499,27 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
   .depot-wrap{flex-direction:column;padding:14px;gap:18px}
   .at thead{display:none}
   .at,.at tbody{display:block;width:100%}
-  .at tr{display:flex;flex-wrap:wrap;align-items:center;width:100%;margin-bottom:9px;border:1px solid #E2E8F0;border-left:4px solid var(--sec,#E2E8F0);border-radius:10px;padding:9px 11px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+  .at tr{display:flex;flex-wrap:wrap;align-items:center;width:100%;margin-bottom:6px;border:1px solid #E2E8F0;border-left:4px solid var(--sec,#E2E8F0);border-radius:10px;padding:7px 9px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
   .at td{border:none!important;padding:0}
   .at td::before{content:attr(data-label);font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:2px}
-  .at td.td-d{flex:0 0 100%;border-left:none!important;padding-bottom:7px}
+  .at td.td-d{flex:0 0 100%;border-left:none!important;padding-bottom:4px}
   .at td.td-d::before{display:none}
-  .at td.td-d .cin{font-size:16px;font-weight:700;color:#0F172A;width:100%;padding:1px 0;border:none;background:none}
-  .at td.td-q{flex:0 0 64px;margin-right:10px}
-  .at td.td-av{flex:1 1 auto}
-  .at td.td-q .cin{width:100%;font-size:13px;padding:5px;border:1px solid #E2E8F0;border-radius:6px;background:#fff}
-  .at td.td-av .csel{width:100%;font-size:12px;padding:5px;border:1px solid #E2E8F0;border-radius:6px;background:#fff}
-  .at td.td-c{flex:0 0 100%;display:none;margin-top:8px}
+  .at td.td-d .cin{font-size:15px;font-weight:700;color:#0F172A;width:100%;padding:0;border:none;background:none;line-height:1.35}
+  .at td.td-q{flex:0 0 50px;margin-right:6px}
+  .at td.td-av{flex:1 1 78px;min-width:78px}
+  .at td.td-q .cin{width:100%;font-size:12.5px;padding:4px 3px;border:1px solid #E2E8F0;border-radius:6px;background:#fff}
+  .at td.td-av .csel{width:100%;font-size:11.5px;padding:4px 3px;border:1px solid #E2E8F0;border-radius:6px;background:#fff}
+  .at td.td-c{flex:0 0 100%;display:none;margin-top:6px}
   .at tr.show-c td.td-c{display:block}
   .at td.td-c::before{display:none}
   .at td.td-c .cin{width:100%;font-size:13px;padding:7px;border:1px solid #E2E8F0;border-radius:6px;background:#fff}
-  .at td.cact{display:inline-flex;flex:0 0 auto;width:auto;padding:0;margin-top:9px;margin-right:8px}
+  /* Les actions occupaient une 3e ligne à elles seules : on les remonte à côté de Qté/Dispo.
+     Une fourniture passe de 3 lignes à 2 — sur une appro de 50 articles, ça change tout. */
+  .at td.cact{display:inline-flex;flex:0 0 auto;width:auto;padding:0;margin-top:0;margin-right:3px;align-items:center}
   .at td.cact::before{display:none}
   .at td.cmt-cell{display:inline-flex;margin-left:auto}
-  .at td.cmt-cell .btn-cmt{padding:6px 9px}
-  .at td.cact .btn-ret,.at td.cact .btn-del{padding:6px 9px}
+  .at td.cmt-cell .btn-cmt{padding:5px 7px}
+  .at td.cact .btn-ret,.at td.cact .btn-del{padding:5px 7px}
   .tbl-wrap{overflow:visible}
 }
 /* ============================================================
@@ -746,7 +748,14 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
 /* ============================================================
    TUTO INTERACTIF — accueil plein écran + bulles guidées
    ============================================================ */
-.tour-ov{position:fixed;inset:0;z-index:6000;display:none;pointer-events:none}
+/* PAS de z-index ici, VOLONTAIREMENT.
+   Un z-index sur un élément positionné crée un CONTEXTE D'EMPILEMENT : les enfants
+   (.tour-mask 6100, .tour-hole 6110, .tour-bubble 6120) ne s'ordonneraient qu'entre eux,
+   et tout le tuto ne vaudrait que 6000 face au reste de la page. La sidebar mobile
+   (.tour-lift, 6105) passerait alors AU-DESSUS de l'anneau ET de la bulle.
+   Sans z-index (auto), aucun contexte n'est créé : les enfants s'empilent globalement
+   et la sidebar peut s'insérer entre les masques et l'anneau, comme voulu. */
+.tour-ov{position:fixed;inset:0;display:none;pointer-events:none}
 .tour-ov.on{display:block}
 .tour-ov>*{pointer-events:auto}
 .tour-ov>.tour-hole{pointer-events:none}
@@ -1233,6 +1242,13 @@ table.at tr.kit-row td.td-d{position:relative}
 .ma-chip b{background:#F1F5F9;color:#334155;border-radius:20px;padding:0 7px;font-size:11px}
 .ma-chip:hover{transform:translateY(-1px)}
 .ma-chip.on{background:var(--accent,#6D28D9);border-color:transparent;color:#fff}
+/* « Rendu au d\u00e9p\u00f4t » : m\u00eame ambre que le badge de statut, pour faire le lien. */
+.ma-chip-rd{border-color:#FDE9C8;color:#B45309}
+.ma-chip-rd i{color:#D97706}
+.ma-chip-rd b{background:#FEF3C7;color:#92400E}
+.ma-chip-rd.on{background:#D97706;border-color:transparent;color:#fff}
+.ma-chip-rd.on i{color:#fff}
+.ma-chip-rd.on b{background:rgba(255,255,255,.24);color:#fff}
 .ma-chip.on b{background:rgba(255,255,255,.22);color:#fff}
 .ma-grid{display:grid;grid-template-columns:1fr;gap:11px;margin-top:16px}
 @media(min-width:820px){.ma-grid{grid-template-columns:1fr 1fr}}
@@ -3418,7 +3434,11 @@ function _maMine(){
     return [s.conducteur,s.chargeAffaires,s.tlName].some(function(n){return _normEq(n||"")===me;});
   });
 }
-function _maEnCours(s){return !s.draft&&s.statut!=="sortie";}
+/* « En cours » = ce sur quoi le conducteur a encore la main.
+   Une appro RENDUE attend le d\u00e9p\u00f4t : elle a son propre filtre, pour ne pas
+   polluer la vue du conducteur. */
+function _maEnCours(s){return !s.draft&&s.statut!=="sortie"&&s.statut!=="rendu";}
+function _maRendu(s){return !s.draft&&s.statut==="rendu";}
 /* Ouvre la page « Mes appros » filtrée sur un état précis (raccourci des cartes d'accueil). */
 function goMaStatut(f){
   if(typeof closeSidebar==="function")closeSidebar();
@@ -3434,9 +3454,11 @@ function renderMesAppros(){
   var m=document.getElementById("main-area");
   var mine=_maMine();
   var cours=mine.filter(_maEnCours);
+  var rendus=mine.filter(_maRendu);
   var brouillons=mine.filter(function(s){return s.draft;});
   var list;
-  if(_maFilter==="brouillons")list=brouillons;
+  if(_maFilter==="rendu")list=rendus;
+  else if(_maFilter==="brouillons")list=brouillons;
   else if(_maFilter==="toutes")list=mine.filter(function(s){return s.statut!=="sortie";});
   else if(_maFilter==="preparation")list=cours.filter(function(s){return s.statut==="en_attente";});
   else if(_maFilter==="prete")list=cours.filter(function(s){return s.statut==="prete";});
@@ -3456,12 +3478,14 @@ function renderMesAppros(){
   h+="<button class=\"ma-chip liv"+(_maFilter==="preparation"?" on":"")+"\" onclick=\"setMaFilter('preparation')\"><i class=\"ti ti-clock\"></i> En préparation <b>"+nPrep+"</b></button>";
   h+="<button class=\"ma-chip liv"+(_maFilter==="prete"?" on":"")+"\" onclick=\"setMaFilter('prete')\"><i class=\"ti ti-package\"></i> Prêtes <b>"+nPr+"</b></button>";
   h+="<button class=\"ma-chip liv"+(_maFilter==="chantier"?" on":"")+"\" onclick=\"setMaFilter('chantier')\"><i class=\"ti ti-tool\"></i> Sur chantier <b>"+nCh+"</b></button>";
+  h+="<button class=\"ma-chip liv ma-chip-rd"+(_maFilter==="rendu"?" on":"")+"\" onclick=\"setMaFilter('rendu')\"><i class=\"ti ti-package-import\"></i> Rendu au d\u00e9p\u00f4t <b>"+rendus.length+"</b></button>";
   h+="<button class=\"ma-chip liv"+(_maFilter==="brouillons"?" on":"")+"\" onclick=\"setMaFilter('brouillons')\"><i class=\"ti ti-file-pencil\"></i> Brouillons <b>"+brouillons.length+"</b></button>";
   h+="<button class=\"ma-chip liv"+(_maFilter==="toutes"?" on":"")+"\" onclick=\"setMaFilter('toutes')\"><i class=\"ti ti-list\"></i> Toutes <b>"+mine.filter(function(s){return s.statut!=="sortie";}).length+"</b></button>";
   h+="</div>";
 
   if(!list.length){
-    var msg=(_maFilter==="brouillons")?["Aucun brouillon","Vos appros non envoy\u00e9es en production appara\u00eetront ici."]
+    var msg=(_maFilter==="rendu")?["Aucun rendu en attente","Les appros rendues attendent que le d\u00e9p\u00f4t traite le retour du mat\u00e9riel."]
+          :(_maFilter==="brouillons")?["Aucun brouillon","Vos appros non envoy\u00e9es en production appara\u00eetront ici."]
           :(_maFilter==="toutes")?["Aucune appro","Cr\u00e9ez votre premi\u00e8re appro depuis le bouton \u00ab Nouvelle appro \u00bb."]
           :(_maFilter==="preparation")?["Aucune appro en pr\u00e9paration","Les appros envoy\u00e9es au d\u00e9p\u00f4t mais pas encore pr\u00eates appara\u00eetront ici."]
           :(_maFilter==="prete")?["Aucune appro pr\u00eate","Les appros pr\u00eates au d\u00e9p\u00f4t appara\u00eetront ici."]
@@ -6759,15 +6783,27 @@ document.addEventListener("click",function(e){
   if(pop&&!e.target.closest("#amb-btn-wrap")&&!e.target.closest("#amb-pop"))pop.remove();
 });
 if(document.readyState!=="loading")updateThemeBtn();else document.addEventListener("DOMContentLoaded",updateThemeBtn);
-function setViewMode(mode){
+function setViewMode(mode,persist){
   window._viewMode=mode;
-  try{localStorage.setItem("appro_vm",mode);}catch(e){}
+  /* persist===false : on applique un d\u00e9faut, ce n'est PAS un choix de l'utilisateur.
+     L'enregistrer figerait le d\u00e9faut du 1er appareil ouvert (ex. \u00ab full \u00bb sur ordinateur)
+     et le d\u00e9faut mobile ne s'appliquerait plus jamais. */
+  if(persist!==false){try{localStorage.setItem("appro_vm",mode);}catch(e){}}
   document.body.classList.remove("vm-full","vm-hybrid","vm-compact");
   document.body.classList.add("vm-"+mode);
   var seg=document.getElementById("vm-seg");
   if(seg){[].forEach.call(seg.querySelectorAll(".vm-b"),function(b){b.classList.toggle("active",b.getAttribute("data-vm")===mode);});}
 }
-function applyViewMode(){try{localStorage.removeItem("appro_vm");}catch(e){}setViewMode("full");}
+function applyViewMode(){
+  /* Avant : removeItem + setViewMode("full") — la préférence était effacée à CHAQUE chargement,
+     le choix de l'utilisateur ne tenait jamais. On la relit maintenant.
+     Sur téléphone, on démarre en « hybride » : sur une longue appro, le mode décompressé
+     oblige à faire défiler très longtemps. */
+  var saved=null;
+  try{saved=localStorage.getItem("appro_vm");}catch(e){}
+  var mob=false;try{mob=window.matchMedia("(max-width:768px)").matches;}catch(e){}
+  setViewMode(saved||(mob?"hybrid":"full"),!!saved);
+}
 if(document.readyState!=="loading")applyViewMode();else document.addEventListener("DOMContentLoaded",applyViewMode);
 function viewModeSeg(){
   var vm=window._viewMode||"full";
