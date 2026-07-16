@@ -1350,6 +1350,33 @@ table.at tr.kit-row td.td-d{position:relative}
 .cp-fab .cp-fab-t{display:inline}
 @media(max-width:640px){.cp-fab{right:14px;bottom:16px;padding:14px;border-radius:50%}.cp-fab .cp-fab-t{display:none}}
 @media print{.cp-fab{display:none!important}}
+/* ═══ Scanner QR intégré ═══ */
+.scan-fab{position:fixed;left:20px;bottom:22px;z-index:850;display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,#0F172A,#334155);color:#fff;border:none;border-radius:30px;padding:14px 20px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 12px 30px -8px rgba(15,23,42,.6);transition:transform .16s var(--ease),box-shadow .2s}
+.scan-fab i{font-size:19px}
+.scan-fab:hover{transform:translateY(-3px);box-shadow:0 18px 38px -10px rgba(15,23,42,.7)}
+.scan-fab:active{transform:scale(.96)}
+.scan-fab .scan-fab-t{display:inline}
+@media(max-width:640px){.scan-fab{left:14px;bottom:16px;padding:14px;border-radius:50%}.scan-fab .scan-fab-t{display:none}}
+@media print{.scan-fab{display:none!important}}
+.scan-ov{position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column}
+.scan-video{flex:1;width:100%;height:100%;object-fit:cover}
+.scan-top{position:absolute;top:0;left:0;right:0;padding:calc(16px + env(safe-area-inset-top)) 18px 16px;background:linear-gradient(180deg,rgba(0,0,0,.6),transparent);display:flex;align-items:center;justify-content:space-between;z-index:2}
+.scan-top .t{color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.scan-close{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px}
+.scan-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(66vw,260px);height:min(66vw,260px);z-index:2;pointer-events:none}
+.scan-frame::before,.scan-frame::after,.scan-frame>i::before,.scan-frame>i::after{content:"";position:absolute;width:34px;height:34px;border:4px solid #fff;border-radius:3px}
+.scan-frame::before{top:0;left:0;border-right:none;border-bottom:none}
+.scan-frame::after{top:0;right:0;border-left:none;border-bottom:none}
+.scan-frame>i::before{bottom:0;left:0;border-right:none;border-top:none}
+.scan-frame>i::after{bottom:0;right:0;border-left:none;border-top:none}
+.scan-laser{position:absolute;left:6px;right:6px;height:2px;background:linear-gradient(90deg,transparent,#4ADE80,transparent);top:0;animation:scanLaser 2s ease-in-out infinite}
+@keyframes scanLaser{0%,100%{top:6px}50%{top:calc(100% - 8px)}}
+.scan-hint{position:absolute;left:0;right:0;bottom:calc(40px + env(safe-area-inset-bottom));text-align:center;color:#fff;font-size:14px;z-index:2;padding:0 30px;text-shadow:0 1px 4px rgba(0,0,0,.7)}
+.scan-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#fff;text-align:center;padding:30px;z-index:3;background:rgba(0,0,0,.85)}
+.scan-msg i{font-size:44px;color:#F87171}
+.scan-msg .st{font-size:17px;font-weight:700}
+.scan-msg .sd{font-size:13.5px;color:#CBD5E1;line-height:1.5;max-width:320px}
+.scan-msg button{margin-top:6px;background:#6D28D9;color:#fff;border:none;border-radius:11px;padding:12px 22px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
 .cp-lay-compact .cp-row{padding:4px 9px;gap:7px}
 .cp-lay-compact .cp-row-n{font-size:12px}
 .cp-lay-compact .cp-qty{width:42px;padding:2px}
@@ -3225,6 +3252,7 @@ function depotItemsPreview(s){
   return h;
 }
 function renderDepot(){
+  if(typeof _mountScanFab==="function")_mountScanFab();
   if(typeof _unmountCpFab==="function")_unmountCpFab();
   if(typeof closeSidebar==="function")closeSidebar();
   if(typeof renderDeadlineBanner==="function")renderDeadlineBanner();
@@ -3459,6 +3487,7 @@ function goMaStatut(f){
   renderMesAppros();
 }
 function renderMesAppros(){
+  if(typeof _mountScanFab==="function")_mountScanFab();
   try{setActiveNav("btn-home");}catch(e){}
   if(typeof _unmountCpFab==="function")_unmountCpFab();
   if(typeof _unmountNextBar==="function")_unmountNextBar();
@@ -3552,6 +3581,7 @@ function previewItems(s){
 }
 
 function renderLibrary(){
+  if(typeof _mountScanFab==="function")_mountScanFab();
   if(typeof _unmountCpFab==="function")_unmountCpFab();
   cur=null;
   var q=_stripAccents(libSearch.toLowerCase());
@@ -3825,6 +3855,7 @@ function _isMineSheet(s){
   return noms.some(function(n){return _stripAccents((n||"").toLowerCase())===meN;});
 }
 function renderWelcome(){
+  if(typeof _mountScanFab==="function")_mountScanFab();
   /* L'accueil ne sert pas au chef d\u00e9p\u00f4t : son \u00e9cran de travail, c'est la vue d\u00e9p\u00f4t. */
   if(currentRole==="depot"&&typeof renderDepot==="function"){renderDepot();return;}
   if(typeof _unmountCpFab==="function")_unmountCpFab();
@@ -4106,6 +4137,132 @@ function _unmountCpFab(){
   /* Le panneau catalogue n'a de sens que sur une appro : on le referme en quittant l'\u00e9cran. */
   try{var pn=document.getElementById("cp-panel");if(pn&&pn.classList.contains("open")&&typeof hideCp==="function")hideCp();}catch(e){}
 }
+/* ═══ Scanner QR intégré (tous rôles) — reste dans l'app, ouvre l'appro scannée ═══ */
+var _scanStream=null,_scanRAF=null,_scanDetector=null,_scanActive=false;
+function _mountScanFab(){
+  var b=document.getElementById("scan-fab");
+  if(!b){b=document.createElement("button");b.id="scan-fab";b.className="scan-fab liv";b.title="Scanner une appro";
+    b.innerHTML="<i class=\"ti ti-qrcode\"></i><span class=\"scan-fab-t\">Scanner</span>";
+    b.onclick=function(){openScanner();};document.body.appendChild(b);}
+  b.style.display="inline-flex";
+}
+function _unmountScanFab(){var b=document.getElementById("scan-fab");if(b)b.style.display="none";}
+function _extractApproId(text){
+  if(!text)return null;
+  try{
+    var m=(""+text).match(/[?&]appro=([^&\s]+)/);if(m)return decodeURIComponent(m[1]);
+    var h=(""+text).match(/appro=([^&\s]+)/);if(h)return decodeURIComponent(h[1]);
+  }catch(e){}
+  return null;
+}
+function _scanMsg(icon,title,desc,btnLabel,btnAct){
+  var ov=document.getElementById("scan-ov");if(!ov)return;
+  var m=document.createElement("div");m.className="scan-msg";
+  m.innerHTML="<i class=\"ti "+icon+"\"></i><div class=\"st\">"+title+"</div><div class=\"sd\">"+desc+"</div>"+(btnLabel?"<button id=\"scan-msg-btn\">"+btnLabel+"</button>":"");
+  ov.appendChild(m);
+  if(btnLabel){var bt=document.getElementById("scan-msg-btn");if(bt)bt.onclick=btnAct||function(){closeScanner();};}
+}
+function openScanner(){
+  if(_scanActive)return;_scanActive=true;
+  var ov=document.createElement("div");ov.id="scan-ov";ov.className="scan-ov";
+  ov.innerHTML="<video class=\"scan-video\" id=\"scan-video\" playsinline muted></video>"+
+    "<div class=\"scan-top\"><span class=\"t\"><i class=\"ti ti-qrcode\"></i> Scanner une appro</span><button class=\"scan-close\" onclick=\"closeScanner()\"><i class=\"ti ti-x\"></i></button></div>"+
+    "<div class=\"scan-frame\"><i></i><div class=\"scan-laser\"></div></div>"+
+    "<div class=\"scan-hint\">Visez le QR code d'une feuille d'appro</div>";
+  document.body.appendChild(ov);
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    _scanMsg("ti-camera-off","Caméra indisponible","Votre appareil ou navigateur ne permet pas l'accès à la caméra. Vous pouvez ouvrir le lien de l'appro directement.","Fermer");return;
+  }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}}).then(function(stream){
+    _scanStream=stream;
+    var v=document.getElementById("scan-video");if(!v){closeScanner();return;}
+    v.srcObject=stream;v.setAttribute("playsinline","");v.play();
+    _startDecode(v);
+  }).catch(function(err){
+    var denied=err&&(err.name==="NotAllowedError"||err.name==="SecurityError");
+    _scanMsg("ti-camera-off",denied?"Accès caméra refusé":"Caméra inaccessible",
+      denied?"Autorisez l'accès à la caméra dans les réglages de votre navigateur, puis réessayez.":"Impossible d'ouvrir la caméra. Réessayez ou saisissez le lien manuellement.",
+      "Fermer");
+  });
+}
+function _startDecode(video){
+  // 1) API native BarcodeDetector si dispo (rapide, sans dépendance)
+  if("BarcodeDetector" in window){
+    try{
+      _scanDetector=new window.BarcodeDetector({formats:["qr_code"]});
+      var loopN=function(){
+        if(!_scanActive)return;
+        _scanDetector.detect(video).then(function(codes){
+          if(codes&&codes.length){_onScanResult(codes[0].rawValue);return;}
+          _scanRAF=requestAnimationFrame(loopN);
+        }).catch(function(){_scanRAF=requestAnimationFrame(loopN);});
+      };
+      _scanRAF=requestAnimationFrame(loopN);
+      return;
+    }catch(e){}
+  }
+  // 2) Repli : charger jsQR à la volée
+  _loadJsQR(function(ok){
+    if(!ok){_scanMsg("ti-alert-triangle","Lecture QR indisponible","Votre navigateur ne peut pas décoder les QR ici. Ouvrez plutôt le lien de l'appro directement.","Fermer");return;}
+    var cv=document.createElement("canvas"),ctx=cv.getContext("2d",{willReadFrequently:true});
+    var loopJ=function(){
+      if(!_scanActive)return;
+      if(video.readyState===video.HAVE_ENOUGH_DATA){
+        cv.width=video.videoWidth;cv.height=video.videoHeight;
+        ctx.drawImage(video,0,0,cv.width,cv.height);
+        try{
+          var img=ctx.getImageData(0,0,cv.width,cv.height);
+          var code=window.jsQR(img.data,img.width,img.height,{inversionAttempts:"dontInvert"});
+          if(code&&code.data){_onScanResult(code.data);return;}
+        }catch(e){}
+      }
+      _scanRAF=requestAnimationFrame(loopJ);
+    };
+    _scanRAF=requestAnimationFrame(loopJ);
+  });
+}
+function _loadJsQR(cb){
+  if(window.jsQR)return cb(true);
+  var s=document.createElement("script");
+  s.src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js";
+  s.onload=function(){cb(!!window.jsQR);};
+  s.onerror=function(){cb(false);};
+  document.head.appendChild(s);
+}
+function _onScanResult(raw){
+  var id=_extractApproId(raw);
+  if(!id){
+    // QR lu mais pas une appro : petit retour puis on continue à scanner
+    var hint=document.querySelector("#scan-ov .scan-hint");
+    if(hint){hint.textContent="Ce QR n'est pas une appro AppROVISIO";hint.style.color="#FCA5A5";
+      setTimeout(function(){if(hint){hint.textContent="Visez le QR code d'une feuille d'appro";hint.style.color="#fff";}},1800);}
+    if("BarcodeDetector" in window&&_scanDetector){_scanRAF=requestAnimationFrame(function(){var v=document.getElementById("scan-video");if(v)_reDetect(v);});}
+    return;
+  }
+  // succès : vibrer, fermer le scanner, ouvrir l'appro
+  try{if(navigator.vibrate)navigator.vibrate(60);}catch(e){}
+  closeScanner();
+  if(authToken&&currentUser){
+    try{if(document.getElementById("app").style.display==="none"&&typeof enterApp==="function")enterApp();}catch(e){}
+    try{openApproById(id);}catch(e){if(typeof toast==="function")toast("Impossible d'ouvrir cette appro","ti-alert-circle");}
+  } else {
+    pendingAppro=id;try{_qrTechMode();}catch(e){}
+  }
+}
+function _reDetect(video){
+  if(!_scanActive||!_scanDetector)return;
+  _scanDetector.detect(video).then(function(codes){
+    if(codes&&codes.length){_onScanResult(codes[0].rawValue);return;}
+    _scanRAF=requestAnimationFrame(function(){_reDetect(video);});
+  }).catch(function(){_scanRAF=requestAnimationFrame(function(){_reDetect(video);});});
+}
+function closeScanner(){
+  _scanActive=false;
+  if(_scanRAF){cancelAnimationFrame(_scanRAF);_scanRAF=null;}
+  if(_scanStream){try{_scanStream.getTracks().forEach(function(t){t.stop();});}catch(e){}_scanStream=null;}
+  _scanDetector=null;
+  var ov=document.getElementById("scan-ov");if(ov)ov.remove();
+}
 // ═══ Parcours visuel de l'appro : calcule l'avancement pour guider ═══
 function _approStepState(){
   // renvoie {chantier, equipe, materiel} = booléens de complétion
@@ -4188,6 +4345,7 @@ function renderForm(){
   var delBtn=canDelCur?"<button class=\"tbi\" style=\"color:#DC2626\" title=\"Supprimer cette appro\" onclick=\"delS(cur.id)\"><i class=\"ti ti-trash\"></i></button>":"";
   h+="<div class=\"topbar\"><button class=\"btn-back\" onclick=\"goBack()\"><i class=\"ti ti-arrow-left\" style=\"font-size:13px\"></i> Retour</button><div class=\"tb-right\"><button class=\"tbi\" style=\"color:#6D28D9\" title=\"Catalogue\" onclick=\"showCp()\"><i class=\"ti ti-package\"></i></button>"+addBtn+"<button class=\"tbi\" style=\"color:#B91C1C\" title=\"Exporter en PDF\" onclick=\"doPDF()\"><i class=\"ti ti-file-type-pdf\"></i></button>"+delBtn+shareBtn+saveBtn+"</div></div>";
   _mountCpFab();
+  if(typeof _unmountScanFab==="function")_unmountScanFab();
   h+=tplNotice+addBanner;
   h+=_approStepperHTML();
   if(cur.draft&&!isField()){
@@ -6146,7 +6304,7 @@ function _cmdVisible(c){
 }
 function _cmdList(){return (typeof COMMANDES!=="undefined"?COMMANDES:[]).filter(_cmdVisible);}
 var _cmdFilter="all"; // all | att | rec
-function renderCommandes(){try{setActiveNav('btn-cmd');}catch(e){}
+function renderCommandes(){try{setActiveNav('btn-cmd');}catch(e){}if(typeof _mountScanFab==="function")_mountScanFab();
   if(typeof _unmountCpFab==="function")_unmountCpFab();
   if(typeof closeSidebar==="function")closeSidebar();
   if(isField())return;
@@ -7334,7 +7492,7 @@ function _dashDueSoon(list){
   out.sort(function(a,b){return a.dd-b.dd;});
   return out;
 }
-function renderDashboard(){try{setActiveNav('btn-dash');}catch(e){}
+function renderDashboard(){try{setActiveNav('btn-dash');}catch(e){}if(typeof _mountScanFab==="function")_mountScanFab();
   if(typeof closeSidebar==="function")closeSidebar();
   cur=null;currentTab="dashboard";
   var m=document.getElementById("main-area");
@@ -7900,6 +8058,8 @@ var TUTO_MODULES={
       {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherchez par chantier, client, N\u00b0 d'affaire\u2026 ou m\u00eame par le nom d'un article contenu dans l'appro.",action:"next"},
       {before:_navHome,sel:"#btn-refresh",ic:"ti-refresh",t:"Mettre \u00e0 jour",d:"Ce bouton recharge les donn\u00e9es du serveur. L'appli le fait d\u00e9j\u00e0 toute seule quand vous y revenez.",action:"next"},
       {before:_navHome,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous pr\u00e9vient : appro pr\u00eate, demande trait\u00e9e, annonce de l'\u00e9quipe.",action:"next"},
+      {before:_navHome,sel:"#scan-fab",ic:"ti-qrcode",t:"Scanner une appro",d:"Ce bouton ouvre la cam\u00e9ra pour scanner le QR d'une feuille papier. L'appro s'ouvre aussit\u00f4t dans l'appli \u2014 id\u00e9al au d\u00e9p\u00f4t pour retrouver une appro en un geste, sans repasser par le navigateur.",action:"next"},
+      {before:_navHome,sel:"#pwa-install-btn",ic:"ti-download",t:"Installer l'application",d:"Ajoutez AppROVISIO \u00e0 votre \u00e9cran d'accueil : une ic\u00f4ne, un d\u00e9marrage plein \u00e9cran, un acc\u00e8s plus rapide. Parfait sur le t\u00e9l\u00e9phone.",action:"next"},
       {before:_navHome,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
     ];
     return s;
@@ -8129,18 +8289,19 @@ function _tourIsMobile(){
   try{return window.matchMedia("(max-width:768px)").matches;}catch(e){return window.innerWidth<=768;}
 }
 function _tourSyncSidebar(step){
-  // sur mobile, ouvrir la sidebar quand la cible s'y trouve, la fermer sinon
-  if(!_tourIsMobile())return;
+  if(!_tourIsMobile())return false;
   var inSb=_tourInSidebar(step.sel);
+  var sb=document.getElementById("sidebar"),ov=document.getElementById("sb-overlay");
+  var wasOpen=sb&&sb.classList.contains("open");
   try{
     if(inSb){if(typeof openSidebar==="function")openSidebar();}
     else{if(typeof closeSidebar==="function")closeSidebar();}
   }catch(e){}
-  // la sidebar mobile est à z-index 1000 : on la remonte AU-DESSUS du voile du tuto
-  var sb=document.getElementById("sidebar"),ov=document.getElementById("sb-overlay");
-  var lift=inSb&&_tourIsMobile();
-  if(sb)sb.classList.toggle("tour-lift",lift);
-  if(ov)ov.classList.toggle("tour-lift-ov",lift);
+  // lift uniquement quand la cible est DANS la sidebar
+  if(sb)sb.classList.toggle("tour-lift",inSb);
+  if(ov)ov.classList.toggle("tour-lift-ov",inSb);
+  // renvoie true si l'état d'ouverture a changé (→ il faut attendre l'animation du tiroir)
+  return (!!inSb)!==(!!wasOpen);
 }
 function _tourShow(){
   _tourClearWaits();
@@ -8149,8 +8310,22 @@ function _tourShow(){
   var bubble=document.getElementById("tour-bubble");
   if(!hole||!bubble)return;
   if(step.before){try{step.before();}catch(e){}}
-  // sur mobile : ouvrir/fermer la sidebar selon que la cible s'y trouve, et la remonter au-dessus du voile
-  _tourSyncSidebar(step);
+  // sur mobile : ouvrir/fermer la sidebar selon la cible. Si l'état change, attendre
+  // la fin de l'animation du tiroir (250ms) AVANT de mesurer/afficher, sinon la
+  // bulle et le trou se placent au mauvais endroit (cible cachée derrière le menu).
+  var toggled=_tourSyncSidebar(step);
+  if(toggled){
+    var ovv=document.getElementById("tour-ov");if(ovv)ovv.classList.remove("tour-anim");
+    hole.style.display="none";
+    setTimeout(function(){ if(_tourSteps[_tourIdx]===step) _tourRender(step); },300);
+    return;
+  }
+  _tourRender(step);
+}
+function _tourRender(step){
+  var hole=document.getElementById("tour-hole");
+  var bubble=document.getElementById("tour-bubble");
+  if(!hole||!bubble)return;
   var target=step.sel?document.querySelector(step.sel):null;
   var visible=_tourVisible(target);
   var dots="";for(var i=0;i<_tourSteps.length;i++)dots+="<span class=\"tour-dot"+(i===_tourIdx?" on":"")+"\"></span>";
@@ -8284,8 +8459,13 @@ function _tourPlaceBubble(bubble,r){
   bubble.style.transform="none";
   var bw=bubble.offsetWidth||290,bh=bubble.offsetHeight||150;
   var gap=14,vw=window.innerWidth,vh=window.innerHeight,m=10;
-  /* Ordre de préférence : droite, gauche, dessous, dessus. */
-  var cands=[
+  var mobile=_tourIsMobile();
+  /* Sur mobile (écran étroit) : privilégier dessous puis dessus — jamais les côtés,
+     sinon la bulle sort de l'écran ou passe derrière le menu. Sur desktop : droite/gauche d'abord. */
+  var cands=mobile?[
+    {l:Math.min(r.left,vw-bw-m), t:r.bottom+gap},
+    {l:Math.min(r.left,vw-bw-m), t:r.top-gap-bh}
+  ]:[
     {l:r.right+gap,        t:r.top},
     {l:r.left-gap-bw,      t:r.top},
     {l:r.left,             t:r.bottom+gap},
@@ -8635,6 +8815,30 @@ function _qrTechMode(){
     document.getElementById("auth-screen").style.display="flex";
     if(pendingAppro)_qrTechMode();
   }
+})();
+// Scan d'un QR alors que l'app est DÉJÀ ouverte (launch_handler navigate-existing) :
+// l'URL change sans recharger la page → on réagit au changement pour ouvrir l'appro visée.
+(function(){
+  function _onUrlAppro(){
+    var id=parseApproParam();
+    if(!id)return;
+    if(authToken&&currentUser){
+      // déjà connecté : ouvrir directement l'appro scannée
+      try{if(typeof enterApp==="function"&&document.getElementById("app").style.display==="none")enterApp();}catch(e){}
+      try{openApproById(id);}catch(e){}
+    } else {
+      // pas connecté : passer par le mode technicien (rejoindre via le lien)
+      pendingAppro=id;try{_qrTechMode();}catch(e){}
+    }
+  }
+  window.addEventListener("popstate",_onUrlAppro);
+  // certains navigateurs signalent la navigation entrante via focus/visibilité
+  document.addEventListener("visibilitychange",function(){
+    if(document.visibilityState==="visible"){
+      var id=parseApproParam();
+      if(id&&authToken&&currentUser&&cur&&cur._id!==id){_onUrlAppro();}
+    }
+  });
 })();
 // ── PWA : enregistrement du service worker + gestion de l'installation ──
 (function(){
