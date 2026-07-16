@@ -759,7 +759,15 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
    (.tour-lift, 6105) passerait alors AU-DESSUS de l'anneau ET de la bulle.
    Sans z-index (auto), aucun contexte n'est créé : les enfants s'empilent globalement
    et la sidebar peut s'insérer entre les masques et l'anneau, comme voulu. */
-.tour-ov{position:fixed;inset:0;display:none;pointer-events:none;z-index:6100}
+/* PAS de z-index ici, VOLONTAIREMENT \u2014 ne pas le remettre.
+   Un \u00e9l\u00e9ment positionn\u00e9 AVEC un z-index cr\u00e9e un CONTEXTE D'EMPILEMENT : les enfants
+   (.tour-mask 6100, .tour-hole 6180, .tour-bubble 6300) ne s'ordonneraient qu'entre eux,
+   et TOUT le tuto ne vaudrait que la valeur pos\u00e9e ici face au reste de la page.
+   La sidebar mobile (.tour-lift, 6150) passerait alors AU-DESSUS de l'anneau ET de la bulle
+   \u2014 c'est exactement le bug \u00ab le menu recouvre le tuto \u00bb.
+   Sans z-index (auto), aucun contexte n'est cr\u00e9\u00e9 : les enfants s'empilent dans le contexte
+   racine et la sidebar s'ins\u00e8re entre les masques et l'anneau, comme voulu. */
+.tour-ov{position:fixed;inset:0;display:none;pointer-events:none}
 .tour-ov.on{display:block}
 .tour-ov>*{pointer-events:auto}
 .tour-ov>.tour-hole{pointer-events:none}
@@ -4364,7 +4372,7 @@ function renderForm(){
   h+="<div class=\"card-fields\">";
   h+="<div class=\"fg\"><label>N&#176; Affaire</label><input class=\"fin\" value=\""+esc(cur.noAffaire)+"\" placeholder=\"2024-001\" oninput=\"upF('noAffaire',this.value)\" onchange=\"checkCommandesForAffaire()\"/></div>";
   if(window.alobeesOn&&!isField()){
-    h+="<div class=\"fg fg-full\" style=\"display:flex;align-items:center;gap:10px;flex-wrap:wrap\"><button type=\"button\" onclick=\"showAlobeesPicker()\" style=\"display:inline-flex;align-items:center;gap:7px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-cloud-download\" style=\"font-size:16px\"></i> Importer un chantier depuis Alobees</button>"+(cur.alobeesSiteId?" <span style=\"font-size:11px;color:#15803D;background:#DCFCE7;padding:4px 9px;border-radius:20px;font-weight:600\"><i class=\"ti ti-link\"></i> Li\u00e9 \u00e0 Alobees</span>":"")+"</div>";
+    h+="<div class=\"fg fg-full\" style=\"display:flex;align-items:center;gap:10px;flex-wrap:wrap\"><button type=\"button\" id=\"alo-import-btn\" onclick=\"showAlobeesPicker()\" style=\"display:inline-flex;align-items:center;gap:7px;background:#EFF6FF;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-cloud-download\" style=\"font-size:16px\"></i> Importer un chantier depuis Alobees</button>"+(cur.alobeesSiteId?" <span class=\"alo-linked\" style=\"font-size:11px;color:#15803D;background:#DCFCE7;padding:4px 9px;border-radius:20px;font-weight:600\"><i class=\"ti ti-link\"></i> Li\u00e9 \u00e0 Alobees</span>":"")+"</div>";
   }
   h+="</div></div>";
   h+="<div class=\"info-grid\">";
@@ -8002,9 +8010,30 @@ function _tutoNeedAppro(){
     else if(typeof openNew==="function")openNew();
   }catch(e){}
 }
+/* Ouvre le s\u00e9lecteur Alobees s'il ne l'est pas d\u00e9j\u00e0.
+   On teste l'\u00e9tat R\u00e9EL du voile, pas la pr\u00e9sence des \u00e9l\u00e9ments : rouvrir \u00e0 chaque \u00e9tape
+   relancerait la requ\u00eate et remettrait la liste \u00e0 z\u00e9ro sous les yeux de l'utilisateur. */
+function _tutoNeedAlobees(){
+  _tutoNeedAppro();
+  try{
+    var ov=document.getElementById("alo-ov");
+    if((!ov||ov.style.display!=="flex")&&typeof showAlobeesPicker==="function")showAlobeesPicker();
+  }catch(e){}
+}
+/* Referme le s\u00e9lecteur pour revenir \u00e0 l'appro (derni\u00e8re \u00e9tape du module). */
+function _tutoCloseAlobees(){
+  _tutoNeedAppro();
+  try{if(typeof hideAlobees==="function")hideAlobees();}catch(e){}
+}
 function _tutoNeedCatalogue(){
   _tutoNeedAppro();
-  try{ if(!document.getElementById("cp-search")&&typeof showCp==="function")showCp(); }catch(e){}
+  try{
+    /* Tester la pr\u00e9sence de #cp-search ne suffit PAS : le panneau conserve son contenu
+       une fois referm\u00e9. Il faut v\u00e9rifier qu'il est r\u00e9ellement OUVERT, sinon les \u00e9tapes
+       suivantes viseraient des \u00e9l\u00e9ments pr\u00e9sents dans le DOM mais invisibles. */
+    var p=document.getElementById("cp-panel");
+    if((!p||!p.classList.contains("open"))&&typeof showCp==="function")showCp();
+  }catch(e){}
 }
 /* L'accueil bascule en \u00e9tat vide quand l'utilisateur n'a aucune appro :
    m\u00eame r\u00e8gle que renderWelcome (mine.length===0 && !isField()).
@@ -8089,6 +8118,21 @@ var TUTO_MODULES={
     ];
   }},
 
+  alobees:{titre:"L'import Alobees",ic:"ti-cloud-download",roles:["conducteur","depot"],
+    /* Le bouton d'import n'existe que si l'int\u00e9gration est configur\u00e9e c\u00f4t\u00e9 serveur
+       (window.alobeesOn, aliment\u00e9 par /api/alobees/status) ET hors r\u00f4les terrain. */
+    avail:function(){return !!window.alobeesOn&&!(typeof isField==="function"&&isField());},
+    etapes:function(){
+    return [
+      {before:_tutoNeedAppro,sel:"#alo-import-btn",ic:"ti-cloud-download",t:"Importer un chantier",d:"Plut\u00f4t que tout retaper, r\u00e9cup\u00e9rez le chantier depuis Alobees. Cliquez sur ce bouton.",action:"click"},
+      {before:_tutoNeedAlobees,sel:"#alo-search",ic:"ti-search",t:"Cherchez votre chantier",d:"Par nom, par N\u00b0 d'affaire, par client ou par ville. Vous pouvez combiner : \u00ab vinci paris \u00bb fonctionne.",action:"next"},
+      {before:_tutoNeedAlobees,sel:".alo-row",ic:"ti-building-community",t:"Une ligne = un chantier",d:"Le nom du chantier, puis le client et l'adresse. Les mots que vous cherchez sont surlign\u00e9s en jaune.",action:"next"},
+      {before:_tutoNeedAlobees,sel:".alo-ref,.alo-meta",ic:"ti-hash",t:"Le N\u00b0 d'affaire",d:"Cette pastille, c'est la r\u00e9f\u00e9rence Alobees. C'est le moyen le plus s\u00fbr de ne pas se tromper de chantier.",action:"next"},
+      {before:_tutoNeedAlobees,sel:".alo-foot",ic:"ti-list-numbers",t:"Combien de r\u00e9sultats",d:"S'il y en a trop, l'appli vous le dit : ajoutez un mot pour affiner. Fl\u00e8ches et Entr\u00e9e marchent aussi.",action:"next"},
+      {before:_tutoCloseAlobees,sel:".alo-linked,#alo-import-btn",ic:"ti-link",t:"Tout se remplit d'un coup",d:"Nom, adresse, N\u00b0 d'affaire, client, contact, charg\u00e9 d'affaires, date, camion. Une pastille verte \u00ab Li\u00e9 \u00e0 Alobees \u00bb confirme le lien.",action:"next"}
+    ];
+  }},
+
   catalogue:{titre:"Maîtriser le catalogue",ic:"ti-package",roles:["conducteur","depot"],etapes:function(){
     return [
       {before:_tutoNeedAppro,sel:"#cp-fab",ic:"ti-package",t:"Ouvrez le catalogue",d:"Tout le matériel JARNIAS s'y trouve. Cliquez sur ce bouton pour l'ouvrir.",action:"click"},
@@ -8102,7 +8146,7 @@ var TUTO_MODULES={
 
   biblio:{titre:"La bibliothèque",ic:"ti-books",roles:["conducteur","depot"],etapes:function(){
     return [
-      {sel:"#btn-biblio,.tab-btn",ic:"ti-books",t:"Ouvrez la bibliothèque",d:"Toutes les appros déjà créées, y compris les anciennes.",action:"click"},
+      {sel:"#btn-biblio",ic:"ti-books",t:"Ouvrez la bibliothèque",d:"Toutes les appros déjà créées, y compris les anciennes.",action:"click"},
       {before:_navBiblio,sel:".lib-search",ic:"ti-search",t:"Chercher",d:"Par chantier, client, N° d'affaire… ou par un article contenu dans l'appro.",action:"next"},
       {before:_navBiblio,sel:".pill-group",ic:"ti-filter",t:"Trier et filtrer",d:"Par conducteur, par date, par épinglées. Le tri change juste l'ordre d'affichage.",action:"next"},
       {before:_navBiblio,sel:".lib-view-tog",ic:"ti-layout-grid",t:"Grille ou liste",d:"Deux façons de voir : cartes en grille, ou liste compacte.",action:"next"},
@@ -8203,13 +8247,16 @@ var TUTO_MODULES={
   }}
 };
 
-function _tutoOrder(){return ["bases","appro","catalogue","biblio","terrain","depot","commandes","tickets","camions","annonces","reglages"];}
+function _tutoOrder(){return ["bases","appro","alobees","catalogue","biblio","terrain","depot","commandes","tickets","camions","annonces","reglages"];}
 function _tutoModulesForRole(){
   var raw=(currentUser&&currentUser.role)||"conducteur";
   /* L'admin a acc\u00e8s aux deux parcours (conducteur + d\u00e9p\u00f4t) : il g\u00e8re tout. */
   var roles=(raw==="admin")?["conducteur","depot"]:[_tourRole()];
   return _tutoOrder().filter(function(k){
     if(!TUTO_MODULES[k])return false;
+    /* Un module peut d\u00e9pendre d'une int\u00e9gration d\u00e9sactiv\u00e9e (ex. Alobees sans cl\u00e9 API) :
+       inutile de proposer un parcours dont aucun \u00e9l\u00e9ment n'existe \u00e0 l'\u00e9cran. */
+    if(typeof TUTO_MODULES[k].avail==="function"){try{if(!TUTO_MODULES[k].avail())return false;}catch(e){return false;}}
     for(var i=0;i<roles.length;i++){if(TUTO_MODULES[k].roles.indexOf(roles[i])>=0)return true;}
     return false;
   });
@@ -8301,6 +8348,46 @@ function _tourInSidebar(sel){
   // cible pas encore trouvée : on déduit des sélecteurs de menu connus
   return /#btn-|\.btn-new-sb|#srch|\.sb-/.test(sel);
 }
+/* Le panneau Catalogue est FLOTTANT et d\u00e9pla\u00e7able (.cp-panel.floating, z-index 501) :
+   l'utilisateur peut le poser n'importe o\u00f9, y compris par-dessus la sidebar. S'il reste
+   ouvert alors que l'\u00e9tape vise un \u00e9l\u00e9ment AILLEURS, l'anneau se dessine par-dessus le
+   panneau autour d'un \u00e9l\u00e9ment invisible et inatteignable \u2014 or plusieurs \u00e9tapes demandent
+   de CLIQUER dessus. On ferme donc le panneau, sauf si l'\u00e9tape le vise justement. */
+/* PI\u00c8GE CSS : document.querySelector("a,b") renvoie le PREMIER \u00c9L\u00c9MENT DANS LE DOM
+   qui correspond \u00e0 l'un OU \u00e0 l'autre \u2014 PAS le premier s\u00e9lecteur. Or les \u00e9tapes du tuto
+   \u00e9crivent "cible,repli" avec une intention d'ORDRE de pr\u00e9f\u00e9rence.
+   Exemple r\u00e9el : ".tk-note,.tk-card" surlignait la carte enti\u00e8re au lieu de la note,
+   parce que la carte appara\u00eet avant dans le DOM (elle contient la note).
+   _tourPick essaie chaque s\u00e9lecteur dans l'ordre \u00e9crit, et pr\u00e9f\u00e8re un \u00e9l\u00e9ment visible. */
+function _tourPick(sel){
+  if(!sel)return null;
+  var parts=String(sel).split(",");
+  var i,p,el,firstFound=null;
+  for(i=0;i<parts.length;i++){
+    p=parts[i].trim();if(!p)continue;
+    el=null;try{el=document.querySelector(p);}catch(e){}
+    if(!el)continue;
+    if(!firstFound)firstFound=el;
+    if(_tourVisible(el))return el;      /* 1er s\u00e9lecteur \u00e9crit dont la cible est visible */
+  }
+  return firstFound;                    /* aucun visible : au moins le 1er trouv\u00e9 */
+}
+function _tourInCp(sel){
+  if(!sel)return false;
+  var p=document.getElementById("cp-panel");if(!p)return false;
+  var el=_tourPick(sel);
+  if(el)return p.contains(el);
+  /* Cible pas encore rendue : on ne devine pas. Une regex sur "cp-" se tromperait,
+     #cp-fab commence par "cp-" mais vit HORS du panneau. */
+  return false;
+}
+function _tourSyncCp(step){
+  var p=document.getElementById("cp-panel");
+  if(!p||!p.classList.contains("open"))return false;
+  if(_tourInCp(step&&step.sel))return false;   /* l'\u00e9tape vise le catalogue : on le laisse ouvert */
+  try{if(typeof hideCp==="function")hideCp();}catch(e){}
+  return true;
+}
 function _tourIsMobile(){
   /* Doit correspondre EXACTEMENT au @media(max-width:768px) qui transforme
      la sidebar en tiroir : sinon on ouvre/ferme un menu qui n'est pas un tiroir. */
@@ -8328,6 +8415,8 @@ function _tourShow(){
   var bubble=document.getElementById("tour-bubble");
   if(!hole||!bubble)return;
   if(step.before){try{step.before();}catch(e){}}
+  // le panneau Catalogue masque la page : on le referme s'il n'est pas la cible
+  _tourSyncCp(step);
   // sur mobile : ouvrir/fermer la sidebar selon la cible. Si l'état change, attendre
   // la fin de l'animation du tiroir (250ms) AVANT de mesurer/afficher, sinon la
   // bulle et le trou se placent au mauvais endroit (cible cachée derrière le menu).
@@ -8344,7 +8433,7 @@ function _tourRender(step){
   var hole=document.getElementById("tour-hole");
   var bubble=document.getElementById("tour-bubble");
   if(!hole||!bubble)return;
-  var target=step.sel?document.querySelector(step.sel):null;
+  var target=step.sel?_tourPick(step.sel):null;
   var visible=_tourVisible(target);
   var dots="";for(var i=0;i<_tourSteps.length;i++)dots+="<span class=\"tour-dot"+(i===_tourIdx?" on":"")+"\"></span>";
   var isLast=_tourIdx===_tourSteps.length-1;
@@ -8375,7 +8464,7 @@ function _tourRender(step){
       _tourMissTimer=setInterval(function(){
         if(!_tourClickWait)return;
         if(document.body.contains(_tourClickWait.el)){_tourPosition();return;}
-        var again=step.sel?document.querySelector(step.sel):null;
+        var again=step.sel?_tourPick(step.sel):null;
         if(_tourVisible(again)){
           var f2=_tourClickWait.fn;
           _tourClickWait={el:again,fn:f2};_tourTarget=again;
@@ -8399,7 +8488,7 @@ function _tourRender(step){
     if(step.sel){
       var rtries=0;
       _tourMissTimer=setInterval(function(){
-        var t2=document.querySelector(step.sel);
+        var t2=_tourPick(step.sel);
         if(_tourVisible(t2)){clearInterval(_tourMissTimer);_tourMissTimer=null;_tourShow();return;}
         if(++rtries>20){clearInterval(_tourMissTimer);_tourMissTimer=null;_tourNav(1);}
       },300);
@@ -8465,7 +8554,7 @@ function _tourPosition(){
   var hole=document.getElementById("tour-hole"),bubble=document.getElementById("tour-bubble");
   if(!hole||!bubble)return;
   var step=_tourSteps[_tourIdx];if(!step)return;
-  var target=_tourTarget&&document.body.contains(_tourTarget)?_tourTarget:(step.sel?document.querySelector(step.sel):null);
+  var target=_tourTarget&&document.body.contains(_tourTarget)?_tourTarget:(step.sel?_tourPick(step.sel):null);
   if(!_tourVisible(target)){hole.style.display="none";_tourMaskFull();return;}
   _tourTarget=target;
   var r=target.getBoundingClientRect(),pad=6,vw=window.innerWidth,vh=window.innerHeight;
