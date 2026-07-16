@@ -8460,8 +8460,33 @@ function _tourPlaceBubble(bubble,r){
   var bw=bubble.offsetWidth||290,bh=bubble.offsetHeight||150;
   var gap=14,vw=window.innerWidth,vh=window.innerHeight,m=10;
   var mobile=_tourIsMobile();
-  /* Sur mobile (écran étroit) : privilégier dessous puis dessus — jamais les côtés,
-     sinon la bulle sort de l'écran ou passe derrière le menu. Sur desktop : droite/gauche d'abord. */
+  /* Cas spécial : sur mobile, si le menu (sidebar) est OUVERT et que la cible est dedans,
+     la bulle se place dans la bande LIBRE à droite du menu, au-dessus de tout. */
+  var sb=document.getElementById("sidebar");
+  var sbOpen=sb&&sb.classList.contains("open")&&mobile;
+  if(sbOpen){
+    var sbRect=sb.getBoundingClientRect();
+    var spaceRight=vw-sbRect.right-m;
+    if(spaceRight>=210){
+      // assez de place : bulle dans la bande à droite du menu, centrée sur la cible
+      var w=Math.min(bw,spaceRight);bubble.style.width=w+"px";bw=w;
+      var left=sbRect.right+8;
+      var top=Math.max(m,Math.min(r.top+r.height/2-bh/2,vh-bh-m));
+      bubble.style.left=left+"px";bubble.style.top=top+"px";
+    } else {
+      // écran étroit (téléphone) : bulle ancrée EN BAS, pleine largeur, AU-DESSUS du menu.
+      // La cible reste surlignée dans le menu ; la bulle ne la recouvre pas.
+      bubble.style.width="";
+      var bw2=Math.min(vw-2*m,360);bubble.style.width=bw2+"px";
+      var bh2=bubble.offsetHeight||160;
+      bubble.style.left=Math.round((vw-bw2)/2)+"px";
+      bubble.style.top=(vh-bh2-m-14)+"px";
+    }
+    return;
+  }
+  bubble.style.width=""; // réinitialise la largeur si on n'est pas dans le cas menu
+  bw=bubble.offsetWidth||290;
+  /* Sur mobile (menu fermé) : dessous puis dessus — jamais les côtés. Desktop : droite/gauche d'abord. */
   var cands=mobile?[
     {l:Math.min(r.left,vw-bw-m), t:r.bottom+gap},
     {l:Math.min(r.left,vw-bw-m), t:r.top-gap-bh}
@@ -8475,13 +8500,11 @@ function _tourPlaceBubble(bubble,r){
   var pick=null;
   for(var i=0;i<cands.length;i++){if(fits(cands[i])){pick=cands[i];break;}}
   if(!pick){
-    /* Rien ne tient : on place où il y a le plus de place, puis on borne. */
     var below=vh-r.bottom, above=r.top;
     pick=(below>=above)?{l:r.left,t:r.bottom+gap}:{l:r.left,t:r.top-gap-bh};
   }
   var left=Math.max(m,Math.min(pick.l,vw-bw-m));
   var top=Math.max(m,Math.min(pick.t,vh-bh-m));
-  /* Dernier filet : si la bulle recouvre encore la cible, on la décale du côté le plus dégagé. */
   var overlap=!(left+bw<r.left-2||left>r.right+2||top+bh<r.top-2||top>r.bottom+2);
   if(overlap){
     if(vh-r.bottom>=r.top)top=Math.min(r.bottom+gap,vh-bh-m);
