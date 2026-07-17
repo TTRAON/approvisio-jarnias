@@ -496,7 +496,11 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
   .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999}
   .sb-overlay.open{display:block}
   .mtop{display:flex;align-items:center;gap:11px;background:#0F172A;flex-shrink:0;padding:calc(9px + env(safe-area-inset-top)) calc(13px + env(safe-area-inset-right)) 9px calc(13px + env(safe-area-inset-left))}
-  .mtop-btn{background:rgba(255,255,255,.13);border:none;color:#fff;width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:21px;cursor:pointer}
+  /* Bouton « activer les notifications » de la barre mobile : cal\u00e9 \u00e0 droite, teint\u00e9,
+   atteignable SANS ouvrir le tiroir. Il dispara\u00eet une fois les notifs activ\u00e9es. */
+.mtop-push{margin-left:auto;background:rgba(167,139,250,.30);color:#fff}
+.mtop-push:hover{background:rgba(167,139,250,.45)}
+.mtop-btn{background:rgba(255,255,255,.13);border:none;color:#fff;width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:21px;cursor:pointer}
   .mtop-btn:active{background:rgba(255,255,255,.25)}
   .mtop-logo{width:30px;border-radius:5px}
   .mtop-title{color:#fff;font-weight:700;font-size:15px}
@@ -2040,6 +2044,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
       <button class="mtop-btn" onclick="toggleSidebar()"><span class="mtop-burger"><span></span><span></span><span></span></span></button>
       <img data-jlogo="1" class="mtop-logo" alt="JARNIAS"/>
       <span class="mtop-title">AppROVISIO</span>
+      <button class="mtop-btn mtop-push" id="push-mtop" onclick="togglePush()" title="Activer les notifications sur cet appareil" style="display:none"><i class="ti ti-bell-plus" style="font-size:19px"></i></button>
     </div>
     <div id="deadline-banner" class="dl-banner" style="display:none"></div>
     <main class="main" id="main-area"></main>
@@ -7929,12 +7934,13 @@ function toggleNotif(){
    quelque chose à faire (push possible ET pas encore activé). Une fois activé, elle
    s'efface — la rangée revient à 7 icônes. */
 function _syncPushIcon(){
-  var b=document.getElementById("push-btn");
-  if(!b)return;
-  if(!_canOfferPush()){b.style.display="none";return;}
-  _isPushOn().then(function(on){
-    b.style.display=on?"none":"flex";
-  }).catch(function(){b.style.display="none";});
+  /* Deux emplacements : la rang\u00e9e de la sidebar (bureau) et la barre du haut (t\u00e9l\u00e9phone,
+     o\u00f9 la sidebar est un tiroir ferm\u00e9). M\u00eame r\u00e8gle pour les deux. */
+  var els=[document.getElementById("push-btn"),document.getElementById("push-mtop")].filter(Boolean);
+  if(!els.length)return;
+  function set(v){els.forEach(function(e){e.style.display=v;});}
+  if(!_canOfferPush()){set("none");return;}
+  _isPushOn().then(function(on){set(on?"none":"flex");}).catch(function(){set("none");});
 }
 function _syncPushFoot(){
   var foot=document.getElementById("notif-push-foot"),btn=document.getElementById("notif-push-btn");
@@ -8170,10 +8176,11 @@ var TUTO_MODULES={
     /* L'\u00e9tape « notifications sur le t\u00e9l\u00e9phone » ne s'ins\u00e8re QUE si le push est
        r\u00e9ellement possible ici (navigateur compatible, et sur iOS appli install\u00e9e) ET
        qu'il n'est pas d\u00e9j\u00e0 activ\u00e9 : sinon #push-btn est masqu\u00e9 et on surlignerait du vide. */
-    if(typeof _canOfferPush==="function"&&_canOfferPush()&&document.getElementById("push-btn")&&_tourVisible(document.getElementById("push-btn"))){
+    var _pb=(typeof _tourPick==="function")?_tourPick("#push-mtop,#push-btn"):document.getElementById("push-btn");
+    if(typeof _canOfferPush==="function"&&_canOfferPush()&&_pb&&_tourVisible(_pb)){
       var iCloche=-1;
       for(var _i=0;_i<s.length;_i++){if(s[_i].sel===".notif-bell"){iCloche=_i;break;}}
-      var etapePush={sel:"#push-btn",ic:"ti-bell-plus",t:"Les notifications sur votre t\u00e9l\u00e9phone",
+      var etapePush={sel:"#push-mtop,#push-btn",ic:"ti-bell-plus",t:"Les notifications sur votre t\u00e9l\u00e9phone",
         d:"Ce bouton violet pr\u00e9vient votre t\u00e9l\u00e9phone m\u00eame quand l'appli est ferm\u00e9e. Un appui, vous acceptez, c'est fait \u2014 et le bouton dispara\u00eet.",action:"next"};
       if(iCloche>=0)s.splice(iCloche+1,0,etapePush); else s.push(etapePush);
     }
@@ -8813,6 +8820,10 @@ function enterApp(){
   // Configure sidebar selon le r\u00f4le
   var ri=ROLE_INFO[currentUser.role]||ROLE_INFO.conducteur;
   try{_syncInstallBtn();}catch(e){}
+  /* Sans cet appel, #push-btn / #push-mtop restent sur leur display:none initial :
+     ils n'\u00e9taient r\u00e9veill\u00e9s que par l'ouverture du panneau cloche ou l'\u00e9cran
+     Personnalisation (admin). Sur t\u00e9l\u00e9phone, on ne les voyait donc JAMAIS. */
+  try{_syncPushIcon();}catch(e){}
   var initials=currentUser.name.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();
   var av=document.getElementById("sb-avatar");
   av.style.background=ri.bg;av.style.color=ri.color;av.textContent=initials;
