@@ -1668,14 +1668,21 @@ table.at tr.kit-row td.td-d{position:relative}
    tout bouton qui ne tient pas est COUPÉ — donc invisible ET incliquable.
    C'est ce qui est arrivé à la déconnexion quand la rangée est passée à 8 boutons
    (8×30 + 7×6 = 282 px pour 244 px utiles). Ne pas remettre nowrap. */
-.sb-user-actions{display:flex;gap:4px;align-items:center;flex-wrap:wrap;flex:1 1 100%;justify-content:flex-end}
+.sb-user-actions{display:flex;gap:5px;align-items:center;flex-wrap:wrap;flex:1 1 100%;justify-content:flex-end}
 .sb-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .sb-user-name{font-size:12px;font-weight:600;color:#1E293B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sb-user-role{font-size:10px;color:#94A3B8}
 /* M\u00eame gabarit que les autres : la d\u00e9connexion est un bouton comme un autre,
    elle ne doit pas \u00eatre le maillon faible de la rang\u00e9e. */
-.btn-logout{width:26px;height:26px;background:none;border:1px solid #E2E8F0;border-radius:8px;padding:0;font-size:11px;cursor:pointer;color:#64748B;font-family:inherit;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.btn-logout:hover{background:#FEF2F2;border-color:#FECACA;color:#DC2626}
+/* La d\u00e9connexion n'est PLUS une ic\u00f4ne dans la rang\u00e9e du haut : elle y \u00e9tait le dernier
+   \u00e9l\u00e9ment et disparaissait d\u00e8s que la rang\u00e9e d\u00e9bordait (sidebar en overflow:hidden).
+   Elle vit d\u00e9sormais dans un pied FIXE, en toutes lettres : rien ne peut la chasser,
+   et un libell\u00e9 vaut mieux qu'un pictogramme pour un utilisateur peu \u00e0 l'aise. */
+.sb-foot{flex-shrink:0;padding:10px 12px;border-top:1px solid #E2E8F0;background:#F8FAFC}
+.sb-logout{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;border:1px solid #E2E8F0;border-radius:9px;padding:9px 12px;font-size:13px;font-weight:600;color:#64748B;cursor:pointer;font-family:inherit;transition:background .16s,color .16s,border-color .16s}
+.sb-logout i{font-size:15px}
+.sb-logout:hover{background:#FEF2F2;border-color:#FECACA;color:#DC2626}
+@media print{.sb-foot{display:none!important}}
 .btn-logout:hover{background:#FEF2F2;color:#DC2626;border-color:#FECACA}
 .btn-admin{position:relative;overflow:hidden;background:transparent;border:none;border-radius:10px;padding:9px 12px 9px 14px;font-size:13.5px;font-weight:600;color:#475569;cursor:pointer;width:100%;text-align:left;display:flex;align-items:center;gap:9px;font-family:inherit;transition:background .18s var(--ease),color .18s var(--ease),transform .1s var(--ease)}
 .btn-admin i{color:#94A3B8;transition:color .18s var(--ease);font-size:16px}
@@ -1783,7 +1790,7 @@ html.dark .tour-hole{box-shadow:0 0 0 3px #0F172A,0 0 0 6px var(--accent,#6D28D9
 /* Les captures/aperçus PDF s'ouvrent dans une fenêtre séparée : jamais inversés. */
 @media print{html.dark #auth-screen{filter:none!important}}
 @media print{html.dark{filter:none!important}html.dark img{filter:none!important}}
-.btn-theme{width:26px;height:26px;border:none;background:rgba(148,163,184,.16);color:#64748B;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-theme{width:30px;height:30px;border:none;background:rgba(148,163,184,.16);color:#64748B;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .btn-theme:hover{background:rgba(148,163,184,.28)}
 /* ===== 3 MODES D'AFFICHAGE DES APPROS ===== */
 .vm-seg{display:inline-flex;background:#F1F5F9;border-radius:8px;padding:2px;gap:2px;margin-right:4px}
@@ -1950,7 +1957,6 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
         <button class="btn-theme" id="help-btn" onclick="startTour()" title="Aide / visite guid&#233;e"><i class="ti ti-help-circle" style="font-size:16px"></i></button>
         <button class="btn-theme" id="pwa-install-btn" onclick="pwaInstall()" title="Installer l'application" style="background:rgba(109,40,217,.14);color:#6D28D9"><i class="ti ti-download" style="font-size:15px"></i></button>
         <button class="btn-theme" id="theme-btn" onclick="toggleTheme()" title="Th&#232;me clair / sombre"><i class="ti ti-moon" style="font-size:15px"></i></button>
-        <button class="btn-logout" onclick="doLogout()" title="D\u00e9connexion"><i class="ti ti-logout" style="font-size:13px"></i></button>
       </div>
     </div>
     
@@ -1970,6 +1976,9 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
       <button class="btn-admin" id="btn-tickets" onclick="renderTickets()" style="display:none;--c:#1D4ED8"><i class="ti ti-ticket" style="font-size:15px"></i> <span id="tk-lbl">Demandes dépôt</span></button>
       <button class="btn-admin" id="btn-perso" onclick="renderPersonnalisation()" style="display:none;--c:#6D28D9"><i class="ti ti-palette" style="font-size:15px"></i> Personnalisation</button>
       <div id="sheets-list"></div>
+    </div>
+    <div class="sb-foot">
+      <button class="sb-logout" onclick="doLogout()"><i class="ti ti-logout"></i> Se d&#233;connecter</button>
     </div>
   </aside>
   <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
