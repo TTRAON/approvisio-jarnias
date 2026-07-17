@@ -1851,6 +1851,29 @@ html.dark .tour-hole{box-shadow:0 0 0 3px #0F172A,0 0 0 6px var(--accent,#6D28D9
    notifications activées (cf. _syncPushIcon) — comme le bouton d'installation. */
 .btn-theme.push-on{background:rgba(109,40,217,.14);color:#6D28D9}
 .btn-theme.push-on:hover{background:rgba(109,40,217,.22)}
+/* ═══ ÉCRAN NOTIFICATIONS (tous les postes) ═══ */
+.ns-wrap{max-width:720px;margin:0 auto;padding:22px 18px 40px}
+.ns-hd{display:flex;gap:13px;align-items:flex-start;margin-bottom:18px}
+.ns-hd-ic{width:42px;height:42px;border-radius:12px;background:#EDE9FE;color:#5B21B6;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.ns-hd-t{font-size:19px;font-weight:800;color:#0F172A;letter-spacing:-.3px}
+.ns-hd-d{font-size:12.5px;color:#64748B;line-height:1.55;margin-top:3px}
+.ns-card{background:#fff;border:1px solid #E8EDF4;border-radius:14px;overflow:hidden;box-shadow:0 4px 18px -14px rgba(15,23,42,.4)}
+.ns-state{display:flex;gap:13px;align-items:flex-start;padding:18px}
+.ns-state>i{font-size:24px;flex-shrink:0;margin-top:1px}
+.ns-state b{font-size:14.5px;font-weight:800;color:#0F172A;display:block}
+.ns-state p{font-size:12.5px;color:#64748B;line-height:1.55;margin:3px 0 0}
+.ns-ok>i{color:#15803D}
+.ns-off-state>i{color:#6D28D9}
+.ns-ko>i{color:#B45309}
+.ns-btn{margin-top:11px;background:var(--accent,#6D28D9);color:#fff;border:none;border-radius:9px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .14s var(--ease)}
+.ns-btn:hover{transform:translateY(-1px)}
+.ns-btn.ns-off{background:#fff;color:#64748B;border:1px solid #E2E8F0}
+.ns-btn.ns-off:hover{background:#FEF2F2;border-color:#FECACA;color:#DC2626}
+.ns-what{margin-top:18px;background:#F8FAFC;border:1px solid #F1F5F9;border-radius:12px;padding:15px 17px}
+.ns-what-t{font-size:11px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.ns-list{margin:0;padding-left:17px}
+.ns-list li{font-size:13px;color:#334155;line-height:1.7}
+@media print{.ns-wrap{display:none!important}}
 /* Activ\u00e9 : vert discret. On reste visible pour dire « c'est en marche »
    et permettre de couper \u2014 sans crier comme l'\u00e9tat « \u00e0 activer ». */
 .btn-theme.push-done{background:rgba(21,128,61,.13);color:#15803D}
@@ -2040,6 +2063,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
       <button class="btn-admin" id="btn-cmd" onclick="renderCommandes()" style="display:none;--c:#6D28D9"><i class="ti ti-clipboard-list" style="font-size:15px"></i> Commande</button>
       <button class="btn-admin" id="btn-annonce" onclick="renderAnnonces()" style="display:none;--c:#BE123C"><i class="ti ti-speakerphone" style="font-size:15px"></i> Annonces</button>
       <button class="btn-admin" id="btn-tickets" onclick="renderTickets()" style="display:none;--c:#1D4ED8"><i class="ti ti-ticket" style="font-size:15px"></i> <span id="tk-lbl">Demandes dépôt</span></button>
+      <button class="btn-admin" id="btn-notifs" onclick="renderNotifSettings()" style="--c:#6D28D9"><i class="ti ti-bell-cog" style="font-size:15px"></i> Notifications</button>
       <button class="btn-admin" id="btn-perso" onclick="renderPersonnalisation()" style="display:none;--c:#6D28D9"><i class="ti ti-palette" style="font-size:15px"></i> Personnalisation</button>
       <div id="sheets-list"></div>
     </div>
@@ -5135,8 +5159,9 @@ function doPDF(){
    • txt   : une phrase, côté utilisateur. Pas de jargon technique. */
 var NEWS=[
   {v:1,date:"17 juillet 2026",items:[
-    {t:"nouveau",z:"Notifications",txt:"Un bouton cloche, \u00e0 c\u00f4t\u00e9 de votre nom et en haut de l'\u00e9cran sur t\u00e9l\u00e9phone, active les notifications \u2014 vous \u00eates pr\u00e9venu m\u00eame quand l'appli est ferm\u00e9e. Violet = \u00e0 activer, vert = c'est en marche."},
-    {t:"ameliore",z:"Notifications",txt:"L'activation \u00e9tait enterr\u00e9e au fond du panneau de la cloche : elle est maintenant visible d'un coup d'\u0153il, pour tous les postes."},
+    {t:"nouveau",z:"Notifications",txt:"Un bouton violet en forme de cloche, \u00e0 c\u00f4t\u00e9 de votre nom et en haut de l'\u00e9cran sur t\u00e9l\u00e9phone, active les notifications \u2014 vous \u00eates pr\u00e9venu m\u00eame quand l'appli est ferm\u00e9e. Il dispara\u00eet une fois activ\u00e9."},
+    {t:"ameliore",z:"Notifications",txt:"Nouvel \u00e9cran \u00ab Notifications \u00bb dans le menu : v\u00e9rifiez ou coupez les notifications quand vous voulez, sur chaque appareil. Accessible \u00e0 tous les postes."},
+    {t:"corrige",z:"Notifications",txt:"Sur un appareil partag\u00e9, les notifications restaient rattach\u00e9es au compte pr\u00e9c\u00e9dent : la personne qui se connectait ensuite ne recevait rien et voyait les alertes de l'autre. Corrig\u00e9."},
     {t:"nouveau",z:"Aide",txt:"La visite guid\u00e9e « Les bases » explique d\u00e9sormais comment activer les notifications sur son t\u00e9l\u00e9phone."}
   ]}
 ];
@@ -6815,8 +6840,8 @@ function tlTicketSection(){
 // ═══ PERSONNALISATION ═══
 
 // ═══ MENU DE GAUCHE — ordre personnalisable ═══
-var MENU_KEYS=["btn-new-sb","btn-terrain","btn-admin","btn-dash","btn-ui","btn-alo","btn-trucks","btn-cmd","btn-annonce","btn-tickets","btn-perso"];
-var MENU_LABELS={"btn-new-sb":"Nouvelle appro","btn-terrain":"Demande du terrain","btn-admin":"Administration","btn-dash":"Tableau de bord","btn-ui":"Param\u00e9trage interface","btn-alo":"Lien Alobees","btn-trucks":"Gestion des camions","btn-cmd":"Commandes","btn-annonce":"Annonces","btn-tickets":"Demandes d\u00e9p\u00f4t","btn-perso":"Personnalisation"};
+var MENU_KEYS=["btn-new-sb","btn-terrain","btn-admin","btn-dash","btn-ui","btn-alo","btn-trucks","btn-cmd","btn-annonce","btn-tickets","btn-notifs","btn-perso"];
+var MENU_LABELS={"btn-new-sb":"Nouvelle appro","btn-terrain":"Demande du terrain","btn-admin":"Administration","btn-dash":"Tableau de bord","btn-ui":"Param\u00e9trage interface","btn-alo":"Lien Alobees","btn-trucks":"Gestion des camions","btn-cmd":"Commandes","btn-annonce":"Annonces","btn-notifs":"Notifications","btn-tickets":"Demandes d\u00e9p\u00f4t","btn-perso":"Personnalisation"};
 function _menuOrder(){var mo=(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.menuOrder)?CONFIG.menuOrder.slice():[];MENU_KEYS.forEach(function(k){if(mo.indexOf(k)<0)mo.push(k);});return mo;}
 function applyMenuOrder(){try{var body=document.querySelector(".sb-body");var anchor=document.getElementById("sheets-list");if(!body||!anchor)return;_menuOrder().forEach(function(k){var el=document.getElementById(k);if(el)body.insertBefore(el,anchor);});}catch(e){}}
 function moveMenu(i,dir){var mo=_menuOrder();var j=i+dir;if(j<0||j>=mo.length)return;var t=mo[i];mo[i]=mo[j];mo[j]=t;if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};CONFIG.menuOrder=mo;applyMenuOrder();saveConfig(function(){});renderPersonnalisation();}
@@ -6856,6 +6881,68 @@ function saveConfig(cb){
   }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
 }
 function setAccentPreview(c){if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};CONFIG.accent=c;try{document.documentElement.style.setProperty("--accent",c);}catch(e){}renderPersonnalisation();}
+/* \u00c9cran \u00ab Notifications \u00bb \u2014 accessible \u00e0 TOUS LES POSTES.
+   Le seul r\u00e9glage push existant vivait dans Personnalisation, r\u00e9serv\u00e9 aux admins :
+   un conducteur ou le d\u00e9p\u00f4t n'avait AUCUN moyen d'y revenir une fois l'invite disparue. */
+function renderNotifSettings(){
+  try{setActiveNav("btn-notifs");}catch(e){}
+  if(typeof closeSidebar==="function")closeSidebar();
+  cur=null;currentTab="notifs";
+  var m=document.getElementById("main-area");
+  var h="<div class=\"ns-wrap\">";
+  h+="<div class=\"ns-hd\"><span class=\"ns-hd-ic\"><i class=\"ti ti-bell-cog\"></i></span>";
+  h+="<div><div class=\"ns-hd-t\">Notifications</div>";
+  h+="<div class=\"ns-hd-d\">R\u00e9glage propre \u00e0 CET appareil. Si vous utilisez l'appli sur un t\u00e9l\u00e9phone et un ordinateur, activez-les des deux c\u00f4t\u00e9s.</div></div></div>";
+  h+="<div class=\"ns-card\" id=\"ns-card\"><div class=\"ns-state\" id=\"ns-state\">";
+  h+="<i class=\"ti ti-loader-2\"></i> V\u00e9rification\u2026</div></div>";
+  h+="<div class=\"ns-what\"><div class=\"ns-what-t\">Ce que vous recevrez</div><ul class=\"ns-list\">";
+  var qui=canManage()
+    ? ["Une nouvelle appro \u00e0 pr\u00e9parer","Un message sur une appro","Une demande du terrain"]
+    : ["Votre appro est pr\u00eate au d\u00e9p\u00f4t","Un message du d\u00e9p\u00f4t sur une appro","Votre appro a \u00e9t\u00e9 rendue"];
+  qui.forEach(function(x){h+="<li>"+esc(x)+"</li>";});
+  h+="</ul></div></div>";
+  m.innerHTML=h;
+  _renderNsState();
+}
+function _renderNsState(){
+  var el=document.getElementById("ns-state");
+  if(!el)return;
+  if(!_pushSupported()){
+    el.className="ns-state ns-ko";
+    el.innerHTML="<i class=\"ti ti-alert-triangle\"></i><div><b>Impossible sur cet appareil</b>"+
+      "<p>Ce navigateur ne sait pas recevoir de notifications. Essayez Chrome, Edge, Firefox ou Safari \u00e0 jour.</p></div>";
+    return;
+  }
+  if(!_pushIosOk()){
+    el.className="ns-state ns-ko";
+    el.innerHTML="<i class=\"ti ti-device-mobile-down\"></i><div><b>Installez d'abord l'application</b>"+
+      "<p>Sur iPhone, Apple n'autorise les notifications que si l'appli est ajout\u00e9e \u00e0 l'\u00e9cran d'accueil. Partager \u2192 Sur l'\u00e9cran d'accueil, puis revenez ici.</p></div>";
+    return;
+  }
+  _isPushOn().then(function(on){
+    if(on){
+      el.className="ns-state ns-ok";
+      el.innerHTML="<i class=\"ti ti-bell-check\"></i><div><b>Notifications activ\u00e9es</b>"+
+        "<p>Cet appareil vous pr\u00e9vient m\u00eame quand l'appli est ferm\u00e9e.</p>"+
+        "<button class=\"ns-btn ns-off\" onclick=\"_nsToggle()\">Couper les notifications</button></div>";
+    }else{
+      el.className="ns-state ns-off-state";
+      el.innerHTML="<i class=\"ti ti-bell-plus\"></i><div><b>Notifications d\u00e9sactiv\u00e9es</b>"+
+        "<p>Vous ne serez pr\u00e9venu que si l'appli est ouverte.</p>"+
+        "<button class=\"ns-btn\" onclick=\"_nsToggle()\">Activer sur cet appareil</button></div>";
+    }
+  }).catch(function(){
+    el.className="ns-state ns-ko";
+    el.innerHTML="<i class=\"ti ti-alert-triangle\"></i><div><b>\u00c9tat inconnu</b><p>Impossible de v\u00e9rifier. R\u00e9essayez.</p></div>";
+  });
+}
+function _nsToggle(){
+  var el=document.getElementById("ns-state");
+  if(el)el.innerHTML="<i class=\"ti ti-loader-2\"></i> Un instant\u2026";
+  Promise.resolve(togglePush()).catch(function(){}).then(function(){
+    setTimeout(function(){_renderNsState();try{_syncPushIcon();}catch(e){}},700);
+  });
+}
 function renderPersonnalisation(){try{setActiveNav('btn-perso');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   if(!isAdmin()){toast("Acc\u00e8s admin uniquement","ti-lock");return;}
@@ -7939,30 +8026,36 @@ function toggleNotif(){
 /* L'icône suit exactement la règle du pied de panneau : on ne la montre QUE s'il y a
    quelque chose à faire (push possible ET pas encore activé). Une fois activé, elle
    s'efface — la rangée revient à 7 icônes. */
+/* ═══ CHANGEMENT DE COMPTE SUR LE M\u00caME APPAREIL ═══
+   Un abonnement push appartient \u00e0 l'APPAREIL (le navigateur), pas au compte.
+   Si Tanguy active les notifications puis qu'un chef d\u00e9p\u00f4t se connecte sur ce t\u00e9l\u00e9phone :
+     \u2022 c\u00f4t\u00e9 serveur l'abonnement reste rattach\u00e9 \u00e0 Tanguy \u2192 le chef d\u00e9p\u00f4t ne re\u00e7oit rien,
+       et le t\u00e9l\u00e9phone continue d'afficher LES NOTIFICATIONS DE TANGUY ;
+     \u2022 _isPushOn() est vrai (l'abonnement navigateur existe) \u2192 le bouton reste cach\u00e9,
+       donc impossible de s'en sortir par l'interface.
+   On r\u00e9affilie donc l'abonnement au compte courant \u00e0 CHAQUE connexion. Le serveur fait
+   un upsert par endpoint (ON CONFLICT (endpoint) DO UPDATE SET user_id) : une seule ligne,
+   toujours rattach\u00e9e \u00e0 qui est connect\u00e9. Silencieux, aucune action de l'utilisateur. */
+function _pushReclaim(){
+  if(!_pushSupported()||!authToken)return;
+  navigator.serviceWorker.ready.then(function(reg){
+    return reg.pushManager.getSubscription();
+  }).then(function(sub){
+    if(!sub)return null;
+    return apiCall("POST","/push/subscribe",{subscription:(sub.toJSON?sub.toJSON():sub)});
+  }).catch(function(){});
+}
 function _syncPushIcon(){
   /* Deux emplacements : la rang\u00e9e de la sidebar (bureau) et la barre du haut (t\u00e9l\u00e9phone,
      o\u00f9 la sidebar est un tiroir ferm\u00e9). M\u00eame r\u00e8gle pour les deux.
-
-     Le bouton NE DISPARA\u00ceT PAS une fois activ\u00e9 : c'est un T\u00c9MOIN D'\u00c9TAT.
-     Le faire s'\u00e9vaporer avait deux d\u00e9fauts : qui avait d\u00e9j\u00e0 activ\u00e9 les notifs ne voyait
-     jamais rien (« je ne vois rien »), et personne ne pouvait les COUPER.
-     Seul cas o\u00f9 on le cache : quand le push est impossible ici (navigateur incompatible,
-     ou iPhone sans appli install\u00e9e) \u2014 proposer un bouton qui ne peut pas marcher est pire. */
+     Le bouton DISPARA\u00ceT une fois activ\u00e9 : c'est une invite ponctuelle, pas un r\u00e9glage.
+     Pour revenir dessus (couper, v\u00e9rifier, changer d'avis), il y a l'\u00e9cran
+     \u00ab Notifications \u00bb du menu \u2014 accessible \u00e0 tous les postes. */
   var els=[document.getElementById("push-btn"),document.getElementById("push-mtop")].filter(Boolean);
   if(!els.length)return;
-  function peint(on){
-    els.forEach(function(e){
-      e.style.display="flex";
-      e.classList.toggle("push-done",!!on);
-      e.classList.toggle("push-on",!on);
-      var i=e.querySelector("i");
-      if(i)i.className="ti "+(on?"ti-bell-check":"ti-bell-plus");
-      e.title=on?"Notifications activ\u00e9es \u2014 appuyez pour les couper"
-                :"Activer les notifications sur cet appareil";
-    });
-  }
-  if(!_canOfferPush()){els.forEach(function(e){e.style.display="none";});return;}
-  _isPushOn().then(peint).catch(function(){peint(false);});
+  function set(v){els.forEach(function(e){e.style.display=v;});}
+  if(!_canOfferPush()){set("none");return;}
+  _isPushOn().then(function(on){set(on?"none":"flex");}).catch(function(){set("none");});
 }
 function _syncPushFoot(){
   var foot=document.getElementById("notif-push-foot"),btn=document.getElementById("notif-push-btn");
@@ -8203,7 +8296,7 @@ var TUTO_MODULES={
       var iCloche=-1;
       for(var _i=0;_i<s.length;_i++){if(s[_i].sel===".notif-bell"){iCloche=_i;break;}}
       var etapePush={sel:"#push-mtop,#push-btn",ic:"ti-bell-plus",t:"Les notifications sur votre t\u00e9l\u00e9phone",
-        d:"Ce bouton pr\u00e9vient votre t\u00e9l\u00e9phone m\u00eame quand l'appli est ferm\u00e9e. Un appui, vous acceptez, c'est fait. Violet = \u00e0 activer, vert = c'est en marche.",action:"next"};
+        d:"Ce bouton violet pr\u00e9vient votre t\u00e9l\u00e9phone m\u00eame quand l'appli est ferm\u00e9e. Un appui, vous acceptez, c'est fait \u2014 et il dispara\u00eet. Pour y revenir : menu, Notifications.",action:"next"};
       if(iCloche>=0)s.splice(iCloche+1,0,etapePush); else s.push(etapePush);
     }
     return s;
@@ -8846,6 +8939,8 @@ function enterApp(){
      ils n'\u00e9taient r\u00e9veill\u00e9s que par l'ouverture du panneau cloche ou l'\u00e9cran
      Personnalisation (admin). Sur t\u00e9l\u00e9phone, on ne les voyait donc JAMAIS. */
   try{_syncPushIcon();}catch(e){}
+  /* Rattache l'abonnement de cet appareil au compte qui vient de se connecter. */
+  try{_pushReclaim();}catch(e){}
   var initials=currentUser.name.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();
   var av=document.getElementById("sb-avatar");
   av.style.background=ri.bg;av.style.color=ri.color;av.textContent=initials;
