@@ -1715,7 +1715,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .uav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .loading-screen{position:fixed;inset:0;background:#0F172A;display:flex;align-items:center;justify-content:center;z-index:3500;flex-direction:column;gap:18px}
 .notif-wrap{position:relative}
-.notif-bell{position:relative;background:none;border:1px solid #E2E8F0;border-radius:8px;width:34px;height:34px;cursor:pointer;color:#64748B;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notif-bell{position:relative;background:none;border:1px solid #E2E8F0;border-radius:8px;width:28px;height:28px;cursor:pointer;color:#64748B;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .notif-bell:hover{background:#F1F5F9;color:#0F172A}
 .notif-badge{position:absolute;top:-5px;right:-5px;background:#EF4444;color:#fff;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #F8FAFC}
 .notif-panel{position:fixed;bottom:14px;left:278px;width:320px;max-height:60vh;background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 8px 28px rgba(15,23,42,.16);z-index:700;overflow:hidden;display:none;flex-direction:column}
@@ -1738,7 +1738,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .notif-empty{padding:36px 16px;text-align:center;color:#CBD5E1;font-size:13px}
 .notif-dot{width:7px;height:7px;border-radius:50%;background:#3B82F6;flex-shrink:0;margin-top:6px}
 .news-wrap{position:relative}
-.news-bell{position:relative;background:none;border:1px solid #E2E8F0;border-radius:8px;width:34px;height:34px;cursor:pointer;color:#64748B;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.news-bell{position:relative;background:none;border:1px solid #E2E8F0;border-radius:8px;width:28px;height:28px;cursor:pointer;color:#64748B;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .news-bell:hover{background:#F1F5F9;color:#0F172A}
 .news-badge{position:absolute;top:-5px;right:-5px;background:#7C3AED;color:#fff;font-size:10px;font-weight:700;min-width:9px;height:9px;border-radius:50%;border:2px solid #F8FAFC}
 .news-panel{position:fixed;bottom:14px;left:278px;width:340px;max-height:65vh;background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 8px 28px rgba(15,23,42,.16);z-index:700;overflow:hidden;display:none;flex-direction:column}
@@ -1750,7 +1750,21 @@ table.at tr.kit-row td.td-d{position:relative}
 .news-entry{padding:11px 16px;border-bottom:1px solid #F8FAFC}
 .news-entry:last-child{border-bottom:none}
 .news-date{font-size:11px;font-weight:700;color:#7C3AED;margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
-.news-item{font-size:13px;color:#334155;line-height:1.5;display:flex;gap:7px;margin-bottom:4px}
+.news-item{font-size:12.5px;color:#334155;line-height:1.5;display:flex;gap:7px;margin-bottom:5px;align-items:flex-start}
+/* Type en pastille : un correctif ne doit pas avoir le m\u00eame poids visuel qu'une nouveaut\u00e9. */
+.news-tag{flex-shrink:0;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;padding:2px 6px;border-radius:20px;margin-top:1px}
+.nt-new{background:#DCFCE7;color:#15803D}
+.nt-imp{background:#DBEAFE;color:#1E40AF}
+.nt-fix{background:#FEF3C7;color:#92400E}
+/* Intertitre : l'\u00e9cran concern\u00e9. */
+.news-zone{font-size:10px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:.5px;margin:9px 0 5px;padding-top:7px;border-top:1px solid #F1F5F9}
+.news-entry .news-zone:first-of-type{margin-top:2px;padding-top:0;border-top:none}
+.news-new{background:#7C3AED;color:#fff;font-size:8.5px;font-weight:800;padding:1px 6px;border-radius:20px;margin-left:7px;letter-spacing:.3px;text-transform:uppercase}
+.news-entry.neuf{background:#FBFAFF}
+.news-empty{text-align:center;padding:32px 20px;color:#94A3B8}
+.news-empty i{font-size:28px;color:#DDD6FE}
+.news-empty-t{font-size:13.5px;font-weight:700;color:#475569;margin-top:9px}
+.news-empty-d{font-size:12px;margin-top:4px;line-height:1.55}
 .news-item i{color:#7C3AED;font-size:14px;flex-shrink:0;margin-top:1px}
 .spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -1940,9 +1954,9 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
       </div>
       <div class="sb-user-actions">
         <div class="news-wrap">
-          <button class="news-bell" onclick="toggleNews()" title="Nouveaut\u00e9s"><i class="ti ti-gift" style="font-size:16px"></i><span class="news-badge" id="news-badge" style="display:none"></span></button>
+          <button class="news-bell" onclick="toggleNews()" title="Nouveaut\u00e9s"><i class="ti ti-sparkles" style="font-size:15px"></i><span class="news-badge" id="news-badge" style="display:none"></span></button>
           <div class="news-panel" id="news-panel">
-            <div class="news-hd"><i class="ti ti-gift" style="font-size:17px"></i><span class="news-hd-t">Nouveaut\u00e9s</span></div>
+            <div class="news-hd"><i class="ti ti-sparkles" style="font-size:17px"></i><span class="news-hd-t">Nouveaut\u00e9s</span></div>
             <div class="news-list" id="news-list"></div>
           </div>
         </div>
@@ -5047,225 +5061,88 @@ function doPDF(){
 // ═══════════════ AUTHENTIFICATION ═══════════════
 // ═══════════════ NOTIFICATIONS ═══════════════
 // ═══════════════ NOUVEAUT\u00c9S ═══════════════
-var NEWS=[
-  {v:48,date:"6 juillet 2026",items:[
-    "Catalogue : bouton \u00ab Ajouter le kit \u00bb sur chaque cat\u00e9gorie \u2014 ajoute tous les articles du kit d'un coup ET les marque comme appartenant \u00e0 ce kit",
-    "Les articles ajout\u00e9s via un kit affichent un badge \u00ab Kit Ma\u00e7onnerie \u00bb (etc.) dans l'appro ET sur le PDF \u2014 le d\u00e9p\u00f4t voit tout de suite d'o\u00f9 vient chaque article (fini l'illisible quand on cumule plusieurs kits)"
-  ]},
-  {v:47,date:"6 juillet 2026",items:[
-    "Camions : nouvel \u00e9tat de base \u00ab Chantier \u00bb (ic\u00f4ne cône) en plus de \u00ab Au d\u00e9p\u00f4t \u00bb et \u00ab En r\u00e9vision \u00bb",
-    "Bouton rouage sur chaque camion : ouvre sa fiche \u00ab situation \u00bb (\u00e2ge/mise en circulation, prochaine r\u00e9vision, p\u00e9riode de r\u00e9vision, journal des \u00e9v\u00e9nements)",
-    "Prochaine r\u00e9vision cod\u00e9e en couleur : rouge si d\u00e9pass\u00e9e, orange si proche, vert si \u00e0 jour",
-    "Journal d'\u00e9v\u00e9nements par camion : accident, casse/panne, entretien\u2026",
-    "Cliquer sur \u00ab R\u00e9vision \u00bb ouvre la fiche pour saisir la p\u00e9riode (du\u2026 au\u2026)",
-    "Sujet camion automatique : si le camion du technicien de l'appro est en r\u00e9vision et qu'aucun autre camion ne lui est pr\u00eat\u00e9, l'appro passe en \u00ab sujet camion \u00bb avec le motif"
-  ]},
-  {v:46,date:"3 juillet 2026",items:[
-    "Catalogue cordiste modulable : 3 agencements d'affichage au choix \u2014 Liste, Compact et Grille (tuiles) \u2014 s\u00e9lectionnables en haut du panneau et m\u00e9moris\u00e9s. Le d\u00e9tachement de fen\u00eatre reste disponible en plus"
-  ]},
-  {v:45,date:"3 juillet 2026",items:[
-    "Correction : l'export/impression A3 des grandes appros refonctionne (en-t\u00eate pleine largeur, mat\u00e9riel r\u00e9parti proprement sur 2 colonnes \u00e9quilibr\u00e9es)",
-    "Administration : les comptes sont tri\u00e9s par ordre alphab\u00e9tique, avec une barre de recherche et des filtres par r\u00f4le (Admin, Conducteur, D\u00e9p\u00f4t, Technicien\u2026)",
-    "Gestion des camions : barre de recherche (nom, plaque, type) pour trouver un camion sans scroller"
-  ]},
-  {v:44,date:"3 juillet 2026",items:[
-    "Le technicien remplace le Team Leader sur le terrain : il peut prendre l'appro (\u00ab sur chantier \u00bb), ajouter du mat\u00e9riel qui fait remonter l'appro pour le d\u00e9p\u00f4t, et rendre le mat\u00e9riel \u2014 comme un TL",
-    "Les personnes inscrites (techniciens compris) apparaissent automatiquement dans les listes de noms : attribution du camion de l'appro, pr\u00eat d'un camion \u00e0 un autre, etc. (fusionn\u00e9es avec les titulaires de camions, sans doublon)"
-  ]},
-  {v:43,date:"3 juillet 2026",items:[
-    "Nouveau r\u00f4le Technicien : on s'inscrit sans code d'invitation (le code reste optionnel pour les autres r\u00f4les)",
-    "Le technicien ne voit que les appros qu'il a ouvertes (via QR/lien) et celles o\u00f9 son nom a \u00e9t\u00e9 indiqu\u00e9 par le conducteur ou le d\u00e9p\u00f4t",
-    "Reconnaissance du nom insensible aux accents/majuscules : le compte est reli\u00e9 automatiquement aux appros \u00e0 son nom, sans doublon, et le menu admin n'est plus pollu\u00e9"
-  ]},
-  {v:42,date:"3 juillet 2026",items:[
-    "Demandes r\u00e9organis\u00e9es : la demande de mat\u00e9riel dispara\u00eet de l'appro. Les Team Leaders ont une nouvelle entr\u00e9e \u00ab Demande du terrain \u00bb pour les besoins larges (nouvel \u00e9quipement, etc.). Pour un chantier pr\u00e9cis, on ajoute directement le mat\u00e9riel dans l'appro (qui remonte pour le d\u00e9p\u00f4t)",
-    "Onglet Commandes : le Team Leader concern\u00e9 est affich\u00e9 sur chaque commande (le d\u00e9p\u00f4t sait \u00e0 qui elle appartient sans chercher le N\u00b0 d'affaire)",
-    "Suppression : un bouton corbeille est disponible directement sur la feuille d'appro (brouillons compris)"
-  ]},
-  {v:41,date:"3 juillet 2026",items:[
-    "Personnalisation \u00e9tendue : tu peux d\u00e9sormais r\u00e9ordonner les entr\u00e9es du menu de gauche (Tableau de bord, Camions, Annonces\u2026) \u2014 l'ordre est m\u00e9moris\u00e9 et partag\u00e9",
-    "Catalogue : bouton \u00ab Nouvelle cat\u00e9gorie \u00bb pour cr\u00e9er une cat\u00e9gorie (m\u00eame vide) et la remplir directement (petit champ \u00ab + Ajouter un article \u00bb sur chaque carte)"
-  ]},
-  {v:40,date:"3 juillet 2026",items:[
-    "Annonces relook\u00e9es : les pop-ups affichent d\u00e9sormais chaque annonce dans une carte color\u00e9e selon son type (G\u00e9n\u00e9rale, Team Leaders, Personne) avec ic\u00f4ne et animation d'ouverture",
-    "La liste de gestion des annonces est plus moderne : pastille de type, indicateur Active/Inactive, bordure color\u00e9e"
-  ]},
-  {v:39,date:"3 juillet 2026",items:[
-    "Catalogue : les articles se modifient directement (nom + section) sans devoir supprimer/recr\u00e9er, et chaque cat\u00e9gorie peut \u00eatre renomm\u00e9e (crayon) \u2014 admin et chef d\u00e9p\u00f4t",
-    "Chef d\u00e9p\u00f4t : sa page d'accueil affiche d\u00e9sormais le panneau \u00ab \u00c0 traiter maintenant \u00bb (charge de travail en un coup d'\u0153il) au-dessus de ses colonnes"
-  ]},
-  {v:38,date:"3 juillet 2026",items:[
-    "Recherche biblioth\u00e8que corrig\u00e9e : d\u00e9sormais insensible aux accents (\u00ab eglise \u00bb trouve \u00ab \u00c9glise \u00bb, \u00ab 8eme \u00bb trouve \u00ab 8\u00c8ME \u00bb) \u2014 la recherche par adresse fonctionne enfin bien",
-    "Feuille d'appro : le champ Team Leader / Camion accepte maintenant un nom libre (technicien sans camion enregistr\u00e9)",
-    "Gestion des camions : tout se modifie directement dans la vue d'ensemble (titulaire, type, plaque, \u00e9tat, pr\u00eat) \u2014 plus besoin de descendre",
-    "Camion type : d\u00e9finis un \u00e9quipement de base, chaque nouveau camion d\u00e9marre avec (puis on ajuste) \u2014 cr\u00e9ation bien plus rapide"
-  ]},
-  {v:37,date:"2 juillet 2026",items:[
-    "Feuille d'appro relook\u00e9e facon \u00ab app moderne \u00bb : les informations sont regroup\u00e9es en 4 cartes th\u00e9matiques (Identification, Chantier, Intervenants, Planning & camion) \u2014 bien plus lisible et a\u00e9r\u00e9",
-    "PDF assorti : bandeaux de section \u00e0 la couleur d'accent (Informations chantier, Planning) pour un rendu coh\u00e9rent avec l'appli",
-    "Les bandeaux (feuille, PDF, menu) suivent la couleur d'accent choisie dans la personnalisation"
-  ]},
-  {v:36,date:"2 juillet 2026",items:[
-    "Personnalisation embellie : aper\u00e7u en direct (logo + nom + slogan) en haut de la page",
-    "Nouvelle couleur d'accent : 8 pastilles + s\u00e9lecteur libre, appliqu\u00e9e aux bandeaux de la feuille, du PDF et du menu (aper\u00e7u instantan\u00e9)",
-    "Petit nettoyage visuel du bouton Alobees et du badge \u00ab Li\u00e9 \u00e0 Alobees \u00bb sur la feuille"
-  ]},
-  {v:35,date:"2 juillet 2026",items:[
-    "Personnalisation : bug d'affichage des accents corrig\u00e9 + slogan de l'entreprise d\u00e9sormais modifiable (visible sur la feuille et le PDF)",
-    "Recherche par adresse/chantier ajout\u00e9e directement dans l'onglet Biblioth\u00e8que (barre de gauche conserv\u00e9e, les deux sont synchronis\u00e9es)",
-    "Commande re\u00e7ue : l'article de l'appro li\u00e9e passe automatiquement en \u00ab En stock \u00bb (et revient si on annule)",
-    "Camions : \u00e9tats \u00ab Au d\u00e9p\u00f4t \u00bb et \u00ab En r\u00e9vision \u00bb, pr\u00eat en un clic depuis la vue d'ensemble, et bouton \u00ab Sujet camion \u00bb sur l'appro (technicien sans camion)",
-    "Chargement plus robuste : nouvelle tentative automatique si le serveur met du temps \u00e0 r\u00e9pondre (\u00e9vite la biblioth\u00e8que vide au r\u00e9veil)"
-  ]},
-  {v:34,date:"2 juillet 2026",items:[
-    "Param\u00e9trage interface plus compact : les sections Types de chantier et Clients / Sites s'affichent c\u00f4te \u00e0 c\u00f4te sur 2 colonnes (moins de d\u00e9filement)"
-  ]},
-  {v:33,date:"2 juillet 2026",items:[
-    "Catalogue repens\u00e9 : les cat\u00e9gories s'affichent en cases sur 2 colonnes (voire plus sur grand \u00e9cran), bien plus lisible",
-    "R\u00e9agencement : fl\u00e8ches monter/descendre sur chaque cat\u00e9gorie pour choisir l'ordre d'affichage (m\u00e9moris\u00e9, appliqu\u00e9 partout y compris dans l'appro)",
-    "Kits m\u00e9tiers pr\u00eats \u00e0 l'emploi : Ma\u00e7onnerie, Couverture / Zinguerie, Peinture / Ravalement, D\u00e9molition \u2014 ajout\u00e9s en un clic"
-  ]},
-  {v:32,date:"2 juillet 2026",items:[
-    "Tableau de bord enrichi : nouveau panneau \u00ab \u00c0 traiter maintenant \u00bb avec 8 indicateurs cliquables (\u00e0 pr\u00e9parer, rendus, sur chantier, commandes en attente, demandes d\u00e9p\u00f4t, camions pr\u00eat\u00e9s, priorit\u00e9 urgente, brouillons) \u2014 un clic ouvre directement l'\u00e9cran concern\u00e9"
-  ]},
-  {v:31,date:"2 juillet 2026",items:[
-    "Annonces : possibilit\u00e9 d'envoyer une annonce \u00e0 une personne pr\u00e9cise (bouton \u00ab Une personne \u00bb, avec menu d\u00e9roulant et barre de recherche parmi tous les utilisateurs)",
-    "Th\u00e8me sombre revu : moins agressif, gris fonc\u00e9 doux et texte gris clair au lieu du noir/blanc pur, plus confortable pour les yeux"
-  ]},
-  {v:30,date:"1 juillet 2026",items:[
-    "Camions : ajout de la plaque d'immatriculation (modifiable dans Gestion des camions)",
-    "Nouvelle vue d'ensemble en haut de Gestion des camions : chaque camion avec son type, sa plaque et la personne \u00e0 qui il est attribu\u00e9 (ou \u00e0 qui il est pr\u00eat\u00e9)",
-    "Dans l'appro, le camion attribu\u00e9 affiche d\u00e9sormais son type, sa plaque et son titulaire/d\u00e9tenteur",
-    "La plaque est incluse dans l'import/export Excel des camions"
-  ]},
-  {v:29,date:"1 juillet 2026",items:[
-    "Recherche biblioth\u00e8que globale : en tapant une recherche, les appros termin\u00e9es apparaissent aussi (recherche par adresse, N\u00b0 d'affaire, article\u2026)",
-    "Mode compact nettement plus dense sur t\u00e9l\u00e9phone (libell\u00e9s de colonnes masqu\u00e9s, lignes resserr\u00e9es)",
-    "Indicateur de r\u00e9ception de commande directement sur les articles de l'appro : \u00ab Commande : re\u00e7ue \u00bb (vert) ou \u00ab en attente \u00bb (orange)"
-  ]},
-  {v:28,date:"1 juillet 2026",items:[
-    "Mode compact d\u00e9sormais efficace sur t\u00e9l\u00e9phone : les cartes d'articles sont vraiment resserr\u00e9es",
-    "Recherche biblioth\u00e8que globale : on peut retrouver une appro par n'importe quel mot (adresse de chantier, nom d'article, conducteur, commentaire...)"
-  ]},
-  {v:27,date:"1 juillet 2026",items:[
-    "Personnalisation (admin) : change le logo de l'appli, son nom, et les libell\u00e9s des 5 statuts \u2014 tout est partag\u00e9 avec l'\u00e9quipe",
-    "Le logo personnalis\u00e9 s'affiche partout (connexion, menu, PDF), avec retour au logo JARNIAS d'un clic"
-  ]},
-  {v:26,date:"1 juillet 2026",items:[
-    "Import Excel des camions et du catalogue : t\u00e9l\u00e9charge un mod\u00e8le Excel, remplis-le tranquillement, et r\u00e9importe-le \u2014 id\u00e9al pour pr\u00e9parer les donn\u00e9es sans passer par l'appli",
-    "Export Excel des camions et du catalogue (sauvegarde ou modification hors ligne)",
-    "Autocompl\u00e9tion des articles depuis le catalogue lors de la saisie d'une appro, pour \u00e9crire les noms \u00e0 l'identique (fiabilise les d\u00e9ductions de stock)"
-  ]},
-  {v:25,date:"1 juillet 2026",items:[
-    "Import Alobees enrichi : la date d'intervention et le Team Leader (chef de chantier) sont repris automatiquement dans l'appro",
-    "PDF : le mat\u00e9riel rendu au d\u00e9p\u00f4t n'est plus d\u00e9taill\u00e9 ligne par ligne, un petit r\u00e9cap \u00ab X articles rendus/d\u00e9duits du stock \u00bb le remplace",
-    "Le mat\u00e9riel d\u00e9j\u00e0 dans le camion s'affiche bien sur le PDF (net \u00e0 pr\u00e9parer)",
-    "Un brouillon ne d\u00e9clenche plus aucune notification : le d\u00e9p\u00f4t est pr\u00e9venu seulement au passage en production"
-  ]},
-  {v:24,date:"30 juin 2026",items:[
-    "Pr\u00eat de camion entre Team Leaders : depuis Gestion des camions, bouton \u00ab Pr\u00eater \u00bb pour confier provisoirement un camion \u00e0 un autre TL, et \u00ab Fin du pr\u00eat \u00bb pour le r\u00e9cup\u00e9rer",
-    "Tra\u00e7abilit\u00e9 : on sait \u00e0 tout moment qui a quel camion, avec un r\u00e9capitulatif des camions pr\u00eat\u00e9s et l'historique complet des pr\u00eats"
-  ]},
-  {v:23,date:"30 juin 2026",items:[
-    "Catalogue en fen\u00eatre flottante : bouton \u00ab fen\u00eatre \u00bb pour le d\u00e9tacher, le d\u00e9placer (glisser l'en-t\u00eate) et le redimensionner \u2014 catalogue d'un c\u00f4t\u00e9, appro de l'autre",
-    "Bouton \u00ab D\u00e9tacher \u00bb : ouvre le catalogue dans une vraie fen\u00eatre s\u00e9par\u00e9e (2e \u00e9cran). Un clic sur + ajoute l'article \u00e0 l'appro en cours",
-    "La position et la taille de la fen\u00eatre sont m\u00e9moris\u00e9es"
-  ]},
-  {v:22,date:"30 juin 2026",items:[
-    "Demandes d\u00e9p\u00f4t : un Team Leader peut demander du mat\u00e9riel au d\u00e9p\u00f4t directement depuis son appro (bouton \u00ab Demande de mat\u00e9riel au d\u00e9p\u00f4t \u00bb)",
-    "Le chef d\u00e9p\u00f4t valide (cela cr\u00e9e automatiquement une commande) ou refuse avec une justification visible par le TL",
-    "Nouvel onglet Demandes d\u00e9p\u00f4t (admin + d\u00e9p\u00f4t) avec le nombre de demandes en attente"
-  ]},
-  {v:21,date:"30 juin 2026",items:[
-    "Nouvel onglet Annonces (admin + chef d\u00e9p\u00f4t) : publie un message qui s'affiche en pop-up",
-    "Deux canaux : Annonce g\u00e9n\u00e9rale (conducteurs, d\u00e9p\u00f4t, admin) et Annonce cibl\u00e9e Team Leaders (ex. mat\u00e9riel perdu)",
-    "Chaque personne voit l'annonce une fois, puis peut la fermer"
-  ]},
-  {v:20,date:"30 juin 2026",items:[
-    "3 modes d'affichage des appros (boutons en haut \u00e0 droite) : D\u00e9compress\u00e9 (fiches d\u00e9taill\u00e9es), Hybride (densit\u00e9 interm\u00e9diaire) et Compact (aper\u00e7u serr\u00e9, id\u00e9al mobile)",
-    "Le camion a maintenant un type (Camionnette / Trafic / Master) et l'\u00e9quipement se modifie directement dans la liste"
-  ]},
-  {v:19,date:"30 juin 2026",items:[
-    "Th\u00e8me sombre : bouton lune/soleil \u00e0 c\u00f4t\u00e9 de la d\u00e9connexion, plus reposant pour les yeux. Ton choix est m\u00e9moris\u00e9 sur l'appareil",
-    "Les logos et QR codes restent lisibles, et l'impression PDF reste en clair"
-  ]},
-  {v:18,date:"30 juin 2026",items:[
-    "Nouvel onglet Commande : retrouve tout le mat\u00e9riel en commande, issu des appros (articles \u00ab En commande \u00bb) ou ajout\u00e9 \u00e0 la main",
-    "Lien automatique par N\u00b0 d'affaire : une commande saisie d'avance s'ajoute toute seule \u00e0 l'appro du m\u00eame N\u00b0 d'affaire, avec l'indication re\u00e7ue / en attente",
-    "Suivi re\u00e7u / en attente sur chaque commande"
-  ]},
-  {v:17,date:"30 juin 2026",items:[
-    "Vrai mode brouillon : une nouvelle appro reste un brouillon (invisible au d\u00e9p\u00f4t) jusqu'\u00e0 ce que tu cliques \u00ab Envoyer en production \u00bb",
-    "Bascule Appros / Brouillons dans la biblioth\u00e8que",
-    "Le chef d\u00e9p\u00f4t a maintenant acc\u00e8s \u00e0 la gestion du catalogue et des camions",
-    "La d\u00e9duction du mat\u00e9riel d\u00e9j\u00e0 dans le camion appara\u00eet aussi sur le PDF (net \u00e0 pr\u00e9parer)"
-  ]},
-  {v:16,date:"29 juin 2026",items:[
-    "Nouvelle page Gestion des camions (admin) : l'\u00e9quipement de chaque Team Leader, import des 27 camions en un clic",
-    "D\u00e9duction automatique : quand vous choisissez le Team Leader dans une appro, le mat\u00e9riel d\u00e9j\u00e0 pr\u00e9sent dans son camion est signal\u00e9 (\u00ab d\u00e9j\u00e0 dans le camion \u00bb) avec le net \u00e0 pr\u00e9parer"
-  ]},
-  {v:15,date:"29 juin 2026",items:[
-    "Nouvelle page Param\u00e9trage interface (admin) : g\u00e9rez le catalogue, ajoutez des cat\u00e9gories, les types et les clients vous-m\u00eame, sans passer par le code",
-    "Import des kits JARNIAS (Ma\u00e7onnerie, Couverture, Peinture, Cordiste, \u00c9lectroportatif...) en un clic",
-    "Nouvelle page Gestion lien Alobees : \u00e9tat de la connexion, test et rafra\u00eechissement de la liste des chantiers"
-  ]},
-  {v:14,date:"29 juin 2026",items:[
-    "Quand le Team Leader ajoute du mat\u00e9riel une fois sur chantier, l'appro reste \u00ab sur chantier \u00bb : seul l'ajout passe en pr\u00e9paration chez le d\u00e9p\u00f4t",
-    "Le nom du Team Leader appara\u00eet d\u00e9sormais sur les \u00e9tiquettes \u00ab sur chantier \u00bb et \u00ab rendu \u00bb pour le chef d\u00e9p\u00f4t"
-  ]},
-  {v:13,date:"29 juin 2026",items:[
-    "Type de travaux en menu d\u00e9roulant : plus compact, la liste ne prend plus toute la place",
-    "Nouvel encadr\u00e9 Adresse du chantier (rempli automatiquement depuis Alobees)",
-    "Boutons du haut transform\u00e9s en ic\u00f4nes, plus clairs et discrets"
-  ]},
-  {v:12,date:"29 juin 2026",items:[
-    "Import d'un chantier depuis Alobees : le N\u00b0 d'affaire, le client, l'adresse et le conducteur se remplissent tout seuls",
-    "Les grandes appros s'impriment en A3 sur 2 colonnes pour rester lisibles"
-  ]},
-  {v:11,date:"26 juin 2026",items:[
-    "Acc\u00e8s Team Leader : partagez une appro par lien ou QR code (\u00e0 mettre sur Alobees ou la feuille). Le chef d'\u00e9quipe entre son nom et compl\u00e8te l'appro depuis le chantier",
-    "Un compte d\u00e9j\u00e0 connect\u00e9 (conducteur/d\u00e9p\u00f4t) qui ouvre le lien va directement sur l'appro",
-    "Suivi des acc\u00e8s : qui a eu la main sur l'appro, dans \u00ab Historique & acc\u00e8s \u00bb"
-  ]},
-  {v:10,date:"26 juin 2026",items:[
-    "Version t\u00e9l\u00e9phone : le menu de gauche se replie en bouton \u2630, les tableaux deviennent des fiches lisibles",
-    "Alerte date limite : un bandeau signale les appros dont l'\u00e9ch\u00e9ance approche et qui ne sont pas pr\u00eates",
-    "Historique d'une appro : cr\u00e9\u00e9e / pr\u00e9par\u00e9e / modifi\u00e9e, avec qui et quand"
-  ]},
-  {v:9,date:"26 juin 2026",items:[
-    "Tableau de bord admin : activit\u00e9 par conducteur, mat\u00e9riel le plus demand\u00e9, r\u00e9partition par type de chantier",
-    "Conducteur de travaux pr\u00e9-rempli avec votre nom + menu d\u00e9roulant de tous les conducteurs"
-  ]},
-  {v:8,date:"26 juin 2026",items:[
-    "Catalogue, types de chantier et clients sont maintenant modifiables et partag\u00e9s par toute l'\u00e9quipe (l'admin peut supprimer)"
-  ]},
-  {v:6,date:"25 juin 2026",items:[
-    "Nouveau bouton Nouveaut\u00e9s \ud83c\udf81 (vous y \u00eates !) pour suivre les am\u00e9liorations de l\u0027appli",
-    "Disponibilit\u00e9 : \u00ab En commande \u00bb remplace d\u00e9sormais \u00ab \u00c0 commander \u00bb"
-  ]},
-  {v:5,date:"25 juin 2026",items:[
-    "Workflow d\u00e9p\u00f4t : une appro d\u00e9j\u00e0 pr\u00e9par\u00e9e puis modifi\u00e9e revient en haut de \u00ab \u00c0 pr\u00e9parer \u00bb avec un bandeau violet",
-    "Le chef d\u00e9p\u00f4t peut maintenant enregistrer ses modifications (le bouton ne restait plus bloqu\u00e9)",
-    "Notification automatique au d\u00e9p\u00f4t quand un ajout de derni\u00e8re minute arrive"
-  ]},
-  {v:4,date:"25 juin 2026",items:[
-    "Couleurs des ajouts : chaque session d\u0027ajout a sa propre couleur, m\u00eame en tapant directement dans une ligne vide"
-  ]},
-  {v:3,date:"24 juin 2026",items:[
-    "Catalogue r\u00e9organis\u00e9 par cat\u00e9gories avec une barre de recherche",
-    "Nouveau mat\u00e9riel : kit soudure \u00e9tanch\u00e9it\u00e9 et tout l\u0027\u00e9quipement d\u0027\u00e9tanch\u00e9it\u00e9",
-    "Types de chantier multiples + nouveaux types (Nettoyage, Ligne de vie, \u00c9v\u00e9nement...)",
-    "Nouveau champ Client / Site (Frozen, Disneyland, Tour Eiffel...)"
-  ]},
-  {v:2,date:"24 juin 2026",items:[
-    "Colonne Commentaire dans les tableaux d\u0027articles",
-    "Suppression d\u0027une appro directement depuis la Biblioth\u00e8que"
-  ]},
-  {v:1,date:"23 juin 2026",items:[
-    "Notifications par cloche \ud83d\udd14 et par email",
-    "Gestion des emails des comptes par l\u0027administrateur"
-  ]}
-];
+/* ═══ NOUVEAUTÉS ═══
+   Table rase à la sortie de la V1 (17 juillet 2026) : l'historique de rodage
+   (47 entrées, ~20 000 caractères) a été effacé. On repart de zéro.
+
+   STRUCTURE D'UNE ENTRÉE — à respecter pour les prochaines :
+     {v:1, date:"20 juillet 2026", items:[
+       {t:"nouveau",  z:"Camions", roles:["depot"],              txt:"..."},
+       {t:"ameliore", z:"Appros",  roles:["conducteur","depot"], txt:"..."},
+       {t:"corrige",  z:"Appros",                                txt:"..."}
+     ]}
+   • v     : numéro de version, strictement croissant (sert au badge « non lu »)
+   • t     : "nouveau" | "ameliore" | "corrige"  → pastille de couleur
+   • z     : l'écran concerné → sert d'intertitre (Appros, Dépôt, Camions…)
+   • roles : QUI est concerné. Absent = tout le monde.
+             On ne montre à chacun que ce qui lui sert.
+   • txt   : une phrase, côté utilisateur. Pas de jargon technique. */
+var NEWS=[];
+
+/* ═══ RÈGLE : TOUTE NOUVEAUTÉ LIVRÉE S'INSCRIT ICI ═══
+   Consigne permanente de Su. Une fonctionnalité, une amélioration ou un correctif
+   visible par l'utilisateur n'est PAS terminé tant qu'il n'a pas son entrée ci-dessus.
+   Ce que la machine vérifie (suite _t_news.js, à rejouer avant chaque livraison) :
+     • le format de chaque entrée (v, date, items) et de chaque item (t, z, txt, roles) ;
+     • que « v » est unique et strictement décroissant ;
+     • que le nombre d'entrées ne dépasse PAS NEWS_MAX.
+   Ce que la machine NE PEUT PAS vérifier : qu'on a pensé à écrire l'entrée.
+   D'où la règle écrite ici, à l'endroit exact où on ajoute une nouveauté. */
+
+/* Plafond : au-delà, les plus anciennes disparaissent d'elles-mêmes.
+   Sans ça, le journal redevient le mur de 47 entrées (~20 000 caractères) qu'on
+   vient d'effacer, que plus personne ne lit. */
+var NEWS_MAX=10;
+
+/* Tri défensif (le plus récent d'abord) puis élagage. Fait au chargement : même si
+   quelqu'un ajoute une entrée au mauvais endroit ou en oublie une vieille, l'écran
+   reste propre. Le test, lui, EXIGE que la source soit élaguée à la main : le code
+   rattrape l'affichage, pas la négligence. */
+NEWS.sort(function(a,b){return b.v-a.v;});
+if(NEWS.length>NEWS_MAX)NEWS=NEWS.slice(0,NEWS_MAX);
+
+/* Rôles à considérer pour l'utilisateur courant (l'admin voit tout). */
+function _newsRoles(){
+  var raw=(currentUser&&currentUser.role)||"conducteur";
+  if(raw==="admin")return ["conducteur","depot","team_leader"];
+  return [(typeof _tourRole==="function")?_tourRole():raw];
+}
+/* Une entrée ne concerne un rôle que si au moins un de ses items le concerne. */
+function _newsItemsFor(n,roles){
+  return (n.items||[]).map(function(it){
+    /* tolère l'ancien format (chaîne simple) au cas où */
+    return (typeof it==="string")?{t:"ameliore",z:"",txt:it}:it;
+  }).filter(function(it){
+    if(!it.roles||!it.roles.length)return true;          /* pas de rôle = pour tout le monde */
+    for(var i=0;i<roles.length;i++)if(it.roles.indexOf(roles[i])>=0)return true;
+    return false;
+  });
+}
+function _newsForRole(){
+  var roles=_newsRoles(),out=[];
+  NEWS.forEach(function(n){
+    var items=_newsItemsFor(n,roles);
+    if(items.length)out.push({v:n.v,date:n.date,items:items});
+  });
+  return out;
+}
+/* Version la plus récente qui me concerne VRAIMENT : si la v48 ne contient rien
+   pour moi, elle ne doit pas me coller une pastille « non lu ». */
+function _newsMaxForRole(){
+  var l=_newsForRole();
+  return l.length?l.reduce(function(m,n){return Math.max(m,n.v);},0):0;
+}
+/* Combien d'items non lus me concernent (pour le compteur). */
+function _newsUnreadCount(){
+  var c=0;
+  _newsForRole().forEach(function(n){if(n.v>newsSeenVersion)c+=n.items.length;});
+  return c;
+}
+var NEWS_TYPES={
+  nouveau:{l:"Nouveau",c:"nt-new"},
+  ameliore:{l:"Am\u00e9lior\u00e9",c:"nt-imp"},
+  corrige:{l:"Corrig\u00e9",c:"nt-fix"}
+};
 var NEWS_VERSION=NEWS.reduce(function(m,n){return Math.max(m,n.v);},0);
 var newsSeenVersion=0;var newsOpen=false;
 var serverConductors=[];
@@ -7749,16 +7626,41 @@ function loadNewsSeen(){
 function renderNewsBadge(){
   var b=document.getElementById("news-badge");
   if(!b)return;
-  b.style.display=(newsSeenVersion<NEWS_VERSION)?"block":"none";
+  /* On se base sur la derni\u00e8re version QUI ME CONCERNE, pas sur le max global :
+     une version qui ne contient rien pour mon r\u00f4le ne doit pas me pastiller. */
+  var n=(newsSeenVersion<_newsMaxForRole())?_newsUnreadCount():0;
+  b.style.display=n?"block":"none";
+  b.textContent=n?(n>9?"9+":String(n)):"";
 }
 function renderNews(){
   var list=document.getElementById("news-list");
   if(!list)return;
+  var data=_newsForRole();
+  if(!data.length){
+    list.innerHTML="<div class=\"news-empty\"><i class=\"ti ti-sparkles\"></i>"+
+      "<div class=\"news-empty-t\">Aucune nouveaut\u00e9</div>"+
+      "<div class=\"news-empty-d\">Les prochaines am\u00e9liorations s'afficheront ici, avec ce qui vous concerne en premier.</div></div>";
+    return;
+  }
   var h="";
-  NEWS.forEach(function(n){
-    h+="<div class=\"news-entry\"><div class=\"news-date\">"+esc(n.date)+"</div>";
+  data.forEach(function(n){
+    var neuf=n.v>newsSeenVersion;
+    h+="<div class=\"news-entry"+(neuf?" neuf":"")+"\">";
+    h+="<div class=\"news-date\">"+esc(n.date)+(neuf?"<span class=\"news-new\">nouveau</span>":"")+"</div>";
+    /* Regroup\u00e9 par \u00e9cran : on garde l'ordre d'apparition des zones, pas un tri alphab\u00e9tique
+       (l'auteur de l'entr\u00e9e met le plus important en premier). */
+    var zones=[],parZone={};
     n.items.forEach(function(it){
-      h+="<div class=\"news-item\"><i class=\"ti ti-sparkles\"></i><span>"+esc(it)+"</span></div>";
+      var z=it.z||"";
+      if(!parZone[z]){parZone[z]=[];zones.push(z);}
+      parZone[z].push(it);
+    });
+    zones.forEach(function(z){
+      if(z)h+="<div class=\"news-zone\">"+esc(z)+"</div>";
+      parZone[z].forEach(function(it){
+        var ty=NEWS_TYPES[it.t]||NEWS_TYPES.ameliore;
+        h+="<div class=\"news-item\"><span class=\"news-tag "+ty.c+"\">"+ty.l+"</span><span>"+esc(it.txt||"")+"</span></div>";
+      });
     });
     h+="</div>";
   });
@@ -7770,10 +7672,14 @@ function toggleNews(){
   if(panel)panel.classList.toggle("open",newsOpen);
   if(newsOpen){
     renderNews();
-    if(newsSeenVersion<NEWS_VERSION){
-      newsSeenVersion=NEWS_VERSION;
+    /* On ne marque lu QUE jusqu'\u00e0 la derni\u00e8re version qui me concerne : sinon une
+       version destin\u00e9e \u00e0 un autre r\u00f4le serait « lue » sans m'avoir \u00e9t\u00e9 montr\u00e9e,
+       et je raterais ses items si on m'y ajoutait plus tard. */
+    var vu=_newsMaxForRole();
+    if(vu>newsSeenVersion){
+      newsSeenVersion=vu;
       renderNewsBadge();
-      apiCall("PUT","/news/seen",{version:NEWS_VERSION}).catch(function(){});
+      apiCall("PUT","/news/seen",{version:vu}).catch(function(){});
     }
   }
 }
