@@ -7,6 +7,26 @@ const path = require('path');
 const cors = require('cors');
 const crypto = require('crypto');
 
+// ── WEB PUSH (notifications type app, iOS 16.4+ / Android / desktop) ──
+// Chargement défensif : si le module ou les clés manquent, le push est
+// simplement désactivé, le reste de l'app continue de tourner normalement.
+let webpush = null, PUSH_ENABLED = false;
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:contact@jarnias.fr';
+try {
+  if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+    webpush = require('web-push');
+    webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+    PUSH_ENABLED = true;
+    console.log('Web push activé.');
+  } else {
+    console.log('Web push désactivé (clés VAPID absentes).');
+  }
+} catch (e) {
+  console.log('Web push indisponible (module web-push non installé) :', e.message);
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const SECRET = process.env.JWT_SECRET || 'jarnias-approvisio-change-me';
@@ -94,6 +114,8 @@ async function notify(userId, type, title, body, approId, emailSubject, emailHtm
   } catch (e) {
     console.error('Erreur création notification:', e.message);
   }
+  // Push (type app) en parallèle — ne bloque jamais.
+  sendPush(userId, { title: title, body: body || '', approId: approId || null, type: type });
   // Email en parallèle (ne bloque pas)
   if (emailSubject) {
     try {
@@ -104,6 +126,36 @@ async function notify(userId, type, title, body, approId, emailSubject, emailHtm
     } catch (e) {
       console.error('Erreur lookup email:', e.message);
     }
+  }
+}
+
+// Envoie une notification push à tous les appareils abonnés d'un utilisateur.
+async function sendPush(userId, payload) {
+  if (!PUSH_ENABLED || !userId) return;
+  try {
+    const { rows } = await pool.query('SELECT id, endpoint, p256dh, auth FROM push_subscriptions WHERE user_id = $1', [userId]);
+    if (!rows.length) return;
+    const data = JSON.stringify({
+      title: payload.title || 'AppROVISIO',
+      body: payload.body || '',
+      approId: payload.approId || null,
+      type: payload.type || ''
+    });
+    for (const sub of rows) {
+      const subscription = { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } };
+      try {
+        await webpush.sendNotification(subscription, data);
+      } catch (err) {
+        // 404/410 = abonnement expiré ou révoqué → on le retire proprement.
+        if (err && (err.statusCode === 404 || err.statusCode === 410)) {
+          await pool.query('DELETE FROM push_subscriptions WHERE id = $1', [sub.id]).catch(() => {});
+        } else {
+          console.error('Push échec:', err && err.statusCode, err && err.body);
+        }
+      }
+    }
+  } catch (e) {
+    console.error('sendPush erreur:', e.message);
   }
 }
 
@@ -172,6 +224,25 @@ async function initDB() {
       user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
       created_at  TIMESTAMP DEFAULT NOW(),
       PRIMARY KEY (appro_id, user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS appro_comments (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      appro_id    UUID NOT NULL,
+      user_id     UUID,
+      author_name VARCHAR(160) NOT NULL,
+      author_role VARCHAR(30),
+      body        VARCHAR(2000) NOT NULL,
+      created_at  TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS push_subscriptions (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
+      endpoint    TEXT NOT NULL UNIQUE,
+      p256dh      TEXT NOT NULL,
+      auth        TEXT NOT NULL,
+      created_at  TIMESTAMP DEFAULT NOW()
     );
   `);
   // Ajout de la colonne email si elle n'existe pas déjà (migration douce)
@@ -481,6 +552,75 @@ app.get('/api/appros/:id/team-leaders', auth, async (req, res) => {
        WHERE tl.appro_id = $1 ORDER BY tl.created_at ASC`, [req.params.id]
     );
     res.json(rows);
+  } catch (e) { res.status(500).json({ error: 'Erreur' }); }
+});
+
+// ── FIL DE DISCUSSION PAR APPRO (conducteur ↔ dépôt) ──────────────
+// Stocké dans sa propre table : jamais dans le JSON de l'appro, pour ne pas
+// être écrasé quand les deux côtés enregistrent l'appro en même temps.
+app.get('/api/appros/:id/comments', auth, async (req, res) => {
+  try {
+    if (req.user.role === 'team_leader') {
+      const lk = await pool.query('SELECT 1 FROM appro_team_leaders WHERE appro_id = $1 AND user_id = $2', [req.params.id, req.user.id]);
+      if (!lk.rows[0]) return res.status(403).json({ error: 'Accès refusé' });
+    }
+    const { rows } = await pool.query(
+      `SELECT id, user_id, author_name, author_role, body, created_at
+         FROM appro_comments WHERE appro_id = $1 ORDER BY created_at ASC`, [req.params.id]
+    );
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: 'Erreur' }); }
+});
+
+app.post('/api/appros/:id/comments', auth, async (req, res) => {
+  try {
+    const body = (req.body && req.body.body || '').trim();
+    if (!body) return res.status(400).json({ error: 'Message vide' });
+    if (body.length > 2000) return res.status(400).json({ error: 'Message trop long' });
+    if (req.user.role === 'team_leader') {
+      const lk = await pool.query('SELECT 1 FROM appro_team_leaders WHERE appro_id = $1 AND user_id = $2', [req.params.id, req.user.id]);
+      if (!lk.rows[0]) return res.status(403).json({ error: 'Accès refusé' });
+    }
+    const ins = await pool.query(
+      `INSERT INTO appro_comments (appro_id, user_id, author_name, author_role, body)
+       VALUES ($1,$2,$3,$4,$5) RETURNING id, user_id, author_name, author_role, body, created_at`,
+      [req.params.id, req.user.id, req.user.name, req.user.role, body]
+    );
+    const msg = ins.rows[0];
+
+    // Notifier les autres intervenants (jamais l'auteur lui-même).
+    try {
+      const ap = await pool.query('SELECT data, created_by FROM appros WHERE id = $1', [req.params.id]);
+      const chantier = (ap.rows[0] && ap.rows[0].data && ap.rows[0].data.nomChantier) || 'une appro';
+      const extrait = body.length > 120 ? body.slice(0, 117) + '…' : body;
+      const dest = new Set();
+      // le créateur de l'appro
+      if (ap.rows[0] && ap.rows[0].created_by) dest.add(ap.rows[0].created_by);
+      // tous les dépôts (sauf si l'auteur est lui-même dépôt)
+      if (req.user.role !== 'depot') {
+        const depots = await pool.query("SELECT id FROM users WHERE role = 'depot'");
+        depots.rows.forEach(d => dest.add(d.id));
+      }
+      // si l'auteur est dépôt, on vise le(s) conducteur(s) via le créateur (déjà ajouté)
+      dest.delete(req.user.id); // jamais soi-même
+      const titre = 'Nouveau message — ' + chantier;
+      const corps = req.user.name + ' : ' + extrait;
+      const mailHtml = '<p><b>' + req.user.name + '</b> a écrit sur l\'appro <b>' + chantier + '</b> :</p><blockquote>' + extrait + '</blockquote>';
+      dest.forEach(uid => notify(uid, 'appro_message', titre, corps, req.params.id, 'AppROVISIO — Nouveau message', mailHtml));
+    } catch (e) { console.error('Notif message:', e.message); }
+
+    res.json(msg);
+  } catch (e) { res.status(500).json({ error: 'Erreur' }); }
+});
+
+app.delete('/api/appros/:id/comments/:cid', auth, async (req, res) => {
+  try {
+    // Un auteur peut supprimer son message ; admin peut tout supprimer.
+    const c = await pool.query('SELECT user_id FROM appro_comments WHERE id = $1 AND appro_id = $2', [req.params.cid, req.params.id]);
+    if (!c.rows[0]) return res.status(404).json({ error: 'Message introuvable' });
+    if (req.user.role !== 'admin' && c.rows[0].user_id !== req.user.id) return res.status(403).json({ error: 'Non autorisé' });
+    await pool.query('DELETE FROM appro_comments WHERE id = $1', [req.params.cid]);
+    res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: 'Erreur' }); }
 });
 
@@ -927,6 +1067,38 @@ app.put('/api/notifications/read-all', auth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: 'Erreur' }); }
 });
 
+// ── WEB PUSH : clé publique + abonnement/désabonnement ──
+// Expose la clé publique VAPID (le client en a besoin pour s'abonner).
+app.get('/api/push/key', (req, res) => {
+  res.json({ enabled: PUSH_ENABLED, key: PUSH_ENABLED ? VAPID_PUBLIC_KEY : '' });
+});
+// Enregistre (ou met à jour) l'abonnement push de l'appareil courant.
+app.post('/api/push/subscribe', auth, async (req, res) => {
+  try {
+    if (!PUSH_ENABLED) return res.status(503).json({ error: 'Push désactivé' });
+    const sub = req.body && req.body.subscription;
+    if (!sub || !sub.endpoint || !sub.keys || !sub.keys.p256dh || !sub.keys.auth) {
+      return res.status(400).json({ error: 'Abonnement invalide' });
+    }
+    // upsert par endpoint (un même appareil ne crée qu'une ligne, rattachée à l'utilisateur courant)
+    await pool.query(
+      `INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth)
+       VALUES ($1,$2,$3,$4)
+       ON CONFLICT (endpoint) DO UPDATE SET user_id = EXCLUDED.user_id, p256dh = EXCLUDED.p256dh, auth = EXCLUDED.auth`,
+      [req.user.id, sub.endpoint, sub.keys.p256dh, sub.keys.auth]
+    );
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: 'Erreur' }); }
+});
+// Retire l'abonnement de cet appareil.
+app.post('/api/push/unsubscribe', auth, async (req, res) => {
+  try {
+    const endpoint = req.body && req.body.endpoint;
+    if (endpoint) await pool.query('DELETE FROM push_subscriptions WHERE endpoint = $1', [endpoint]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: 'Erreur' }); }
+});
+
 // ── PWA : manifest + service worker servis en inline (pas de fichiers à déposer) ──
 const PWA_ACCENT = '#6D28D9';
 // Icône SVG simple (boîte d'appro) encodée — sert d'icône maskable toutes tailles.
@@ -992,6 +1164,30 @@ self.addEventListener('fetch',e=>{
   e.respondWith(caches.match(req).then(cached=>{
     const net=fetch(req).then(r=>{const cp=r.clone();caches.open(CACHE).then(c=>c.put(req,cp)).catch(()=>{});return r;}).catch(()=>cached);
     return cached||net;
+  }));
+});
+// ── PUSH : afficher la notification reçue ──
+self.addEventListener('push',e=>{
+  let d={};try{d=e.data?e.data.json():{};}catch(_){d={};}
+  const title=d.title||'AppROVISIO';
+  const opts={
+    body:d.body||'',
+    icon:'/pwa-icon-192.png',
+    badge:'/pwa-icon-192.png',
+    data:{approId:d.approId||null,type:d.type||''},
+    tag:d.approId?('appro-'+d.approId):undefined,
+    renotify:!!d.approId
+  };
+  e.waitUntil(self.registration.showNotification(title,opts));
+});
+// ── Clic sur la notification : ouvrir l'app (et l'appro visée si présente) ──
+self.addEventListener('notificationclick',e=>{
+  e.notification.close();
+  const approId=e.notification.data&&e.notification.data.approId;
+  const target=approId?('/?appro='+approId):'/';
+  e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{
+    for(const c of list){ if('focus' in c){ c.navigate(target).catch(()=>{}); return c.focus(); } }
+    if(clients.openWindow) return clients.openWindow(target);
   }));
 });
 `);
