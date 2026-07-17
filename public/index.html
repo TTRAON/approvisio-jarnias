@@ -500,6 +500,8 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
    atteignable SANS ouvrir le tiroir. Il dispara\u00eet une fois les notifs activ\u00e9es. */
 .mtop-push{margin-left:auto;background:rgba(167,139,250,.30);color:#fff}
 .mtop-push:hover{background:rgba(167,139,250,.45)}
+.mtop-push.push-done{background:rgba(74,222,128,.26)}
+.mtop-push.push-done:hover{background:rgba(74,222,128,.40)}
 .mtop-btn{background:rgba(255,255,255,.13);border:none;color:#fff;width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:21px;cursor:pointer}
   .mtop-btn:active{background:rgba(255,255,255,.25)}
   .mtop-logo{width:30px;border-radius:5px}
@@ -1849,6 +1851,10 @@ html.dark .tour-hole{box-shadow:0 0 0 3px #0F172A,0 0 0 6px var(--accent,#6D28D9
    notifications activées (cf. _syncPushIcon) — comme le bouton d'installation. */
 .btn-theme.push-on{background:rgba(109,40,217,.14);color:#6D28D9}
 .btn-theme.push-on:hover{background:rgba(109,40,217,.22)}
+/* Activ\u00e9 : vert discret. On reste visible pour dire « c'est en marche »
+   et permettre de couper \u2014 sans crier comme l'\u00e9tat « \u00e0 activer ». */
+.btn-theme.push-done{background:rgba(21,128,61,.13);color:#15803D}
+.btn-theme.push-done:hover{background:rgba(21,128,61,.22)}
 /* ===== 3 MODES D'AFFICHAGE DES APPROS ===== */
 .vm-seg{display:inline-flex;background:#F1F5F9;border-radius:8px;padding:2px;gap:2px;margin-right:4px}
 .vm-b{border:none;background:transparent;color:#94A3B8;width:28px;height:26px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px}
@@ -5129,7 +5135,7 @@ function doPDF(){
    • txt   : une phrase, côté utilisateur. Pas de jargon technique. */
 var NEWS=[
   {v:1,date:"17 juillet 2026",items:[
-    {t:"nouveau",z:"Notifications",txt:"Un bouton violet en forme de cloche, \u00e0 c\u00f4t\u00e9 de votre nom, active les notifications sur votre t\u00e9l\u00e9phone \u2014 vous \u00eates pr\u00e9venu m\u00eame quand l'appli est ferm\u00e9e. Il dispara\u00eet une fois activ\u00e9."},
+    {t:"nouveau",z:"Notifications",txt:"Un bouton cloche, \u00e0 c\u00f4t\u00e9 de votre nom et en haut de l'\u00e9cran sur t\u00e9l\u00e9phone, active les notifications \u2014 vous \u00eates pr\u00e9venu m\u00eame quand l'appli est ferm\u00e9e. Violet = \u00e0 activer, vert = c'est en marche."},
     {t:"ameliore",z:"Notifications",txt:"L'activation \u00e9tait enterr\u00e9e au fond du panneau de la cloche : elle est maintenant visible d'un coup d'\u0153il, pour tous les postes."},
     {t:"nouveau",z:"Aide",txt:"La visite guid\u00e9e « Les bases » explique d\u00e9sormais comment activer les notifications sur son t\u00e9l\u00e9phone."}
   ]}
@@ -7935,12 +7941,28 @@ function toggleNotif(){
    s'efface — la rangée revient à 7 icônes. */
 function _syncPushIcon(){
   /* Deux emplacements : la rang\u00e9e de la sidebar (bureau) et la barre du haut (t\u00e9l\u00e9phone,
-     o\u00f9 la sidebar est un tiroir ferm\u00e9). M\u00eame r\u00e8gle pour les deux. */
+     o\u00f9 la sidebar est un tiroir ferm\u00e9). M\u00eame r\u00e8gle pour les deux.
+
+     Le bouton NE DISPARA\u00ceT PAS une fois activ\u00e9 : c'est un T\u00c9MOIN D'\u00c9TAT.
+     Le faire s'\u00e9vaporer avait deux d\u00e9fauts : qui avait d\u00e9j\u00e0 activ\u00e9 les notifs ne voyait
+     jamais rien (« je ne vois rien »), et personne ne pouvait les COUPER.
+     Seul cas o\u00f9 on le cache : quand le push est impossible ici (navigateur incompatible,
+     ou iPhone sans appli install\u00e9e) \u2014 proposer un bouton qui ne peut pas marcher est pire. */
   var els=[document.getElementById("push-btn"),document.getElementById("push-mtop")].filter(Boolean);
   if(!els.length)return;
-  function set(v){els.forEach(function(e){e.style.display=v;});}
-  if(!_canOfferPush()){set("none");return;}
-  _isPushOn().then(function(on){set(on?"none":"flex");}).catch(function(){set("none");});
+  function peint(on){
+    els.forEach(function(e){
+      e.style.display="flex";
+      e.classList.toggle("push-done",!!on);
+      e.classList.toggle("push-on",!on);
+      var i=e.querySelector("i");
+      if(i)i.className="ti "+(on?"ti-bell-check":"ti-bell-plus");
+      e.title=on?"Notifications activ\u00e9es \u2014 appuyez pour les couper"
+                :"Activer les notifications sur cet appareil";
+    });
+  }
+  if(!_canOfferPush()){els.forEach(function(e){e.style.display="none";});return;}
+  _isPushOn().then(peint).catch(function(){peint(false);});
 }
 function _syncPushFoot(){
   var foot=document.getElementById("notif-push-foot"),btn=document.getElementById("notif-push-btn");
@@ -8181,7 +8203,7 @@ var TUTO_MODULES={
       var iCloche=-1;
       for(var _i=0;_i<s.length;_i++){if(s[_i].sel===".notif-bell"){iCloche=_i;break;}}
       var etapePush={sel:"#push-mtop,#push-btn",ic:"ti-bell-plus",t:"Les notifications sur votre t\u00e9l\u00e9phone",
-        d:"Ce bouton violet pr\u00e9vient votre t\u00e9l\u00e9phone m\u00eame quand l'appli est ferm\u00e9e. Un appui, vous acceptez, c'est fait \u2014 et le bouton dispara\u00eet.",action:"next"};
+        d:"Ce bouton pr\u00e9vient votre t\u00e9l\u00e9phone m\u00eame quand l'appli est ferm\u00e9e. Un appui, vous acceptez, c'est fait. Violet = \u00e0 activer, vert = c'est en marche.",action:"next"};
       if(iCloche>=0)s.splice(iCloche+1,0,etapePush); else s.push(etapePush);
     }
     return s;
