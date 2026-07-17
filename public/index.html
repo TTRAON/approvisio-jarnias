@@ -1358,6 +1358,34 @@ table.at tr.kit-row td.td-d{position:relative}
 .cp-fab .cp-fab-t{display:inline}
 @media(max-width:640px){.cp-fab{right:14px;bottom:16px;padding:14px;border-radius:50%}.cp-fab .cp-fab-t{display:none}}
 @media print{.cp-fab{display:none!important}}
+/* ═══ Fil de discussion ═══ */
+.thread-card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden}
+.thread-hd{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid #F1F5F9;font-size:14px;font-weight:700;color:#0F172A}
+.thread-sub{font-size:11.5px;font-weight:500;color:#94A3B8}
+.thread-cnt{margin-left:auto;font-size:11px;font-weight:700;color:#6D28D9;background:#F3EEFF;padding:2px 9px;border-radius:20px;min-width:22px;text-align:center}
+.thread-cnt:empty{display:none}
+.thread-list{max-height:340px;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px;background:#FBFCFD}
+.thread-loading,.thread-empty{color:#94A3B8;font-size:12.5px;text-align:center;padding:18px 10px;line-height:1.5}
+.thread-empty i{font-size:20px;display:block;margin-bottom:6px;color:#CBD5E1}
+.thread-msg{display:flex;gap:9px;align-items:flex-start}
+.thread-msg.mine{flex-direction:row-reverse}
+.thread-av{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700}
+.thread-bub{background:#fff;border:1px solid #E8EDF4;border-radius:12px;padding:8px 12px;max-width:78%}
+.thread-msg.mine .thread-bub{background:#F3EEFF;border-color:#E4D8FF}
+.thread-meta{font-size:11px;color:#94A3B8;margin-bottom:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.thread-meta b{color:#0F172A;font-size:12px}
+.thread-role{background:#F1F5F9;color:#475569;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:20px;text-transform:uppercase;letter-spacing:.3px}
+.thread-time{font-size:10.5px}
+.thread-del{background:none;border:none;color:#CBD5E1;cursor:pointer;padding:2px;margin-left:2px;font-size:12px}
+.thread-del:hover{color:#DC2626}
+.thread-body{font-size:13px;color:#1E293B;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.thread-compose{display:flex;gap:8px;padding:11px 12px;border-top:1px solid #F1F5F9;align-items:flex-end}
+.thread-input{flex:1;border:1px solid #E2E8F0;border-radius:10px;padding:9px 12px;font-family:inherit;font-size:13px;resize:none;max-height:120px;line-height:1.4;color:#1E293B}
+.thread-input:focus{outline:none;border-color:#6D28D9;box-shadow:0 0 0 3px rgba(109,40,217,.12)}
+.thread-send{width:40px;height:40px;flex-shrink:0;border:none;border-radius:10px;background:#6D28D9;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px}
+.thread-send:hover{background:#5B21B6}
+.thread-send:disabled{opacity:.5;cursor:default}
+@media print{.thread-card{display:none!important}}
 /* ═══ Scanner QR intégré ═══ */
 .scan-fab{position:fixed;left:20px;bottom:22px;z-index:850;display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,#0F172A,#334155);color:#fff;border:none;border-radius:30px;padding:14px 20px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 12px 30px -8px rgba(15,23,42,.6);transition:transform .16s var(--ease),box-shadow .2s}
 .scan-fab i{font-size:19px}
@@ -1721,6 +1749,9 @@ table.at tr.kit-row td.td-d{position:relative}
 .notif-panel{position:fixed;bottom:14px;left:278px;width:320px;max-height:60vh;background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 8px 28px rgba(15,23,42,.16);z-index:700;overflow:hidden;display:none;flex-direction:column}
 @media(max-width:640px){.notif-panel{left:12px;right:12px;width:auto;bottom:12px}}
 .notif-panel.open{display:flex}
+.notif-foot{border-top:1px solid #F1F5F9;padding:10px 12px;flex-shrink:0}
+.notif-push-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:#F3EEFF;color:#6D28D9;border:1px solid #E4D8FF;border-radius:9px;padding:10px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer}
+.notif-push-btn:hover{background:#EBE3FF}
 .notif-hd{padding:12px 15px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between}
 .notif-hd-t{font-size:14px;font-weight:700;color:#0F172A}
 .notif-readall{background:none;border:none;font-size:12px;color:#1D4ED8;cursor:pointer;font-family:inherit;font-weight:600}
@@ -1965,6 +1996,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
           <div class="notif-panel" id="notif-panel">
             <div class="notif-hd"><span class="notif-hd-t">Notifications</span><button class="notif-readall" onclick="markAllRead()">Tout marquer lu</button></div>
             <div class="notif-list" id="notif-list"></div>
+            <div class="notif-foot" id="notif-push-foot" style="display:none"><button class="notif-push-btn" id="notif-push-btn" onclick="togglePush()"><i class="ti ti-bell"></i> Activer les notifications sur cet appareil</button></div>
           </div>
         </div>
         <div id="amb-btn-wrap" style="position:relative;display:inline-block">
@@ -4436,9 +4468,16 @@ h+="<div class=\"card\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class
   h+=_approNextStepHTML();
   h+="<div style=\"height:16px\"></div></div>";
   if(cur&&cur._id){
+    // Fil de discussion conducteur ↔ dépôt (chargé après le rendu)
+    h+="<div style=\"max-width:920px;margin:0 auto 20px;padding:0 18px\"><div class=\"thread-card\"><div class=\"thread-hd\"><i class=\"ti ti-messages\" style=\"font-size:18px;color:#6D28D9\"></i> Discussion <span class=\"thread-sub\">conducteur &amp; d&#233;p&#244;t</span><span class=\"thread-cnt\" id=\"thread-cnt\"></span></div><div class=\"thread-list\" id=\"thread-list\"><div class=\"thread-loading\">Chargement&#8230;</div></div>"+
+      (isField()?"":"<div class=\"thread-compose\"><textarea id=\"thread-input\" class=\"thread-input\" rows=\"1\" placeholder=\"\u00c9crire un message\u2026\" oninput=\"_threadGrow(this)\"></textarea><button class=\"thread-send\" onclick=\"postThreadMsg()\" title=\"Envoyer\"><i class=\"ti ti-send\"></i></button></div>")+
+      "</div></div>";
+  }
+  if(cur&&cur._id){
     h+="<div style=\"max-width:920px;margin:0 auto 24px;padding:0 18px\"><div style=\"background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden\"><button type=\"button\" onclick=\"toggleHistory()\" style=\"width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:14px 16px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#0F172A\"><i class=\"ti ti-history\" style=\"font-size:17px;color:#64748B\"></i> Historique &amp; acc\u00e8s <i class=\"ti ti-chevron-down\" id=\"hist-chev\" style=\"margin-left:auto;color:#94A3B8\"></i></button><div id=\"hist-box\" style=\"display:none;padding:0 16px 16px\"></div></div></div>";
   }
   document.getElementById("main-area").innerHTML=h;
+  if(cur&&cur._id){try{loadThread();}catch(e){}}
   if(isField()){
     var _isecs=document.querySelectorAll(".info-sec");
     _isecs.forEach(function(ic){
@@ -6844,7 +6883,10 @@ function renderPersonnalisation(){try{setActiveNav('btn-perso');}catch(e){}
   h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-device-mobile\" style=\"color:#6D28D9\"></i> Application mobile</div>";
   h+="<div style=\"padding:14px\"><p style=\"font-size:12.5px;color:#64748B;margin:0 0 12px;line-height:1.55\">Installez AppROVISIO comme une vraie application : une ic\u00f4ne sur l'\u00e9cran d'accueil, un d\u00e9marrage en plein \u00e9cran, et un acc\u00e8s plus rapide. Id\u00e9al sur le t\u00e9l\u00e9phone, sur chantier.</p>";
   h+="<button class=\"jbtn\" onclick=\"pwaInstall()\" style=\"display:inline-flex;align-items:center;gap:8px\"><i class=\"ti ti-download\"></i> Installer l'application</button>";
-  h+="<div style=\"font-size:11.5px;color:#94A3B8;margin-top:9px\">Sur iPhone : bouton <b>Partager</b> puis <b>\u00ab Sur l'\u00e9cran d'accueil \u00bb</b>. Sur Android : le bouton ci-dessus (ou le menu du navigateur).</div></div></div>";
+  h+="<div style=\"font-size:11.5px;color:#94A3B8;margin-top:9px\">Sur iPhone : bouton <b>Partager</b> puis <b>\u00ab Sur l'\u00e9cran d'accueil \u00bb</b>. Sur Android : le bouton ci-dessus (ou le menu du navigateur).</div>";
+  // Notifications push (type app) — activées par appareil
+  h+="<div id=\"push-row\" style=\"display:none;border-top:1px solid #F1F5F9;margin-top:14px;padding-top:14px\"><div style=\"font-size:13px;font-weight:700;color:#0F172A;margin-bottom:5px\"><i class=\"ti ti-bell\" style=\"color:#6D28D9\"></i> Notifications sur l'appareil</div><p style=\"font-size:12.5px;color:#64748B;margin:0 0 10px;line-height:1.5\">Recevez une notification (comme une vraie app) d\u00e8s qu'une appro vous concerne : appro pr\u00eate, message du d\u00e9p\u00f4t, demande de derni\u00e8re minute. \u00c0 activer sur chaque appareil.</p><button id=\"push-toggle-btn\" class=\"jbtn\" onclick=\"togglePush()\" style=\"display:inline-flex;align-items:center;gap:8px\"><i class=\"ti ti-bell\"></i> Activer les notifications</button><div id=\"push-state\" style=\"font-size:11.5px;color:#94A3B8;margin-top:8px\"></div></div>";
+  h+="</div></div>";
   // Notifications par email (admin uniquement — déjà dans cette page réservée admin)
   var mailOn=(CONFIG.mailNotifs!==false);
   h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-mail\" style=\"color:#6D28D9\"></i> Notifications par email</div>";
@@ -6856,6 +6898,7 @@ function renderPersonnalisation(){try{setActiveNav('btn-perso');}catch(e){}
   h+="<button onclick=\"savePerso()\" style=\"width:100%;background:#6D28D9;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit\"><i class=\"ti ti-device-floppy\"></i> Enregistrer la personnalisation</button>";
   h+="</div>";
   m.innerHTML=h;
+  try{_syncPushBtn();}catch(e){}
 }
 function pickLogo(){
   var inp=document.createElement("input");inp.type="file";inp.accept="image/png,image/jpeg,image/webp";
@@ -7052,6 +7095,74 @@ function toggleHistory(){
   box.style.display=histOpen?"block":"none";
   if(chev)chev.className="ti ti-chevron-"+(histOpen?"up":"down");
   if(histOpen)loadHistory();
+}
+/* ═══ Fil de discussion par appro ═══ */
+var _threadMsgs=[];
+function _threadRoleLabel(role){return role==="depot"?"D\u00e9p\u00f4t":role==="conducteur"?"Conducteur":role==="admin"?"Admin":role==="team_leader"?"Terrain":"";}
+function _threadInitials(name){return (name||"?").trim().split(/\s+/).map(function(w){return w[0]||"";}).slice(0,2).join("").toUpperCase();}
+function loadThread(){
+  if(!cur||!cur._id)return;
+  apiCall("GET","/appros/"+cur._id+"/comments").then(function(list){
+    _threadMsgs=Array.isArray(list)?list:[];
+    renderThread();
+  }).catch(function(){
+    var l=document.getElementById("thread-list");
+    if(l)l.innerHTML="<div class=\"thread-empty\">Impossible de charger la discussion.</div>";
+  });
+}
+function renderThread(){
+  var l=document.getElementById("thread-list");if(!l)return;
+  var cnt=document.getElementById("thread-cnt");if(cnt)cnt.textContent=_threadMsgs.length?String(_threadMsgs.length):"";
+  if(!_threadMsgs.length){l.innerHTML="<div class=\"thread-empty\"><i class=\"ti ti-message-2\"></i> Aucun message. Posez une question au d\u00e9p\u00f4t ou au conducteur \u2014 la trace reste sur l'appro.</div>";return;}
+  var me=(currentUser&&currentUser.id)||null;
+  var h="";
+  _threadMsgs.forEach(function(m){
+    var mine=me&&m.user_id===me;
+    var when=_threadWhen(m.created_at);
+    var del=(mine||(currentUser&&currentUser.role==="admin"))?"<button class=\"thread-del\" onclick=\"delThreadMsg('"+m.id+"')\" title=\"Supprimer\"><i class=\"ti ti-trash\"></i></button>":"";
+    h+="<div class=\"thread-msg"+(mine?" mine":"")+"\">"+
+        "<div class=\"thread-av\" style=\"background:"+_threadColor(m.author_role)+"\">"+_threadInitials(m.author_name)+"</div>"+
+        "<div class=\"thread-bub\"><div class=\"thread-meta\"><b>"+esc(m.author_name||"")+"</b> <span class=\"thread-role\">"+_threadRoleLabel(m.author_role)+"</span> <span class=\"thread-time\">"+when+"</span>"+del+"</div><div class=\"thread-body\">"+esc(m.body||"").replace(/\n/g,"<br>")+"</div></div>"+
+       "</div>";
+  });
+  l.innerHTML=h;
+  l.scrollTop=l.scrollHeight;
+}
+function _threadColor(role){return role==="depot"?"#0F766E":role==="conducteur"?"#6D28D9":role==="admin"?"#B45309":role==="team_leader"?"#1D4ED8":"#64748B";}
+function _threadWhen(iso){
+  if(!iso)return"";
+  var d=new Date(iso),now=new Date();
+  var sameDay=d.toDateString()===now.toDateString();
+  var hh=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
+  if(sameDay)return"aujourd'hui "+hh;
+  var y=new Date(now);y.setDate(now.getDate()-1);
+  if(d.toDateString()===y.toDateString())return"hier "+hh;
+  return ("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+d.getFullYear()+" "+hh;
+}
+function _threadGrow(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight,120)+"px";}
+function postThreadMsg(){
+  if(!cur||!cur._id)return;
+  var ta=document.getElementById("thread-input");if(!ta)return;
+  var body=(ta.value||"").trim();
+  if(!body){ta.focus();return;}
+  var btn=document.querySelector(".thread-send");if(btn)btn.disabled=true;
+  apiCall("POST","/appros/"+cur._id+"/comments",{body:body}).then(function(m){
+    ta.value="";ta.style.height="auto";
+    if(m&&m.id)_threadMsgs.push(m);
+    renderThread();
+    if(btn)btn.disabled=false;
+  }).catch(function(){
+    if(btn)btn.disabled=false;
+    toast("Envoi impossible","ti-alert-circle");
+  });
+}
+function delThreadMsg(id){
+  if(!cur||!cur._id)return;
+  if(!confirm("Supprimer ce message ?"))return;
+  apiCall("DELETE","/appros/"+cur._id+"/comments/"+id).then(function(){
+    _threadMsgs=_threadMsgs.filter(function(m){return m.id!==id;});
+    renderThread();
+  }).catch(function(){toast("Suppression impossible","ti-alert-circle");});
 }
 function histMeta(type){
   var m={
@@ -7716,7 +7827,8 @@ var NOTIF_ICONS={
   appro_creee:{ic:"ti-clipboard-plus",bg:"#FFF7ED",col:"#C2410C"},
   appro_prete:{ic:"ti-package-import",bg:"#D1FAE5",col:"#065F46"},
   appro_rendue:{ic:"ti-checks",bg:"#DBEAFE",col:"#1D4ED8"},
-  appro_modifiee:{ic:"ti-edit",bg:"#F1F5F9",col:"#475569"}
+  appro_modifiee:{ic:"ti-edit",bg:"#F1F5F9",col:"#475569"},
+  appro_message:{ic:"ti-message-2",bg:"#F3EEFF",col:"#6D28D9"}
 };
 
 function loadNotifs(){
@@ -7799,7 +7911,17 @@ function toggleNotif(){
   notifOpen=!notifOpen;
   var panel=document.getElementById("notif-panel");
   if(panel)panel.classList.toggle("open",notifOpen);
-  if(notifOpen)loadNotifs();
+  if(notifOpen){loadNotifs();try{_syncPushFoot();}catch(e){}}
+}
+function _syncPushFoot(){
+  var foot=document.getElementById("notif-push-foot"),btn=document.getElementById("notif-push-btn");
+  if(!foot)return;
+  if(!_canOfferPush()){foot.style.display="none";return;}
+  _isPushOn().then(function(on){
+    if(on){foot.style.display="none";return;} // déjà activé : on n'encombre pas
+    foot.style.display="block";
+    if(btn)btn.innerHTML="<i class=\"ti ti-bell\"></i> Activer les notifications sur cet appareil";
+  });
 }
 
 function openNotif(id,approId){
@@ -9028,6 +9150,82 @@ function pwaInstall(){
   } else {
     if(typeof toast==="function")toast("Dans Chrome/Edge : icône d'installation dans la barre d'adresse, ou menu ⋮ → Installer","ti-download");
   }
+}
+/* ═══ Notifications push (type app) ═══ */
+function _urlB64ToU8(base64){
+  var pad="=".repeat((4-base64.length%4)%4);
+  var b64=(base64+pad).replace(/-/g,"+").replace(/_/g,"/");
+  var raw=atob(b64),arr=new Uint8Array(raw.length);
+  for(var i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);
+  return arr;
+}
+function _pushSupported(){
+  return ("serviceWorker" in navigator)&&("PushManager" in window)&&("Notification" in window);
+}
+function _pushIosOk(){
+  // sur iOS le push n'existe QUE si l'app est installée en plein écran (standalone)
+  var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent||"");
+  return !isIOS || _isPwaInstalled();
+}
+function _canOfferPush(){return _pushSupported()&&_pushIosOk();}
+function _isPushOn(){
+  if(!_pushSupported())return Promise.resolve(false);
+  return navigator.serviceWorker.ready.then(function(reg){
+    return reg.pushManager.getSubscription().then(function(s){return !!s;});
+  }).catch(function(){return false;});
+}
+function enablePush(){
+  if(!_canOfferPush()){
+    var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent||"");
+    if(isIOS&&!_isPwaInstalled()){toast("Installez d'abord l'app sur l'écran d'accueil pour activer les notifications","ti-device-mobile");_pwaShowIosHelp&&_pwaShowIosHelp();}
+    else toast("Notifications non disponibles sur cet appareil","ti-bell-off");
+    return;
+  }
+  // la demande de permission doit être déclenchée par un geste utilisateur (ce clic)
+  Notification.requestPermission().then(function(perm){
+    if(perm!=="granted"){toast("Notifications refusées","ti-bell-off");_syncPushBtn();return;}
+    apiCall("GET","/push/key").then(function(r){
+      if(!r||!r.enabled||!r.key){toast("Push non configuré côté serveur","ti-alert-circle");return;}
+      navigator.serviceWorker.ready.then(function(reg){
+        reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:_urlB64ToU8(r.key)}).then(function(sub){
+          apiCall("POST","/push/subscribe",{subscription:sub.toJSON?sub.toJSON():sub}).then(function(){
+            toast("Notifications activées","ti-bell-check");_syncPushBtn();
+          }).catch(function(){toast("Enregistrement impossible","ti-alert-circle");});
+        }).catch(function(){toast("Abonnement impossible","ti-alert-circle");});
+      });
+    }).catch(function(){toast("Push indisponible","ti-alert-circle");});
+  });
+}
+function disablePush(){
+  if(!_pushSupported())return;
+  navigator.serviceWorker.ready.then(function(reg){
+    reg.pushManager.getSubscription().then(function(sub){
+      if(!sub){_syncPushBtn();return;}
+      var ep=sub.endpoint;
+      sub.unsubscribe().finally(function(){
+        apiCall("POST","/push/unsubscribe",{endpoint:ep}).finally(function(){toast("Notifications désactivées","ti-bell-off");_syncPushBtn();});
+      });
+    });
+  });
+}
+function togglePush(){
+  _isPushOn().then(function(on){on?disablePush():enablePush();});
+}
+function _syncPushBtn(){
+  var row=document.getElementById("push-row");
+  var btn=document.getElementById("push-toggle-btn");
+  if(!row&&!btn)return;
+  if(!_canOfferPush()){if(row)row.style.display="none";return;}
+  if(row)row.style.display="flex";
+  _isPushOn().then(function(on){
+    if(btn){
+      btn.innerHTML=on?"<i class=\"ti ti-bell-check\"></i> Notifications activées":"<i class=\"ti ti-bell\"></i> Activer les notifications";
+      btn.className="jbtn"+(on?" jbtn-ghost":"");
+    }
+    var st=document.getElementById("push-state");
+    if(st)st.textContent=on?"Activées sur cet appareil":"Désactivées sur cet appareil";
+  });
+  try{_syncPushFoot();}catch(e){}
 }
 function _pwaShowIosHelp(){
   // petite fenêtre d'aide illustrée pour iPhone (pas de prompt natif sur iOS)
