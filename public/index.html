@@ -1696,7 +1696,7 @@ table.at tr.kit-row td.td-d{position:relative}
    tout bouton qui ne tient pas est COUPÉ — donc invisible ET incliquable.
    C'est ce qui est arrivé à la déconnexion quand la rangée est passée à 8 boutons
    (8×30 + 7×6 = 282 px pour 244 px utiles). Ne pas remettre nowrap. */
-.sb-user-actions{display:flex;gap:5px;align-items:center;flex-wrap:wrap;flex:1 1 100%;justify-content:flex-end}
+.sb-user-actions{display:flex;gap:3px;align-items:center;flex-wrap:wrap;flex:1 1 100%;justify-content:flex-end}
 .sb-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .sb-user-name{font-size:12px;font-weight:600;color:#1E293B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sb-user-role{font-size:10px;color:#94A3B8}
@@ -1743,7 +1743,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .uav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .loading-screen{position:fixed;inset:0;background:#0F172A;display:flex;align-items:center;justify-content:center;z-index:3500;flex-direction:column;gap:18px}
 .notif-wrap{position:relative}
-.notif-bell{position:relative;background:none;border:1px solid #E2E8F0;border-radius:8px;width:28px;height:28px;cursor:pointer;color:#64748B;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notif-bell{position:relative;background:none;border:1px solid #E2E8F0;border-radius:8px;width:26px;height:26px;cursor:pointer;color:#64748B;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .notif-bell:hover{background:#F1F5F9;color:#0F172A}
 .notif-badge{position:absolute;top:-5px;right:-5px;background:#EF4444;color:#fff;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #F8FAFC}
 .notif-panel{position:fixed;bottom:14px;left:278px;width:320px;max-height:60vh;background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 8px 28px rgba(15,23,42,.16);z-index:700;overflow:hidden;display:none;flex-direction:column}
@@ -1769,7 +1769,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .notif-empty{padding:36px 16px;text-align:center;color:#CBD5E1;font-size:13px}
 .notif-dot{width:7px;height:7px;border-radius:50%;background:#3B82F6;flex-shrink:0;margin-top:6px}
 .news-wrap{position:relative}
-.news-bell{position:relative;background:none;border:1px solid #E2E8F0;border-radius:8px;width:28px;height:28px;cursor:pointer;color:#64748B;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.news-bell{position:relative;background:none;border:1px solid #E2E8F0;border-radius:8px;width:26px;height:26px;cursor:pointer;color:#64748B;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .news-bell:hover{background:#F1F5F9;color:#0F172A}
 .news-badge{position:absolute;top:-5px;right:-5px;background:#7C3AED;color:#fff;font-size:10px;font-weight:700;min-width:9px;height:9px;border-radius:50%;border:2px solid #F8FAFC}
 .news-panel{position:fixed;bottom:14px;left:278px;width:340px;max-height:65vh;background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 8px 28px rgba(15,23,42,.16);z-index:700;overflow:hidden;display:none;flex-direction:column}
@@ -1838,8 +1838,13 @@ html.dark .tour-hole{box-shadow:0 0 0 3px #0F172A,0 0 0 6px var(--accent,#6D28D9
 /* Les captures/aperçus PDF s'ouvrent dans une fenêtre séparée : jamais inversés. */
 @media print{html.dark #auth-screen{filter:none!important}}
 @media print{html.dark{filter:none!important}html.dark img{filter:none!important}}
-.btn-theme{width:28px;height:28px;border:none;background:rgba(148,163,184,.16);color:#64748B;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-theme{width:26px;height:26px;border:none;background:rgba(148,163,184,.16);color:#64748B;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .btn-theme:hover{background:rgba(148,163,184,.28)}
+/* Le bouton « activer les notifications » est une ACTION ponctuelle, pas un réglage :
+   on le teinte pour qu'il ressorte des autres icônes, et il DISPARAÎT une fois les
+   notifications activées (cf. _syncPushIcon) — comme le bouton d'installation. */
+.btn-theme.push-on{background:rgba(109,40,217,.14);color:#6D28D9}
+.btn-theme.push-on:hover{background:rgba(109,40,217,.22)}
 /* ===== 3 MODES D'AFFICHAGE DES APPROS ===== */
 .vm-seg{display:inline-flex;background:#F1F5F9;border-radius:8px;padding:2px;gap:2px;margin-right:4px}
 .vm-b{border:none;background:transparent;color:#94A3B8;width:28px;height:26px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px}
@@ -1999,6 +2004,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
             <div class="notif-foot" id="notif-push-foot" style="display:none"><button class="notif-push-btn" id="notif-push-btn" onclick="togglePush()"><i class="ti ti-bell"></i> Activer les notifications sur cet appareil</button></div>
           </div>
         </div>
+        <button class="btn-theme push-on" id="push-btn" onclick="togglePush()" title="Activer les notifications sur cet appareil" style="display:none"><i class="ti ti-bell-plus" style="font-size:15px"></i></button>
         <div id="amb-btn-wrap" style="position:relative;display:inline-block">
           <button class="btn-theme" id="amb-btn" onclick="event.stopPropagation();toggleAmbPop()" title="Ambiance couleur"><i class="ti ti-palette" style="font-size:15px"></i></button>
         </div>
@@ -5116,7 +5122,13 @@ function doPDF(){
    • roles : QUI est concerné. Absent = tout le monde.
              On ne montre à chacun que ce qui lui sert.
    • txt   : une phrase, côté utilisateur. Pas de jargon technique. */
-var NEWS=[];
+var NEWS=[
+  {v:1,date:"17 juillet 2026",items:[
+    {t:"nouveau",z:"Notifications",txt:"Un bouton violet en forme de cloche, \u00e0 c\u00f4t\u00e9 de votre nom, active les notifications sur votre t\u00e9l\u00e9phone \u2014 vous \u00eates pr\u00e9venu m\u00eame quand l'appli est ferm\u00e9e. Il dispara\u00eet une fois activ\u00e9."},
+    {t:"ameliore",z:"Notifications",txt:"L'activation \u00e9tait enterr\u00e9e au fond du panneau de la cloche : elle est maintenant visible d'un coup d'\u0153il, pour tous les postes."},
+    {t:"nouveau",z:"Aide",txt:"La visite guid\u00e9e « Les bases » explique d\u00e9sormais comment activer les notifications sur son t\u00e9l\u00e9phone."}
+  ]}
+];
 
 /* ═══ RÈGLE : TOUTE NOUVEAUTÉ LIVRÉE S'INSCRIT ICI ═══
    Consigne permanente de Su. Une fonctionnalité, une amélioration ou un correctif
@@ -7911,7 +7923,18 @@ function toggleNotif(){
   notifOpen=!notifOpen;
   var panel=document.getElementById("notif-panel");
   if(panel)panel.classList.toggle("open",notifOpen);
-  if(notifOpen){loadNotifs();try{_syncPushFoot();}catch(e){}}
+  if(notifOpen){loadNotifs();try{_syncPushFoot();_syncPushIcon();}catch(e){}}
+}
+/* L'icône suit exactement la règle du pied de panneau : on ne la montre QUE s'il y a
+   quelque chose à faire (push possible ET pas encore activé). Une fois activé, elle
+   s'efface — la rangée revient à 7 icônes. */
+function _syncPushIcon(){
+  var b=document.getElementById("push-btn");
+  if(!b)return;
+  if(!_canOfferPush()){b.style.display="none";return;}
+  _isPushOn().then(function(on){
+    b.style.display=on?"none":"flex";
+  }).catch(function(){b.style.display="none";});
 }
 function _syncPushFoot(){
   var foot=document.getElementById("notif-push-foot"),btn=document.getElementById("notif-push-btn");
@@ -8144,6 +8167,16 @@ var TUTO_MODULES={
       {before:_navHome,sel:"#pwa-install-btn",ic:"ti-download",t:"Installer l'application",d:"Ajoutez AppROVISIO \u00e0 votre \u00e9cran d'accueil : une ic\u00f4ne, un d\u00e9marrage plein \u00e9cran, un acc\u00e8s plus rapide. Parfait sur le t\u00e9l\u00e9phone.",action:"next"},
       {before:_navHome,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
     ];
+    /* L'\u00e9tape « notifications sur le t\u00e9l\u00e9phone » ne s'ins\u00e8re QUE si le push est
+       r\u00e9ellement possible ici (navigateur compatible, et sur iOS appli install\u00e9e) ET
+       qu'il n'est pas d\u00e9j\u00e0 activ\u00e9 : sinon #push-btn est masqu\u00e9 et on surlignerait du vide. */
+    if(typeof _canOfferPush==="function"&&_canOfferPush()&&document.getElementById("push-btn")&&_tourVisible(document.getElementById("push-btn"))){
+      var iCloche=-1;
+      for(var _i=0;_i<s.length;_i++){if(s[_i].sel===".notif-bell"){iCloche=_i;break;}}
+      var etapePush={sel:"#push-btn",ic:"ti-bell-plus",t:"Les notifications sur votre t\u00e9l\u00e9phone",
+        d:"Ce bouton violet pr\u00e9vient votre t\u00e9l\u00e9phone m\u00eame quand l'appli est ferm\u00e9e. Un appui, vous acceptez, c'est fait \u2014 et le bouton dispara\u00eet.",action:"next"};
+      if(iCloche>=0)s.splice(iCloche+1,0,etapePush); else s.push(etapePush);
+    }
     return s;
   }},
 
@@ -9225,7 +9258,7 @@ function _syncPushBtn(){
     var st=document.getElementById("push-state");
     if(st)st.textContent=on?"Activées sur cet appareil":"Désactivées sur cet appareil";
   });
-  try{_syncPushFoot();}catch(e){}
+  try{_syncPushFoot();_syncPushIcon();}catch(e){}
 }
 function _pwaShowIosHelp(){
   // petite fenêtre d'aide illustrée pour iPhone (pas de prompt natif sur iOS)
