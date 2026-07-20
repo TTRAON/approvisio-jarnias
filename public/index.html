@@ -1851,6 +1851,32 @@ html.dark .tour-hole{box-shadow:0 0 0 3px #0F172A,0 0 0 6px var(--accent,#6D28D9
    notifications activées (cf. _syncPushIcon) — comme le bouton d'installation. */
 .btn-theme.push-on{background:rgba(109,40,217,.14);color:#6D28D9}
 .btn-theme.push-on:hover{background:rgba(109,40,217,.22)}
+/* ═══ MESSAGES EN ATTENTE ═══ */
+.pending-badge{background:#DC2626;color:#fff;font-size:10px;font-weight:800;min-width:17px;height:17px;border-radius:9px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;margin-left:auto}
+#btn-pending{position:relative}
+.mtop-pending{position:relative}
+.mtop-pending .pending-badge{position:absolute;top:-3px;right:-3px;margin:0}
+.pd-wrap{max-width:760px;margin:0 auto;padding:22px 18px 40px}
+.pd-hd{display:flex;gap:13px;align-items:flex-start;margin-bottom:18px}
+.pd-hd-ic{width:42px;height:42px;border-radius:12px;background:#FEE2E2;color:#B91C1C;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.pd-hd-t{font-size:19px;font-weight:800;color:#0F172A;letter-spacing:-.3px}
+.pd-hd-d{font-size:12.5px;color:#64748B;line-height:1.55;margin-top:3px}
+.pd-card{display:block;width:100%;text-align:left;background:#fff;border:1px solid #E8EDF4;border-left:3px solid #DC2626;border-radius:12px;padding:13px 15px;margin-bottom:11px;cursor:pointer;font-family:inherit;transition:transform .14s var(--ease),box-shadow .16s}
+.pd-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px -14px rgba(15,23,42,.5)}
+.pd-card-top{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+.pd-aff{font-size:11px;font-weight:800;color:#6D28D9;letter-spacing:.2px}
+.pd-at{font-size:11px;color:#94A3B8;margin-left:auto}
+.pd-chantier{font-size:14.5px;font-weight:800;color:#0F172A;margin-bottom:7px}
+.pd-msg{display:flex;gap:7px;align-items:baseline;flex-wrap:wrap}
+.pd-role{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;padding:1px 7px;border-radius:20px;background:#F1F5F9;color:#64748B;flex-shrink:0}
+.pd-extrait{font-size:12.5px;color:#475569;line-height:1.5}
+.pd-go{margin-top:9px;font-size:12px;font-weight:700;color:#B91C1C;display:flex;align-items:center;gap:5px}
+.pd-empty{text-align:center;padding:40px 20px;color:#94A3B8}
+.pd-empty i{font-size:34px;color:#86EFAC}
+.pd-empty-t{font-size:15px;font-weight:800;color:#15803D;margin-top:10px}
+.pd-empty-d{font-size:12.5px;margin-top:4px;line-height:1.55}
+@media print{.pd-wrap{display:none!important}}
+
 /* ═══ ÉCRAN NOTIFICATIONS (tous les postes) ═══ */
 .ns-wrap{max-width:720px;margin:0 auto;padding:22px 18px 40px}
 .ns-hd{display:flex;gap:13px;align-items:flex-start;margin-bottom:18px}
@@ -2063,6 +2089,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
       <button class="btn-admin" id="btn-cmd" onclick="renderCommandes()" style="display:none;--c:#6D28D9"><i class="ti ti-clipboard-list" style="font-size:15px"></i> Commande</button>
       <button class="btn-admin" id="btn-annonce" onclick="renderAnnonces()" style="display:none;--c:#BE123C"><i class="ti ti-speakerphone" style="font-size:15px"></i> Annonces</button>
       <button class="btn-admin" id="btn-tickets" onclick="renderTickets()" style="display:none;--c:#1D4ED8"><i class="ti ti-ticket" style="font-size:15px"></i> <span id="tk-lbl">Demandes dépôt</span></button>
+      <button class="btn-admin" id="btn-pending" onclick="renderPending()" style="--c:#B91C1C"><i class="ti ti-message-report" style="font-size:15px"></i> Messages en attente<span class="pending-badge" id="pending-badge" style="display:none">0</span></button>
       <button class="btn-admin" id="btn-notifs" onclick="renderNotifSettings()" style="--c:#6D28D9"><i class="ti ti-bell-cog" style="font-size:15px"></i> Notifications</button>
       <button class="btn-admin" id="btn-perso" onclick="renderPersonnalisation()" style="display:none;--c:#6D28D9"><i class="ti ti-palette" style="font-size:15px"></i> Personnalisation</button>
       <div id="sheets-list"></div>
@@ -2074,6 +2101,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
       <button class="mtop-btn" onclick="toggleSidebar()"><span class="mtop-burger"><span></span><span></span><span></span></span></button>
       <img data-jlogo="1" class="mtop-logo" alt="JARNIAS"/>
       <span class="mtop-title">AppROVISIO</span>
+      <button class="mtop-btn mtop-pending" id="btn-pending-m" onclick="renderPending()" title="Messages en attente" style="display:none"><i class="ti ti-message-report" style="font-size:19px"></i><span class="pending-badge" id="pending-badge-m" style="display:none">0</span></button>
       <button class="mtop-btn mtop-push" id="push-mtop" onclick="togglePush()" title="Activer les notifications sur cet appareil" style="display:none"><i class="ti ti-bell-plus" style="font-size:19px"></i></button>
     </div>
     <div id="deadline-banner" class="dl-banner" style="display:none"></div>
@@ -5161,6 +5189,7 @@ var NEWS=[
   {v:1,date:"17 juillet 2026",items:[
     {t:"nouveau",z:"Notifications",txt:"Un bouton violet en forme de cloche, \u00e0 c\u00f4t\u00e9 de votre nom et en haut de l'\u00e9cran sur t\u00e9l\u00e9phone, active les notifications \u2014 vous \u00eates pr\u00e9venu m\u00eame quand l'appli est ferm\u00e9e. Il dispara\u00eet une fois activ\u00e9."},
     {t:"ameliore",z:"Notifications",txt:"Nouvel \u00e9cran \u00ab Notifications \u00bb dans le menu : v\u00e9rifiez ou coupez les notifications quand vous voulez, sur chaque appareil. Accessible \u00e0 tous les postes."},
+    {t:"nouveau",z:"Appros",txt:"Nouvel onglet \u00ab Messages en attente \u00bb : toutes les appros dont un message est rest\u00e9 sans r\u00e9ponse, au m\u00eame endroit. D\u00e8s que vous r\u00e9pondez, l'appro en sort. Un compteur rouge signale ce qu'il reste \u00e0 traiter."},
     {t:"corrige",z:"Notifications",txt:"Sur un appareil partag\u00e9, les notifications restaient rattach\u00e9es au compte pr\u00e9c\u00e9dent : la personne qui se connectait ensuite ne recevait rien et voyait les alertes de l'autre. Corrig\u00e9."},
     {t:"nouveau",z:"Aide",txt:"La visite guid\u00e9e « Les bases » explique d\u00e9sormais comment activer les notifications sur son t\u00e9l\u00e9phone."}
   ]}
@@ -6840,8 +6869,8 @@ function tlTicketSection(){
 // ═══ PERSONNALISATION ═══
 
 // ═══ MENU DE GAUCHE — ordre personnalisable ═══
-var MENU_KEYS=["btn-new-sb","btn-terrain","btn-admin","btn-dash","btn-ui","btn-alo","btn-trucks","btn-cmd","btn-annonce","btn-tickets","btn-notifs","btn-perso"];
-var MENU_LABELS={"btn-new-sb":"Nouvelle appro","btn-terrain":"Demande du terrain","btn-admin":"Administration","btn-dash":"Tableau de bord","btn-ui":"Param\u00e9trage interface","btn-alo":"Lien Alobees","btn-trucks":"Gestion des camions","btn-cmd":"Commandes","btn-annonce":"Annonces","btn-notifs":"Notifications","btn-tickets":"Demandes d\u00e9p\u00f4t","btn-perso":"Personnalisation"};
+var MENU_KEYS=["btn-new-sb","btn-pending","btn-terrain","btn-admin","btn-dash","btn-ui","btn-alo","btn-trucks","btn-cmd","btn-annonce","btn-tickets","btn-notifs","btn-perso"];
+var MENU_LABELS={"btn-new-sb":"Nouvelle appro","btn-terrain":"Demande du terrain","btn-admin":"Administration","btn-dash":"Tableau de bord","btn-ui":"Param\u00e9trage interface","btn-alo":"Lien Alobees","btn-trucks":"Gestion des camions","btn-cmd":"Commandes","btn-annonce":"Annonces","btn-pending":"Messages en attente","btn-notifs":"Notifications","btn-tickets":"Demandes d\u00e9p\u00f4t","btn-perso":"Personnalisation"};
 function _menuOrder(){var mo=(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.menuOrder)?CONFIG.menuOrder.slice():[];MENU_KEYS.forEach(function(k){if(mo.indexOf(k)<0)mo.push(k);});return mo;}
 function applyMenuOrder(){try{var body=document.querySelector(".sb-body");var anchor=document.getElementById("sheets-list");if(!body||!anchor)return;_menuOrder().forEach(function(k){var el=document.getElementById(k);if(el)body.insertBefore(el,anchor);});}catch(e){}}
 function moveMenu(i,dir){var mo=_menuOrder();var j=i+dir;if(j<0||j>=mo.length)return;var t=mo[i];mo[i]=mo[j];mo[j]=t;if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};CONFIG.menuOrder=mo;applyMenuOrder();saveConfig(function(){});renderPersonnalisation();}
@@ -6884,6 +6913,78 @@ function setAccentPreview(c){if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};C
 /* \u00c9cran \u00ab Notifications \u00bb \u2014 accessible \u00e0 TOUS LES POSTES.
    Le seul r\u00e9glage push existant vivait dans Personnalisation, r\u00e9serv\u00e9 aux admins :
    un conducteur ou le d\u00e9p\u00f4t n'avait AUCUN moyen d'y revenir une fois l'invite disparue. */
+/* ═══ MESSAGES EN ATTENTE ═══
+   Une appro est « en attente » quand le DERNIER message vient de l'autre bord et que
+   personne n'a répondu. C'est calculé côté serveur (dernier message + rôle). Pour tous
+   les postes. Répondre fait sortir l'appro de la liste \u2014 rien \u00e0 cocher. */
+var PENDING=[];
+function loadPending(cb){
+  if(!authToken){if(cb)cb();return;}
+  apiCall("GET","/appros/pending-messages").then(function(list){
+    PENDING=Array.isArray(list)?list:[];
+    _renderPendingBadge();
+    if(currentTab==="pending")renderPending();
+    if(cb)cb();
+  }).catch(function(){if(cb)cb();});
+}
+function _renderPendingBadge(){
+  var n=PENDING.length;
+  ["pending-badge","pending-badge-m"].forEach(function(id){
+    var b=document.getElementById(id);
+    if(!b)return;
+    b.style.display=n?"inline-flex":"none";
+    b.textContent=n>9?"9+":String(n);
+  });
+  /* Sur t\u00e9l\u00e9phone, l'acc\u00e8s de la barre du haut n'appara\u00eet que s'il y a \u00e0 traiter :
+     pas d'\u00e9l\u00e9ment mort dans la barre quand tout est \u00e0 jour. */
+  var mb=document.getElementById("btn-pending-m");
+  if(mb)mb.style.display=n?"inline-flex":"none";
+}
+function _pendingQuand(iso){
+  try{
+    var d=new Date(iso),n=new Date();
+    var j=Math.floor((new Date(n.getFullYear(),n.getMonth(),n.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
+    var h=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
+    if(j===0)return "aujourd'hui \u00e0 "+h;
+    if(j===1)return "hier \u00e0 "+h;
+    return d.toLocaleDateString("fr-FR");
+  }catch(e){return "";}
+}
+function _pendingRole(r){
+  if(r==="depot")return "D\u00e9p\u00f4t";
+  if(r==="conducteur")return "Conducteur";
+  if(r==="admin")return "Admin";
+  if(r==="team_leader")return "Terrain";
+  return r||"";
+}
+function renderPending(){
+  try{setActiveNav("btn-pending");}catch(e){}
+  if(typeof closeSidebar==="function")closeSidebar();
+  cur=null;currentTab="pending";
+  var m=document.getElementById("main-area");
+  var h="<div class=\"pd-wrap\">";
+  h+="<div class=\"pd-hd\"><span class=\"pd-hd-ic\"><i class=\"ti ti-message-report\"></i></span>";
+  h+="<div><div class=\"pd-hd-t\">Messages en attente</div>";
+  h+="<div class=\"pd-hd-d\">Ces appros ont re\u00e7u un message rest\u00e9 sans r\u00e9ponse. Ouvrez-les pour r\u00e9pondre : d\u00e8s que vous r\u00e9pondez, l'appro dispara\u00eet d'ici.</div></div></div>";
+  if(!PENDING.length){
+    h+="<div class=\"pd-empty\"><i class=\"ti ti-checks\"></i><div class=\"pd-empty-t\">Rien en attente</div>"+
+       "<div class=\"pd-empty-d\">Aucun message ne demande de r\u00e9ponse. Tout est \u00e0 jour.</div></div>";
+  }else{
+    PENDING.forEach(function(a){
+      h+="<button type=\"button\" class=\"pd-card\" onclick=\"openFromLib('"+a._id+"')\">";
+      h+="<div class=\"pd-card-top\">";
+      h+=a.noAffaire?"<span class=\"pd-aff\">"+esc(a.noAffaire)+"</span>":"";
+      h+="<span class=\"pd-at\">"+esc(_pendingQuand(a.at))+"</span></div>";
+      h+="<div class=\"pd-chantier\">"+esc(a.nomChantier)+"</div>";
+      h+="<div class=\"pd-msg\"><span class=\"pd-role fr-"+esc(a.role||"")+"\">"+esc(_pendingRole(a.role))+"</span>";
+      h+="<span class=\"pd-extrait\">"+esc(a.auteur)+" : "+esc(a.extrait)+"</span></div>";
+      h+="<div class=\"pd-go\"><i class=\"ti ti-arrow-right\"></i> R\u00e9pondre</div>";
+      h+="</button>";
+    });
+  }
+  h+="</div>";
+  m.innerHTML=h;
+}
 function renderNotifSettings(){
   try{setActiveNav("btn-notifs");}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
@@ -7261,6 +7362,8 @@ function postThreadMsg(){
     if(m&&m.id)_threadMsgs.push(m);
     renderThread();
     if(btn)btn.disabled=false;
+    /* Je viens de r\u00e9pondre : cette appro n'est plus « en attente » pour moi. */
+    try{loadPending();}catch(e){}
   }).catch(function(){
     if(btn)btn.disabled=false;
     toast("Envoi impossible","ti-alert-circle");
@@ -8941,6 +9044,9 @@ function enterApp(){
   try{_syncPushIcon();}catch(e){}
   /* Rattache l'abonnement de cet appareil au compte qui vient de se connecter. */
   try{_pushReclaim();}catch(e){}
+  /* Les messages en attente : on les charge d'embl\u00e9e pour que le badge soit juste
+     d\u00e8s l'arriv\u00e9e, sans attendre que l'utilisateur ouvre l'onglet. */
+  try{loadPending();}catch(e){}
   var initials=currentUser.name.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();
   var av=document.getElementById("sb-avatar");
   av.style.background=ri.bg;av.style.color=ri.color;av.textContent=initials;
