@@ -539,10 +539,9 @@ app.post('/api/tl/link', auth, async (req, res) => {
 // n'a répondu depuis. Dès qu'on répond, l'appro sort de la liste. Aucun « lu » à gérer :
 // c'est un simple « la balle est dans mon camp », calculé sur le dernier message.
 // Deux bords : {depot, admin} d'un côté, {conducteur, team_leader} de l'autre.
-function _memeBord(a, b){
-  var cote = function(r){ return (r === 'depot' || r === 'admin') ? 'depot' : 'field'; };
-  return cote(a) === cote(b);
-}
+/* Une appro est « en attente » quand le DERNIER message n'est pas de moi.
+   L'ancien découpage par « bord » (dépôt et admin comptés ensemble) faisait qu'un
+   compte admin ne voyait jamais les messages du dépôt : sa liste restait vide. */
 app.get('/api/appros/pending-messages', auth, async (req, res) => {
   try {
     // Le technicien ne voit que ses appros rattachées ; les autres voient tout.
@@ -558,16 +557,29 @@ app.get('/api/appros/pending-messages', auth, async (req, res) => {
     const ids = appros.rows.map(r => r.id);
     // Le dernier message de chaque appro, en une requête (DISTINCT ON).
     const derniers = await pool.query(
-      `SELECT DISTINCT ON (appro_id) appro_id, author_name, author_role, body, created_at
+      `SELECT DISTINCT ON (appro_id) appro_id, user_id, author_name, author_role, body, created_at
        FROM appro_comments WHERE appro_id = ANY($1)
        ORDER BY appro_id, created_at DESC`, [ids]);
+    // Combien de messages des autres depuis ma dernière prise de parole (par appro).
+    const compte = await pool.query(
+      `SELECT c.appro_id, COUNT(*)::int AS n
+         FROM appro_comments c
+        WHERE c.appro_id = ANY($1)
+          AND c.user_id IS DISTINCT FROM $2
+          AND c.created_at > COALESCE(
+                (SELECT MAX(m.created_at) FROM appro_comments m
+                  WHERE m.appro_id = c.appro_id AND m.user_id = $2),
+                '-infinity'::timestamp)
+        GROUP BY c.appro_id`, [ids, req.user.id]);
+    const nParAppro = {};
+    compte.rows.forEach(r => { nParAppro[r.appro_id] = r.n; });
     const parAppro = {};
     derniers.rows.forEach(r => { parAppro[r.appro_id] = r; });
     const out = [];
     appros.rows.forEach(a => {
       const last = parAppro[a.id];
-      if (!last) return;                              // aucune discussion
-      if (_memeBord(last.author_role, req.user.role)) return;  // c'est moi (ou mon bord) qui ai le dernier mot
+      if (!last) return;                                   // aucune discussion
+      if (last.user_id && last.user_id === req.user.id) return; // j'ai le dernier mot
       const d = a.data || {};
       out.push({
         _id: a.id,
@@ -576,7 +588,8 @@ app.get('/api/appros/pending-messages', auth, async (req, res) => {
         auteur: last.author_name,
         role: last.author_role,
         extrait: last.body.length > 120 ? last.body.slice(0, 120) + '\u2026' : last.body,
-        at: last.created_at
+        at: last.created_at,
+        nonLus: nParAppro[a.id] || 1
       });
     });
     // le plus récent d'abord
