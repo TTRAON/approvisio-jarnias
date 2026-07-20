@@ -1392,6 +1392,15 @@ table.at tr.kit-row td.td-d{position:relative}
 .thread-send:hover{background:#5B21B6}
 .thread-send:disabled{opacity:.5;cursor:default}
 @media print{.thread-card{display:none!important}}
+/* Accus\u00e9 de lecture + bouton « J'ai lu » */
+.thread-read{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid #F1F5F9;background:#FCFCFD}
+.thread-read-btn{display:inline-flex;align-items:center;gap:6px;background:#16A34A;color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer;flex-shrink:0}
+.thread-read-btn:hover{background:#15803D}
+.thread-read-btn:disabled{opacity:.6;cursor:default}
+.thread-read-hint{font-size:11.5px;color:#94A3B8;line-height:1.4;flex:1;min-width:150px}
+.thread-read-ok{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#16A34A}
+.thread-read-by{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:#64748B;margin-left:auto}
+@media print{.thread-read{display:none!important}}
 /* Raccourci « discussion » de la barre d'outils */
 .tbi-thread{position:relative;color:#6D28D9}
 .tbi-thread-on{background:#FEF2F2;border-color:#FECACA;color:#DC2626;animation:tbThreadPulse 2s ease-in-out infinite}
@@ -4548,7 +4557,7 @@ h+="<div class=\"card\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class
   h+="<div style=\"height:16px\"></div></div>";
   if(cur&&cur._id){
     // Fil de discussion conducteur ↔ dépôt (chargé après le rendu)
-    h+="<div id=\"thread-anchor\" style=\"max-width:920px;margin:0 auto 20px;padding:0 18px\"><div class=\"thread-card\"><div class=\"thread-hd\"><i class=\"ti ti-messages\" style=\"font-size:18px;color:#6D28D9\"></i> Discussion <span class=\"thread-sub\">conducteur &amp; d&#233;p&#244;t</span><span class=\"thread-cnt\" id=\"thread-cnt\"></span></div><div class=\"thread-list\" id=\"thread-list\"><div class=\"thread-loading\">Chargement&#8230;</div></div>"+
+    h+="<div id=\"thread-anchor\" style=\"max-width:920px;margin:0 auto 20px;padding:0 18px\"><div class=\"thread-card\"><div class=\"thread-hd\"><i class=\"ti ti-messages\" style=\"font-size:18px;color:#6D28D9\"></i> Discussion <span class=\"thread-sub\">conducteur &amp; d&#233;p&#244;t</span><span class=\"thread-cnt\" id=\"thread-cnt\"></span></div><div class=\"thread-list\" id=\"thread-list\"><div class=\"thread-loading\">Chargement&#8230;</div></div><div class=\"thread-read\" id=\"thread-read\" style=\"display:none\"></div>"+
       (isField()?"":"<div class=\"thread-compose\"><textarea id=\"thread-input\" class=\"thread-input\" rows=\"1\" placeholder=\"\u00c9crire un message\u2026\" oninput=\"_threadGrow(this)\"></textarea><button class=\"thread-send\" onclick=\"postThreadMsg()\" title=\"Envoyer\"><i class=\"ti ti-send\"></i></button></div>")+
       "</div></div>";
   }
@@ -7382,14 +7391,55 @@ function openPendingAppro(id){
 }
 function _threadRoleLabel(role){return role==="depot"?"D\u00e9p\u00f4t":role==="conducteur"?"Conducteur":role==="admin"?"Admin":role==="team_leader"?"Terrain":"";}
 function _threadInitials(name){return (name||"?").trim().split(/\s+/).map(function(w){return w[0]||"";}).slice(0,2).join("").toUpperCase();}
+var _threadLectures=[],_threadMaLecture=null;
 function loadThread(){
   if(!cur||!cur._id)return;
-  apiCall("GET","/appros/"+cur._id+"/comments").then(function(list){
-    _threadMsgs=Array.isArray(list)?list:[];
+  apiCall("GET","/appros/"+cur._id+"/comments").then(function(d){
+    /* Le serveur renvoie d\u00e9sormais {messages, lectures, maLecture}.
+       On accepte encore l'ancien format (tableau) par s\u00e9curit\u00e9. */
+    if(Array.isArray(d)){_threadMsgs=d;_threadLectures=[];_threadMaLecture=null;}
+    else{
+      _threadMsgs=Array.isArray(d&&d.messages)?d.messages:[];
+      _threadLectures=Array.isArray(d&&d.lectures)?d.lectures:[];
+      _threadMaLecture=(d&&d.maLecture)||null;
+    }
     renderThread();
   }).catch(function(){
     var l=document.getElementById("thread-list");
     if(l)l.innerHTML="<div class=\"thread-empty\">Impossible de charger la discussion.</div>";
+  });
+}
+/* Y a-t-il des messages des autres que je n'ai pas encore lus ? */
+function _threadNonLus(){
+  var me=(currentUser&&currentUser.id)||null;
+  var repere=null;
+  _threadMsgs.forEach(function(m){if(me&&m.user_id===me)repere=m.created_at;});
+  if(_threadMaLecture&&(!repere||new Date(_threadMaLecture)>new Date(repere)))repere=_threadMaLecture;
+  var n=0;
+  _threadMsgs.forEach(function(m){
+    if(me&&m.user_id===me)return;
+    if(!repere||new Date(m.created_at)>new Date(repere))n++;
+  });
+  return n;
+}
+/* Bouton « J'ai lu » : sortir de « en attente » SANS r\u00e9pondre. */
+function markThreadRead(){
+  if(!cur||!cur._id)return;
+  var b=document.getElementById("thread-read-btn");
+  if(b)b.disabled=true;
+  apiCall("POST","/appros/"+cur._id+"/read").then(function(r){
+    _threadMaLecture=(r&&r.read_at)||new Date().toISOString();
+    /* je me place moi-m\u00eame dans la liste des lecteurs pour un retour imm\u00e9diat */
+    var me=(currentUser&&currentUser.id)||null;
+    var vu=false;
+    _threadLectures.forEach(function(x){if(x.user_id===me){x.read_at=_threadMaLecture;vu=true;}});
+    if(!vu&&me)_threadLectures.push({user_id:me,name:(currentUser&&currentUser.name)||"Moi",role:(currentUser&&currentUser.role)||"",read_at:_threadMaLecture});
+    renderThread();
+    toast("Marqu\u00e9 comme lu","ti-checks");
+    try{loadPending();}catch(e){}
+  }).catch(function(){
+    if(b)b.disabled=false;
+    toast("Impossible de marquer comme lu","ti-alert-circle");
   });
 }
 function renderThread(){
@@ -7409,6 +7459,32 @@ function renderThread(){
   });
   l.innerHTML=h;
   l.scrollTop=l.scrollHeight;
+  _renderThreadRead();
+}
+/* Ligne « Lu par … » + bouton « J'ai lu ».
+   Le bouton n'appara\u00eet que s'il reste des messages des autres non lus : une fois
+   cliqu\u00e9 (ou une fois qu'on a r\u00e9pondu), il laisse place \u00e0 la mention de lecture. */
+function _renderThreadRead(){
+  var zone=document.getElementById("thread-read");
+  if(!zone)return;
+  var me=(currentUser&&currentUser.id)||null;
+  var n=_threadNonLus();
+  var autres=_threadLectures.filter(function(x){return x.user_id!==me&&x.name;});
+  var h="";
+  if(n>0){
+    h+="<button class=\"thread-read-btn\" id=\"thread-read-btn\" onclick=\"markThreadRead()\">"+
+       "<i class=\"ti ti-checks\"></i> J'ai lu"+(n>1?" ("+n+" messages)":"")+"</button>"+
+       "<span class=\"thread-read-hint\">Sort cette appro des \u00ab messages en attente \u00bb, sans avoir \u00e0 r\u00e9pondre.</span>";
+  }else if(_threadMaLecture){
+    h+="<span class=\"thread-read-ok\"><i class=\"ti ti-checks\"></i> Vous avez lu cette discussion</span>";
+  }
+  if(autres.length){
+    var noms=autres.map(function(x){return esc((x.name||"").split(" ")[0]);});
+    var txt=noms.length>2?(noms.slice(0,2).join(", ")+" +"+(noms.length-2)):noms.join(", ");
+    h+="<span class=\"thread-read-by\"><i class=\"ti ti-eye\"></i> Lu par "+txt+"</span>";
+  }
+  zone.innerHTML=h;
+  zone.style.display=h?"flex":"none";
 }
 function _threadColor(role){return role==="depot"?"#0F766E":role==="conducteur"?"#6D28D9":role==="admin"?"#B45309":role==="team_leader"?"#1D4ED8":"#64748B";}
 function _threadWhen(iso){
@@ -7431,6 +7507,8 @@ function postThreadMsg(){
   apiCall("POST","/appros/"+cur._id+"/comments",{body:body}).then(function(m){
     ta.value="";ta.style.height="auto";
     if(m&&m.id)_threadMsgs.push(m);
+    /* R\u00e9pondre vaut lecture (le serveur fait de m\u00eame) : on aligne l'affichage. */
+    _threadMaLecture=(m&&m.created_at)||new Date().toISOString();
     renderThread();
     if(btn)btn.disabled=false;
     /* Je viens de r\u00e9pondre : cette appro n'est plus « en attente » pour moi. */
