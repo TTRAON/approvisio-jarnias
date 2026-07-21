@@ -210,6 +210,64 @@ html[data-amb="jarnias"] .home-title{color:#F1EADA!important}
 html[data-amb="jarnias"] .sb-brand,html[data-amb="jarnias"] .doc-band{background:#123528}
 html[data-amb="jarnias"] .sb-brand-name{color:#E4C878}
 html[data-amb="jarnias"] .sb-brand-tag{color:rgba(228,200,120,.55)}
+
+/* ═══ JARNIAS — immersion (Su : plus de zone blanche, tout en vert,
+   liseré blanc autour des cartes/boutons, texte blanc, or réservé aux
+   titres et points d'attention). Périmètre : sidebar, liste des appros,
+   tableau de bord — les autres écrans (dépôt, catalogue, admin, assistant)
+   gardent l'apparence standard pour l'instant. */
+
+/* Coquille de la sidebar : plus seulement l'en-tête, tout le corps */
+html[data-amb="jarnias"] .sidebar{background:#0A2118}
+html[data-amb="jarnias"] .sb-user{background:transparent;border-bottom-color:rgba(255,255,255,.12)}
+html[data-amb="jarnias"] .sb-search,html[data-amb="jarnias"] #srch-lib{background:transparent!important;border:1.5px solid rgba(255,255,255,.28)!important;color:#fff!important}
+html[data-amb="jarnias"] .sb-search::placeholder,html[data-amb="jarnias"] #srch-lib::placeholder{color:rgba(255,255,255,.4)}
+
+/* Liens de navigation (Accueil, Nouvelle appro, Bibliothèque...) */
+html[data-amb="jarnias"] .btn-admin{color:rgba(255,255,255,.75)}
+html[data-amb="jarnias"] .btn-admin i{color:rgba(228,200,120,.7)}
+html[data-amb="jarnias"] .btn-admin:hover,html[data-amb="jarnias"] .btn-admin.active{background:rgba(255,255,255,.09);color:#fff}
+html[data-amb="jarnias"] .btn-admin:hover i,html[data-amb="jarnias"] .btn-admin.active i{color:#E4C878}
+html[data-amb="jarnias"] .btn-admin.active::before{background:#E4C878!important}
+
+/* Regroupement par conducteur ("TANGUY TRAON · 2") */
+html[data-amb="jarnias"] .cat-lbl{color:rgba(255,255,255,.55)}
+html[data-amb="jarnias"] .cat-cnt{background:rgba(255,255,255,.1);color:rgba(255,255,255,.65)}
+
+/* Cartes d'appro (liste + bibliothèque) */
+html[data-amb="jarnias"] .sc{background:#123528;border:1.5px solid rgba(255,255,255,.24)}
+html[data-amb="jarnias"] .sc:hover{border-color:rgba(255,255,255,.42)}
+html[data-amb="jarnias"] .sc-name{color:#fff}
+html[data-amb="jarnias"] .sc-client{color:rgba(255,255,255,.55)}
+html[data-amb="jarnias"] .sc-aff{color:#E4C878}
+html[data-amb="jarnias"] .sc-btn{background:transparent;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.85)}
+
+/* Fond de l'écran principal */
+html[data-amb="jarnias"] .main{background:#0F2D22;background-image:none}
+
+/* Onglets (Mes appros / Bibliothèque) */
+html[data-amb="jarnias"] .tab-btn{color:rgba(255,255,255,.5)}
+html[data-amb="jarnias"] .tab-btn.active{color:#E4C878;border-bottom-color:#E4C878}
+html[data-amb="jarnias"] .tab-badge{background:rgba(255,255,255,.12);color:rgba(255,255,255,.7)}
+html[data-amb="jarnias"] .tab-btn.active .tab-badge{background:#E4C878;color:#12210D}
+
+/* Cartes-chiffres du tableau de bord */
+html[data-amb="jarnias"] .dstat{background:#123528;border:1.5px solid rgba(255,255,255,.28)}
+html[data-amb="jarnias"] .dstat.cmd-on{border-color:#E4C878!important}
+html[data-amb="jarnias"] .dstat-num{color:#fff}
+html[data-amb="jarnias"] .dstat-lbl{color:rgba(255,255,255,.55)}
+html[data-amb="jarnias"] .dstat-arw{color:rgba(255,255,255,.35)!important}
+
+/* Actions rapides */
+html[data-amb="jarnias"] .home-sec-t{color:rgba(228,200,120,.7)}
+html[data-amb="jarnias"] .qa{background:#123528;border:1.5px solid rgba(255,255,255,.28)}
+html[data-amb="jarnias"] .qa-primary{border:2px solid rgba(255,255,255,.62)}
+html[data-amb="jarnias"] .qa-t{color:#fff}
+html[data-amb="jarnias"] .qa-d{color:rgba(255,255,255,.5)}
+
+/* Bascule Appros / Brouillons (styles en ligne : on force via des classes ajoutées au balisage) */
+html[data-amb="jarnias"] .seg-btn{background:transparent!important;border-color:rgba(255,255,255,.28)!important;color:rgba(255,255,255,.7)!important}
+html[data-amb="jarnias"] .seg-btn.on{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.6)!important;color:#fff!important}
 html[data-amb="foret"] .home-hero{background:linear-gradient(165deg,#0B2E20,#134E3A 60%,#1B6B4A)}
 html[data-amb="foret"] .home-hero::before{inset:0;background:radial-gradient(260px 200px at 30% 0%,rgba(74,222,128,.25),transparent 70%);animation:ambBreathe 7s ease-in-out infinite}
 html[data-amb="foret"] .home-hello{color:#86EFAC!important}
@@ -4688,7 +4746,7 @@ function renderList(){
   var _dv=!!window._draftView;
   var toggle="";
   if(!(currentUser&&(currentUser.role==="depot"||isField()))){
-    toggle="<div style=\"display:flex;gap:5px;padding:2px 0 9px\"><button onclick=\"setDraftView(false)\" style=\"flex:1;border:1px solid "+(_dv?"#E2E8F0":"#1D4ED8")+";background:"+(_dv?"#fff":"#EFF6FF")+";color:"+(_dv?"#64748B":"#1D4ED8")+";border-radius:7px;padding:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\">Appros</button><button onclick=\"setDraftView(true)\" style=\"flex:1;border:1px solid "+(_dv?"#A16207":"#E2E8F0")+";background:"+(_dv?"#FEF9C3":"#fff")+";color:"+(_dv?"#854D0E":"#64748B")+";border-radius:7px;padding:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-pencil\" style=\"font-size:12px\"></i> Brouillons"+(_dc?" ("+_dc+")":"")+"</button></div>";
+    toggle="<div style=\"display:flex;gap:5px;padding:2px 0 9px\"><button class=\"seg-btn"+(_dv?"":" on")+"\" onclick=\"setDraftView(false)\" style=\"flex:1;border:1px solid "+(_dv?"#E2E8F0":"#1D4ED8")+";background:"+(_dv?"#fff":"#EFF6FF")+";color:"+(_dv?"#64748B":"#1D4ED8")+";border-radius:7px;padding:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\">Appros</button><button class=\"seg-btn"+(_dv?" on":"")+"\" onclick=\"setDraftView(true)\" style=\"flex:1;border:1px solid "+(_dv?"#A16207":"#E2E8F0")+";background:"+(_dv?"#FEF9C3":"#fff")+";color:"+(_dv?"#854D0E":"#64748B")+";border-radius:7px;padding:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-pencil\" style=\"font-size:12px\"></i> Brouillons"+(_dc?" ("+_dc+")":"")+"</button></div>";
   }
   var srchBar="<div style=\"position:relative;margin-bottom:8px\"><i class=\"ti ti-search\" style=\"position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:15px\"></i><input id=\"srch-lib\" value=\""+esc(q)+"\" oninput=\"onLibSearch(this.value)\" placeholder=\"Rechercher : chantier, adresse, N\u00b0 affaire, article...\" style=\"width:100%;box-sizing:border-box;padding:9px 12px 9px 33px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;font-family:inherit;background:#fff\"/></div>";
   document.getElementById("sheets-list").innerHTML=srchBar+toggle+html;
