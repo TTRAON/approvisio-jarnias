@@ -1106,6 +1106,25 @@ table.at tr.kit-row td.td-d{position:relative}
 .cp-row.weak:hover,.cp-tile.weak:hover{opacity:.8}
 .cp-hl{background:#FEF3C7;color:#92400E;border-radius:3px;padding:0 1px;font-weight:700}
 .cp-sec-cnt{font-size:9.5px;color:#94A3B8;font-weight:600;text-transform:none;letter-spacing:0;margin-left:2px}
+/* ═══ Boutons +/- sur la quantité (plus rapide qu'au clavier, gants inclus) ═══ */
+.cp-qty-stp{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.cp-qty-stp button{width:20px;height:20px;border:1px solid #E2E8F0;background:#F8FAFC;color:#475569;border-radius:5px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;font-family:inherit}
+.cp-qty-stp button:hover{background:#EEF2F7}
+.cp-qty-stp button:active{transform:scale(.92)}
+.cp-qty-stp .cp-qty{width:30px;padding:2px;margin:0}
+.cp-items-wrap .cp-qty-stp .cp-qty{width:26px}
+/* ═══ Favoris (étoile) ═══ */
+.cp-star{background:none;border:none;color:#CBD5E1;cursor:pointer;padding:2px;font-size:14px;flex-shrink:0;display:flex;align-items:center}
+.cp-star:hover{color:#D97706}
+.cp-star.on{color:#D97706}
+.cp-tile .cp-star{position:absolute;top:6px;right:6px;z-index:1}
+.cp-tile{position:relative}
+/* ═══ Sections épinglées : favoris / articles fréquents personnels ═══ */
+.cp-pin{border-color:#EDE4FF}
+.cp-pin .cp-sec-hd{background:#FAF7FF}
+.cp-freq-row{background:#FCFBFF}
+.cp-freq-add{flex-shrink:0;background:#6D28D9;color:#fff;border:none;border-radius:6px;width:22px;height:22px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cp-freq-add:hover{background:#5B21B6}
 .cp-search{width:100%;border:1px solid #E2E8F0;border-radius:9px;padding:10px 12px 10px 36px;font-size:14px;font-family:inherit;outline:none;background:#F8FAFC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 12px center}
 .cp-search:focus{border-color:#6D28D9;background-color:#fff}
 .cp-tile.sel{border-color:#6D28D9;background:#F5F3FF}
@@ -3129,7 +3148,14 @@ function renderCpPopup(w){
     "input[type=number]{width:34px;padding:3px;border:1px solid #E2E8F0;border-radius:5px;text-align:center;font-family:inherit;font-size:10.5px}"+
     ".addb{flex-shrink:0;background:#15803D;color:#fff;border:none;border-radius:6px;width:24px;height:24px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}"+
     ".empty{text-align:center;color:#94A3B8;font-size:12px;padding:30px 14px}"+
-    ".hint{font-size:10.5px;color:#94A3B8;padding:0 14px 14px;text-align:center}";
+    ".hint{font-size:10.5px;color:#94A3B8;padding:0 14px 14px;text-align:center}"+
+    ".qstp{display:flex;align-items:center;gap:2px;flex-shrink:0}"+
+    ".qstp button{width:20px;height:20px;border:1px solid #E2E8F0;background:#F8FAFC;color:#475569;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit}"+
+    ".qstp input{width:26px}"+
+    ".star{background:none;border:none;color:#CBD5E1;cursor:pointer;padding:2px;font-size:13px;flex-shrink:0;display:flex;align-items:center}"+
+    ".star.on{color:#D97706}"+
+    ".pin{border-color:#EDE4FF}.pin .sec-h{background:#FAF7FF}"+
+    ".freq-row{background:#FCFBFF}";
   d.head.appendChild(st);
   var top=d.createElement("div");top.className="top";top.innerHTML="<i class=\"ti ti-package\"></i> Catalogue \u2014 li\u00e9 \u00e0 l'appro ouverte";d.body.appendChild(top);
   var wrap=d.createElement("div");wrap.className="wrap";d.body.appendChild(wrap);
@@ -3141,6 +3167,22 @@ function renderCpPopup(w){
     var pref=_myQtyFor(item.n);
     if(pref!=null&&(""+pref).trim()!=="")return pref;
     return (""+(item.q||"")).trim()||"1";
+  }
+  function makeStepper(initVal){
+    var wrap=d.createElement("div");wrap.className="qstp";
+    var minus=d.createElement("button");minus.type="button";minus.textContent="\u2212";
+    var qin=d.createElement("input");qin.type="number";qin.min="1";qin.value=initVal;
+    var plus=d.createElement("button");plus.type="button";plus.textContent="+";
+    minus.onclick=function(){var v=parseInt(qin.value,10);if(isNaN(v))v=1;qin.value=String(Math.max(1,v-1));};
+    plus.onclick=function(){var v=parseInt(qin.value,10);if(isNaN(v))v=1;qin.value=String(v+1);};
+    wrap.appendChild(minus);wrap.appendChild(qin);wrap.appendChild(plus);
+    return {el:wrap,input:qin};
+  }
+  function makeStar(name){
+    var btn=d.createElement("button");btn.type="button";btn.className="star"+(_isFavorite(name)?" on":"");
+    btn.innerHTML="<i class=\"ti "+(_isFavorite(name)?"ti-star-filled":"ti-star")+"\"></i>";
+    btn.onclick=function(){toggleFavorite(name);btn.classList.toggle("on",_isFavorite(name));btn.innerHTML="<i class=\"ti "+(_isFavorite(name)?"ti-star-filled":"ti-star")+"\"></i>";};
+    return btn;
   }
   function build(q){
     var resSearch=q?_cpSearch(q):null;
@@ -3159,6 +3201,48 @@ function renderCpPopup(w){
     }
     results.innerHTML="";
     var any=false;
+    /* Sections \u00e9pingl\u00e9es (favoris + articles fr\u00e9quents hors catalogue), hors recherche */
+    if(!resSearch){
+      var favItems=(MY_FAVORITES||[]).map(function(name){
+        var key=name.toLowerCase();
+        for(var k=0;k<CAT_ITEMS.length;k++){if((CAT_ITEMS[k].n||"").toLowerCase()===key)return CAT_ITEMS[k];}
+        return null;
+      }).filter(Boolean);
+      if(favItems.length){
+        any=true;
+        var favSec=d.createElement("div");favSec.className="sec pin";
+        var favHd=d.createElement("div");favHd.className="sec-h";favHd.innerHTML="<i class=\"ti ti-star-filled\" style=\"color:#D97706\"></i> Favoris";favSec.appendChild(favHd);
+        var favGrid=d.createElement("div");favGrid.className="grid";
+        favItems.forEach(function(item){
+          var row=d.createElement("div");row.className="row";
+          var nm=d.createElement("span");nm.className="nm";nm.textContent=item.n;row.appendChild(nm);
+          var stp=makeStepper(qtyFor(item));row.appendChild(stp.el);
+          var btn=d.createElement("button");btn.className="addb";btn.innerHTML="<i class=\"ti ti-plus\"></i>";
+          btn.onclick=function(){var qv=stp.input.value||"1";addCatItemDirect(item.sec,item.n,qv);_saveQtyPrefs([{n:item.n,q:qv}]);btn.innerHTML="<i class=\"ti ti-check\"></i>";setTimeout(function(){btn.innerHTML="<i class=\"ti ti-plus\"></i>";},700);};
+          row.appendChild(btn);
+          row.appendChild(makeStar(item.n));
+          favGrid.appendChild(row);
+        });
+        favSec.appendChild(favGrid);results.appendChild(favSec);
+      }
+      var freqOut=(MY_FREQ||[]).filter(function(it){return it.n&&!_isInCatalogue(it.n);}).slice(0,10);
+      if(freqOut.length){
+        any=true;
+        var fSec=d.createElement("div");fSec.className="sec pin";
+        var fHd=d.createElement("div");fHd.className="sec-h";fHd.innerHTML="<i class=\"ti ti-repeat\" style=\"color:#6D28D9\"></i> Vos articles fr\u00e9quents<span class=\"cnt\">hors catalogue</span>";fSec.appendChild(fHd);
+        var fGrid=d.createElement("div");fGrid.className="grid";
+        freqOut.forEach(function(it){
+          var row=d.createElement("div");row.className="row freq-row";
+          var nm=d.createElement("span");nm.className="nm";nm.textContent=it.n;row.appendChild(nm);
+          var stp=makeStepper("1");row.appendChild(stp.el);
+          var btn=d.createElement("button");btn.className="addb";btn.innerHTML="<i class=\"ti ti-plus\"></i>";
+          btn.onclick=function(){var qv=stp.input.value||"1";addCatItemDirect(it.sec||"consommables",it.n,qv);_saveQtyPrefs([{n:it.n,q:qv}]);btn.innerHTML="<i class=\"ti ti-check\"></i>";setTimeout(function(){btn.innerHTML="<i class=\"ti ti-plus\"></i>";},700);};
+          row.appendChild(btn);
+          fGrid.appendChild(row);
+        });
+        fSec.appendChild(fGrid);results.appendChild(fSec);
+      }
+    }
     order.forEach(function(cat){
       if(!groups[cat]||!groups[cat].length)return;
       any=true;
@@ -3192,16 +3276,17 @@ function renderCpPopup(w){
         var nm=d.createElement("span");nm.className="nm";
         nm.innerHTML=(o.sc>0&&tokens.length)?_hlMatch(item.n,tokens):esc(item.n);
         row.appendChild(nm);
-        var qin=d.createElement("input");qin.type="number";qin.min="1";qin.value=qtyFor(item);row.appendChild(qin);
+        var stp=makeStepper(qtyFor(item));row.appendChild(stp.el);
         var btn=d.createElement("button");btn.className="addb";btn.innerHTML="<i class=\"ti ti-plus\"></i>";
         btn.onclick=function(){
-          var qv=qin.value||"1";
+          var qv=stp.input.value||"1";
           addCatItemDirect(item.sec,item.n,qv);
           _saveQtyPrefs([{n:item.n,q:qv}]);
           btn.innerHTML="<i class=\"ti ti-check\"></i>";btn.style.background="#0F766E";
           setTimeout(function(){btn.innerHTML="<i class=\"ti ti-plus\"></i>";btn.style.background="#15803D";},700);
         };
         row.appendChild(btn);
+        row.appendChild(makeStar(item.n));
         grid.appendChild(row);
       });
       sec.appendChild(grid);
@@ -3418,19 +3503,59 @@ function _saveQtyPrefs(items){
     if(d&&Array.isArray(d.data))MY_QTY_PREFS=d.data;
   }).catch(function(){});
 }
+/* ═══ Favoris \u00e9pingl\u00e9s manuellement (ind\u00e9pendants de la fr\u00e9quence) ═══ */
+var MY_FAVORITES=[];
+function loadMyFavorites(){
+  apiCall("GET","/my/favorites").then(function(list){
+    MY_FAVORITES=Array.isArray(list)?list:[];
+  }).catch(function(){});
+}
+function _isFavorite(name){
+  if(!name)return false;
+  var key=(""+name).toLowerCase();
+  return MY_FAVORITES.some(function(f){return (f||"").toLowerCase()===key;});
+}
+function toggleFavorite(name){
+  if(!name)return;
+  var key=name.toLowerCase();
+  var idx=MY_FAVORITES.findIndex(function(f){return (f||"").toLowerCase()===key;});
+  if(idx>=0)MY_FAVORITES.splice(idx,1);else MY_FAVORITES.push(name);
+  // rafra\u00eechit l'affichage tout de suite, sans attendre le serveur
+  try{renderCpItems(window._cpQ||"");}catch(e){}
+  apiCall("POST","/my/favorites/toggle",{name:name}).then(function(d){
+    if(d&&Array.isArray(d.data)){MY_FAVORITES=d.data;try{renderCpItems(window._cpQ||"");}catch(e){}}
+  }).catch(function(){});
+}
 function _bumpFrequentItems(){
   if(!cur)return;
   var seen={},names=[];
   ["consommables","fournitures","outillage"].forEach(function(sec){
     (cur[sec]||[]).forEach(function(r){
       var n=(r.designation||"").trim();
-      if(n&&!seen[n]){seen[n]=1;names.push(n);}
+      if(n&&!seen[n]){seen[n]=1;names.push({n:n,sec:sec});}
     });
   });
   if(!names.length)return;
   apiCall("POST","/my/frequent-items/bump",{names:names}).then(function(d){
-    if(d&&Array.isArray(d.data))MY_FREQ=d.data;
+    if(d&&Array.isArray(d.data)){MY_FREQ=d.data;_maybeSuggestToCatalogue();}
   }).catch(function(){});
+}
+/* Quand un article que la personne tape souvent n'existe toujours pas dans le
+   catalogue partag\u00e9, on propose \u00e0 l'admin/d\u00e9p\u00f4t de l'y ajouter (seuil : 4 usages). */
+var CATALOGUE_SUGGEST_THRESHOLD=4;
+function _isInCatalogue(name){
+  if(typeof CAT_ITEMS==="undefined")return false;
+  var key=(""+name).toLowerCase();
+  for(var i=0;i<CAT_ITEMS.length;i++){if((CAT_ITEMS[i].n||"").toLowerCase()===key)return true;}
+  return false;
+}
+function _maybeSuggestToCatalogue(){
+  if(!MY_FREQ||!MY_FREQ.length)return;
+  MY_FREQ.forEach(function(it){
+    if((it.c||0)>=CATALOGUE_SUGGEST_THRESHOLD&&!_isInCatalogue(it.n)){
+      apiCall("POST","/catalogue-suggestions",{name:it.n}).catch(function(){});
+    }
+  });
 }
 document.addEventListener("keydown",function(e){
   if(e.key!=="Tab"||e.shiftKey||e.ctrlKey||e.metaKey)return;
@@ -3450,6 +3575,22 @@ document.addEventListener("keydown",function(e){
 /* ═══ CATALOGUE — sélection PERSISTANTE (survit à la recherche et au re-render) ═══ */
 function _cpSelInit(){if(!window._cpSel)window._cpSel={};if(!window._cpQty)window._cpQty={};if(!window._cpKit)window._cpKit={};}
 function _cpQtySet(el){_cpSelInit();window._cpQty[el.id.replace("cq_","")]=el.value;}
+/* Boutons +/- sur la quantit\u00e9 : plus rapide qu'\u00e0 taper au clavier, notamment avec
+   des gants ou une seule main libre sur chantier. */
+function _cpQtyStep(id,delta){
+  var el=document.getElementById(id);if(!el)return;
+  var v=parseInt(el.value,10);if(isNaN(v))v=1;
+  v=Math.max(1,v+delta);
+  el.value=String(v);
+  _cpQtySet(el);
+}
+function _qtyStepperHTML(id,value){
+  return "<div class=\"cp-qty-stp\"><button type=\"button\" tabindex=\"-1\" onclick=\"event.stopPropagation();_cpQtyStep('"+id+"',-1)\">\u2212</button><input type=\"number\" id=\""+id+"\" class=\"cp-qty\" value=\""+esc(value)+"\" min=\"1\" onclick=\"event.stopPropagation()\" onchange=\"_cpQtySet(this)\"/><button type=\"button\" tabindex=\"-1\" onclick=\"event.stopPropagation();_cpQtyStep('"+id+"',1)\">+</button></div>";
+}
+function _starHTML(name){
+  var on=_isFavorite(name);
+  return "<button type=\"button\" class=\"cp-star"+(on?" on":"")+"\" onclick=\"event.stopPropagation();toggleFavorite('"+esc(name).replace(/'/g,"&#39;")+"')\" title=\""+(on?"Retirer des favoris":"Ajouter aux favoris")+"\"><i class=\"ti "+(on?"ti-star-filled":"ti-star")+"\"></i></button>";
+}
 function _cpQtyOf(i){
   _cpSelInit();
   var v=window._cpQty[i];
@@ -3498,6 +3639,36 @@ function renderCpItems(q){
     });
   }
   var html="";
+  /* ═══ Sections épinglées (uniquement hors recherche : « accès rapide ») ═══ */
+  if(!res){
+    // Favoris épinglés manuellement
+    var favIdx=[];
+    (MY_FAVORITES||[]).forEach(function(name){
+      var key=(name||"").toLowerCase();
+      for(var fi=0;fi<CAT_ITEMS.length;fi++){if((CAT_ITEMS[fi].n||"").toLowerCase()===key){favIdx.push(fi);break;}}
+    });
+    if(favIdx.length){
+      html+="<div class=\"cp-sec cp-pin\"><div class=\"cp-sec-hd\"><div class=\"cp-sec-title\"><i class=\"ti ti-star-filled\" style=\"font-size:14px;color:#D97706\"></i> Favoris<span class=\"cp-sec-cnt\">"+favIdx.length+"</span></div></div>";
+      html+="<div class=\"cp-items-wrap\">";
+      favIdx.forEach(function(i){
+        var item=CAT_ITEMS[i];
+        var _ck=window._cpSel[i]?" checked":"";
+        html+="<div class=\"cp-row\"><input type=\"checkbox\" id=\"ci_"+i+"\" class=\"ccb\" data-sec=\""+item.sec+"\" data-n=\""+esc(item.n)+"\" data-cat=\""+esc(item.cat)+"\" data-i=\""+i+"\""+_ck+" onchange=\"_cpChk(this)\"/><label for=\"ci_"+i+"\" class=\"cp-row-n\" style=\"cursor:pointer\">"+esc(item.n)+"</label>"+_qtyStepperHTML("cq_"+i,_cpQtyOf(i))+_starHTML(item.n)+"</div>";
+      });
+      html+="</div></div>";
+    }
+    // Articles fréquents personnels ABSENTS du catalogue partagé (redondance)
+    var freqOut=(MY_FREQ||[]).filter(function(it){return it.n&&!_isInCatalogue(it.n);}).slice(0,10);
+    if(freqOut.length){
+      html+="<div class=\"cp-sec cp-pin\"><div class=\"cp-sec-hd\"><div class=\"cp-sec-title\"><i class=\"ti ti-repeat\" style=\"font-size:14px;color:#6D28D9\"></i> Vos articles fr\u00e9quents<span class=\"cp-sec-cnt\">hors catalogue</span></div></div>";
+      html+="<div class=\"cp-items-wrap\">";
+      freqOut.forEach(function(it,fx){
+        var qid="fq_"+fx;
+        html+="<div class=\"cp-row cp-freq-row\"><span class=\"cp-row-n\">"+esc(it.n)+"</span>"+_qtyStepperHTML(qid,"1")+"<button type=\"button\" class=\"cp-freq-add\" onclick=\"event.stopPropagation();_insertFreqDirect('"+esc(it.n).replace(/'/g,"&#39;")+"','"+(it.sec||"consommables")+"','"+qid+"')\" title=\"Ajouter \u00e0 l'appro\"><i class=\"ti ti-plus\"></i></button></div>";
+      });
+      html+="</div></div>";
+    }
+  }
   order.forEach(function(cat){
     var ci=CAT_ORDER.indexOf(cat);if(ci<0)ci=order.indexOf(cat)+900;
     if(!groups[cat]||!groups[cat].length)return;
@@ -3510,7 +3681,7 @@ function renderCpItems(q){
       groups[cat].forEach(function(o){var item=o.item,i=o.i;
         var _ck=window._cpSel[i]?" checked":"";
         var nmHtml=o.sc>0?_hlMatch(item.n,tokens):esc(item.n);
-        html+="<div class=\"cp-tile"+(window._cpSel[i]?" sel":"")+(o.sc>0?"":" weak")+"\" onclick=\"_cpTileToggle(event,"+i+")\"><input type=\"checkbox\" id=\"ci_"+i+"\" class=\"ccb\" data-sec=\""+item.sec+"\" data-n=\""+esc(item.n)+"\" data-cat=\""+esc(item.cat)+"\" data-i=\""+i+"\" style=\"display:none\""+_ck+" onchange=\"_cpChk(this)\"/><div class=\"cp-tile-n\">"+nmHtml+"</div><div class=\"cp-tile-b\"><input type=\"number\" id=\"cq_"+i+"\" class=\"cp-qty\" value=\""+_cpQtyOf(i)+"\" data-base=\""+item.q+"\" min=\"1\" onclick=\"event.stopPropagation()\" onchange=\"_cpQtySet(this)\"/><span class=\"cp-tile-check\"><i class=\"ti ti-check\"></i></span></div></div>";
+        html+="<div class=\"cp-tile"+(window._cpSel[i]?" sel":"")+(o.sc>0?"":" weak")+"\" onclick=\"_cpTileToggle(event,"+i+")\">"+_starHTML(item.n)+"<input type=\"checkbox\" id=\"ci_"+i+"\" class=\"ccb\" data-sec=\""+item.sec+"\" data-n=\""+esc(item.n)+"\" data-cat=\""+esc(item.cat)+"\" data-i=\""+i+"\" style=\"display:none\""+_ck+" onchange=\"_cpChk(this)\"/><div class=\"cp-tile-n\">"+nmHtml+"</div><div class=\"cp-tile-b\">"+_qtyStepperHTML("cq_"+i,_cpQtyOf(i))+"<span class=\"cp-tile-check\"><i class=\"ti ti-check\"></i></span></div></div>";
       });
       html+="</div>";
     } else {
@@ -3520,7 +3691,7 @@ function renderCpItems(q){
       var del=isAdmin()?"<button onclick=\"event.stopPropagation();delCatItem("+i+")\" title=\"Supprimer du catalogue\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:0 4px;font-size:13px;flex-shrink:0\"><i class=\"ti ti-trash\"></i></button>":"";
       var _ck=window._cpSel[i]?" checked":"";
       var nmHtml=o.sc>0?_hlMatch(item.n,tokens):esc(item.n);
-      html+="<div class=\"cp-row"+(o.sc>0?"":" weak")+"\"><input type=\"checkbox\" id=\"ci_"+i+"\" class=\"ccb\" data-sec=\""+item.sec+"\" data-n=\""+esc(item.n)+"\" data-cat=\""+esc(item.cat)+"\" data-i=\""+i+"\""+_ck+" onchange=\"_cpChk(this)\"/><label for=\"ci_"+i+"\" class=\"cp-row-n\" style=\"cursor:pointer\">"+nmHtml+"</label><div style=\"display:flex;flex-direction:column;align-items:center\"><input type=\"number\" id=\"cq_"+i+"\" class=\"cp-qty\" value=\""+_cpQtyOf(i)+"\" data-base=\""+item.q+"\" min=\"1\" onchange=\"_cpQtySet(this)\"/><div class=\"cp-qty-l\">qt&#233;</div></div>"+del+"</div>";
+      html+="<div class=\"cp-row"+(o.sc>0?"":" weak")+"\"><input type=\"checkbox\" id=\"ci_"+i+"\" class=\"ccb\" data-sec=\""+item.sec+"\" data-n=\""+esc(item.n)+"\" data-cat=\""+esc(item.cat)+"\" data-i=\""+i+"\""+_ck+" onchange=\"_cpChk(this)\"/><label for=\"ci_"+i+"\" class=\"cp-row-n\" style=\"cursor:pointer\">"+nmHtml+"</label>"+_qtyStepperHTML("cq_"+i,_cpQtyOf(i))+_starHTML(item.n)+del+"</div>";
     });
     html+="</div>";
     }
@@ -3530,6 +3701,14 @@ function renderCpItems(q){
   container.className="cp-lay-"+(typeof _cpLayout!=="undefined"?_cpLayout:"list")+" stagger";
   container.innerHTML=html;
   updN();
+}
+/* Ajout direct \u00e0 l'appro d'un article personnel fr\u00e9quent (absent du catalogue). */
+function _insertFreqDirect(name,sec,qid){
+  if(!cur){toast("Ouvrez une appro d\u2019abord","ti-alert-circle");return;}
+  var qEl=document.getElementById(qid);
+  var qty=(qEl&&qEl.value)||"1";
+  addCatItemDirect(sec,name,qty);
+  _saveQtyPrefs([{n:name,q:qty}]);
 }
 function filterCp(q){
   _cpSelInit();
@@ -5813,6 +5992,17 @@ function renderUISettings(){try{setActiveNav('btn-ui');}catch(e){}
   h+="<input id=\"ui-cat-qty\" placeholder=\"Qt\u00e9 par d\u00e9faut\" value=\"1\" class=\"ui-in\"/>";
   h+="</div><button class=\"liv\" onclick=\"uiAddCatItem()\" style=\"margin-top:9px;background:#15803D;color:#fff;border:none;border-radius:8px;padding:8px 15px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-plus\"></i> Ajouter l'article</button></div>";
 
+  // Suggestions d'ajout au catalogue (aliment\u00e9es par l'usage r\u00e9el des \u00e9quipes)
+  h+="<div id=\"cat-suggest-box\" style=\"display:none;background:#FFFBEB;border:1px solid #FDE68A;border-radius:9px;padding:12px;margin-bottom:14px\">"+
+     "<div style=\"font-size:13px;font-weight:700;color:#92400E;margin-bottom:3px\"><i class=\"ti ti-bulb\"></i> Suggestions d'ajout au catalogue</div>"+
+     "<div style=\"font-size:11.5px;color:#B45309;margin-bottom:9px\">Des articles que l'\u00e9quipe tape souvent \u00e0 la main, absents du catalogue partag\u00e9.</div>"+
+     "<div id=\"cat-suggest-list\"></div></div>";
+  // Doublons probables (fautes de frappe qui fragmentent la recherche)
+  h+="<div id=\"cat-dup-box\" style=\"display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:9px;padding:12px;margin-bottom:14px\">"+
+     "<div style=\"font-size:13px;font-weight:700;color:#B91C1C;margin-bottom:3px\"><i class=\"ti ti-copy\"></i> Doublons probables</div>"+
+     "<div style=\"font-size:11.5px;color:#DC2626;margin-bottom:9px\">Des noms tr\u00e8s proches (faute de frappe ?) qui fragmentent la recherche.</div>"+
+     "<div id=\"cat-dup-list\"></div></div>";
+
   // Categories list with items
   var byCat={};CAT_ITEMS.forEach(function(it,idx){var c=it.cat||"(sans cat\u00e9gorie)";(byCat[c]=byCat[c]||[]).push({it:it,idx:idx});});
   var order=CAT_ORDER.slice();Object.keys(byCat).forEach(function(c){if(order.indexOf(c)<0)order.push(c);});
@@ -5864,6 +6054,73 @@ function renderUISettings(){try{setActiveNav('btn-ui');}catch(e){}
   h+="</div>";
   m.innerHTML=h;
   try{_initCatDrag();}catch(e){}
+  try{loadCatalogueSuggestions();}catch(e){}
+  try{renderDuplicateWarnings();}catch(e){}
+}
+/* ═══ Suggestions d'ajout au catalogue (aliment\u00e9es par l'usage r\u00e9el) ═══ */
+function loadCatalogueSuggestions(){
+  var box=document.getElementById("cat-suggest-box"),list=document.getElementById("cat-suggest-list");
+  if(!box||!list)return;
+  apiCall("GET","/catalogue-suggestions").then(function(rows){
+    if(!Array.isArray(rows)||!rows.length){box.style.display="none";return;}
+    box.style.display="block";
+    var catOpts="";CAT_ORDER.forEach(function(c){catOpts+="<option value=\""+esc(c)+"\"></option>";});
+    var h="";
+    rows.forEach(function(s){
+      h+="<div class=\"cat-sug-row\" data-id=\""+s.id+"\" style=\"display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 0;border-top:1px solid #FDE68A\">"+
+         "<div style=\"flex:1;min-width:140px\"><b style=\"font-size:13px;color:#0F172A\">"+esc(s.name)+"</b><div style=\"font-size:10.5px;color:#B45309\">tap\u00e9 "+s.count+" fois \u00b7 dernier par "+esc(s.suggested_by_name||"?")+"</div></div>"+
+         "<input placeholder=\"Cat\u00e9gorie\" list=\"ui-cat-list\" id=\"sg-cat-"+s.id+"\" style=\"width:130px;padding:5px 7px;border:1px solid #FDE68A;border-radius:6px;font-size:12px;font-family:inherit\"/>"+
+         "<select id=\"sg-sec-"+s.id+"\" style=\"padding:5px 7px;border:1px solid #FDE68A;border-radius:6px;font-size:12px;font-family:inherit\"><option value=\"consommables\">Consommables</option><option value=\"fournitures\">Fournitures</option><option value=\"outillage\">Outillage</option></select>"+
+         "<input placeholder=\"Qt\u00e9\" value=\"1\" id=\"sg-q-"+s.id+"\" style=\"width:44px;padding:5px 7px;border:1px solid #FDE68A;border-radius:6px;font-size:12px;text-align:center;font-family:inherit\"/>"+
+         "<button onclick=\"approveCatalogueSuggestion('"+s.id+"')\" style=\"background:#15803D;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-check\"></i> Ajouter</button>"+
+         "<button onclick=\"rejectCatalogueSuggestion('"+s.id+"')\" style=\"background:none;border:1px solid #FDE68A;color:#B45309;border-radius:6px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:inherit\">Ignorer</button>"+
+         "</div>";
+    });
+    list.innerHTML=h;
+  }).catch(function(){box.style.display="none";});
+}
+function approveCatalogueSuggestion(id){
+  var cat=(document.getElementById("sg-cat-"+id)||{}).value||"Divers";
+  var sec=(document.getElementById("sg-sec-"+id)||{}).value||"consommables";
+  var q=(document.getElementById("sg-q-"+id)||{}).value||"1";
+  apiCall("POST","/catalogue-suggestions/"+id+"/approve",{cat:cat,sec:sec,q:q}).then(function(d){
+    if(d&&Array.isArray(d.catalogue)){CAT_ITEMS=d.catalogue.slice();rebuildCatOrder();}
+    toast("Article ajout\u00e9 au catalogue","ti-check");
+    renderUISettings();
+  }).catch(function(e){toast("Erreur: "+e.message,"ti-alert-circle");});
+}
+function rejectCatalogueSuggestion(id){
+  apiCall("POST","/catalogue-suggestions/"+id+"/reject").then(function(){
+    var row=document.querySelector(".cat-sug-row[data-id=\""+id+"\"]");if(row)row.remove();
+    toast("Suggestion ignor\u00e9e","ti-x");
+  }).catch(function(){});
+}
+/* ═══ Doublons probables (fautes de frappe qui fragmentent la recherche) ═══ */
+function renderDuplicateWarnings(){
+  var box=document.getElementById("cat-dup-box"),list=document.getElementById("cat-dup-list");
+  if(!box||!list||typeof CAT_ITEMS==="undefined")return;
+  var pairs=[],seen={};
+  for(var i=0;i<CAT_ITEMS.length;i++){
+    for(var j=i+1;j<CAT_ITEMS.length;j++){
+      var a=_cpNorm(CAT_ITEMS[i].n),b=_cpNorm(CAT_ITEMS[j].n);
+      if(!a||!b||a.length<4||b.length<4)continue;
+      var key=i+"_"+j;if(seen[key])continue;seen[key]=1;
+      if(a!==b&&_lev(a,b)<=1){pairs.push({i:i,j:j});}
+    }
+  }
+  if(!pairs.length){box.style.display="none";return;}
+  box.style.display="block";
+  var h="";
+  pairs.slice(0,20).forEach(function(p){
+    var a=CAT_ITEMS[p.i],b=CAT_ITEMS[p.j];
+    h+="<div style=\"display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid #FECACA;font-size:12.5px\">"+
+       "<span style=\"flex:1\"><b>"+esc(a.n)+"</b> <span style=\"color:#94A3B8\">("+esc(a.cat)+")</span></span>"+
+       "<i class=\"ti ti-arrow-right\" style=\"color:#DC2626\"></i>"+
+       "<span style=\"flex:1\"><b>"+esc(b.n)+"</b> <span style=\"color:#94A3B8\">("+esc(b.cat)+")</span></span>"+
+       "<button onclick=\"delCatItem("+p.j+")\" title=\"Supprimer le second\" style=\"background:none;border:1px solid #FECACA;color:#B91C1C;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:inherit\"><i class=\"ti ti-trash\"></i></button>"+
+       "</div>";
+  });
+  list.innerHTML=h;
 }
 function uiAddCatItem(){
   var n=(document.getElementById("ui-cat-name")||{}).value||"";n=n.trim();
@@ -9466,6 +9723,8 @@ function enterApp(){
   /* Quantit\u00e9s pr\u00e9f\u00e9r\u00e9es (ex. toujours 2 mousquetons) : reprises comme valeur
      par d\u00e9faut la prochaine fois que l'article est choisi dans le catalogue. */
   try{loadMyQtyPrefs();}catch(e){}
+  /* Favoris \u00e9pingl\u00e9s manuellement (ind\u00e9pendants de la fr\u00e9quence d'usage). */
+  try{loadMyFavorites();}catch(e){}
   var initials=currentUser.name.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();
   var av=document.getElementById("sb-avatar");
   av.style.background=ri.bg;av.style.color=ri.color;av.textContent=initials;
