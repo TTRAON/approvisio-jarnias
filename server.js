@@ -256,6 +256,25 @@ async function initDB() {
       read_at     TIMESTAMP NOT NULL DEFAULT NOW(),
       PRIMARY KEY (appro_id, user_id)
     );
+
+    /* Articles que CET utilisateur tape souvent, même absents du catalogue.
+       Alimente l'autocomplétion « redondance personnelle » : taper "SC" propose
+       "Scellement chimique" si c'est un article que la personne saisit fréquemment,
+       indépendamment de ce qui existe dans le catalogue partagé. */
+    CREATE TABLE IF NOT EXISTS user_frequent_items (
+      user_id     UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      data        JSONB NOT NULL DEFAULT '[]'::jsonb,
+      updated_at  TIMESTAMP DEFAULT NOW()
+    );
+
+    /* Quantité que CET utilisateur choisit d'habitude pour un article du catalogue
+       (ex. il prend toujours 2 mousquetons). Mémorisée par nom d'article, réutilisée
+       comme quantité par défaut la prochaine fois qu'il le sélectionne. */
+    CREATE TABLE IF NOT EXISTS user_qty_prefs (
+      user_id     UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      data        JSONB NOT NULL DEFAULT '[]'::jsonb,
+      updated_at  TIMESTAMP DEFAULT NOW()
+    );
   `);
   // Ajout de la colonne email si elle n'existe pas déjà (migration douce)
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(160);`);
@@ -687,6 +706,79 @@ app.post('/api/appros/:id/read', auth, async (req, res) => {
     res.json({ ok: true, read_at: rows[0] && rows[0].read_at });
   } catch (e) { res.status(500).json({ error: 'Erreur' }); }
 });
+
+// ── ARTICLES FRÉQUENTS PERSONNELS (autocomplétion « redondance ») ──
+// Chaque compte a sa propre liste, alimentée par ce qu'il tape effectivement dans
+// ses appros — même des articles absents du catalogue partagé.
+app.get('/api/my/frequent-items', auth, async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT data FROM user_frequent_items WHERE user_id = $1', [req.user.id]);
+    res.json(rows[0] ? rows[0].data : []);
+  } catch (e) { res.status(500).json({ error: 'Erreur' }); }
+});
+app.post('/api/my/frequent-items/bump', auth, async (req, res) => {
+  try {
+    const names = Array.isArray(req.body && req.body.names) ? req.body.names : [];
+    if (!names.length) return res.json({ ok: true });
+    const { rows } = await pool.query('SELECT data FROM user_frequent_items WHERE user_id = $1', [req.user.id]);
+    let list = rows[0] ? rows[0].data : [];
+    if (!Array.isArray(list)) list = [];
+    const now = new Date().toISOString();
+    names.slice(0, 60).forEach(raw => {
+      const n = ('' + raw).trim().slice(0, 120);
+      if (!n) return;
+      const key = n.toLowerCase();
+      const found = list.find(x => (x.n || '').toLowerCase() === key);
+      if (found) { found.c = (found.c || 1) + 1; found.t = now; }
+      else list.push({ n, c: 1, t: now });
+    });
+    // On garde les plus utilisés, plafonné pour rester léger.
+    list.sort((a, b) => (b.c || 0) - (a.c || 0));
+    list = list.slice(0, 150);
+    await pool.query(
+      `INSERT INTO user_frequent_items (user_id, data, updated_at) VALUES ($1,$2::jsonb,NOW())
+       ON CONFLICT (user_id) DO UPDATE SET data = $2::jsonb, updated_at = NOW()`,
+      [req.user.id, JSON.stringify(list)]);
+    res.json({ ok: true, data: list });
+  } catch (e) { res.status(500).json({ error: 'Erreur' }); }
+});
+
+// ── QUANTITÉS PRÉFÉRÉES PERSONNELLES ──
+// Ce que CET utilisateur choisit d'habitude pour un article donné (ex. toujours 2
+// mousquetons) : réutilisé comme quantité par défaut à la prochaine sélection.
+app.get('/api/my/qty-prefs', auth, async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT data FROM user_qty_prefs WHERE user_id = $1', [req.user.id]);
+    res.json(rows[0] ? rows[0].data : []);
+  } catch (e) { res.status(500).json({ error: 'Erreur' }); }
+});
+app.post('/api/my/qty-prefs/set', auth, async (req, res) => {
+  try {
+    const items = Array.isArray(req.body && req.body.items) ? req.body.items : [];
+    if (!items.length) return res.json({ ok: true });
+    const { rows } = await pool.query('SELECT data FROM user_qty_prefs WHERE user_id = $1', [req.user.id]);
+    let list = rows[0] ? rows[0].data : [];
+    if (!Array.isArray(list)) list = [];
+    const now = new Date().toISOString();
+    items.slice(0, 60).forEach(it => {
+      const n = ('' + (it && it.n || '')).trim().slice(0, 120);
+      const q = ('' + (it && it.q != null ? it.q : '')).trim().slice(0, 20);
+      if (!n || !q) return;
+      const key = n.toLowerCase();
+      const found = list.find(x => (x.n || '').toLowerCase() === key);
+      if (found) { found.q = q; found.t = now; }
+      else list.push({ n, q, t: now });
+    });
+    list.sort((a, b) => new Date(b.t) - new Date(a.t));
+    list = list.slice(0, 200);
+    await pool.query(
+      `INSERT INTO user_qty_prefs (user_id, data, updated_at) VALUES ($1,$2::jsonb,NOW())
+       ON CONFLICT (user_id) DO UPDATE SET data = $2::jsonb, updated_at = NOW()`,
+      [req.user.id, JSON.stringify(list)]);
+    res.json({ ok: true, data: list });
+  } catch (e) { res.status(500).json({ error: 'Erreur' }); }
+});
+
 
 app.post('/api/appros/:id/comments', auth, async (req, res) => {
   try {
