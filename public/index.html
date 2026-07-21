@@ -476,6 +476,10 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .sc-btn-del:hover{background:#FEF2F2;border-color:#FECACA;color:#DC2626}
 .sb-empty{color:#94A3B8;font-size:13px;text-align:center;padding:24px 0;line-height:1.6}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.toast-undo{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:10px 10px 10px 16px;border-radius:10px;font-size:13px;font-weight:500;z-index:10000;display:flex;align-items:center;gap:12px;white-space:nowrap;box-shadow:0 14px 34px -10px rgba(0,0,0,.5);animation:tourPop .25s var(--spring)}
+.toast-undo-btn{background:rgba(255,255,255,.16);color:#fff;border:none;border-radius:7px;padding:6px 13px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.toast-undo-btn:hover{background:rgba(255,255,255,.28)}
+@media(max-width:480px){.toast-undo{left:12px;right:12px;transform:none;white-space:normal}}
 .toast.show{opacity:1}
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;background-image:radial-gradient(rgba(15,23,42,.035) 1px,transparent 1.5px);background-size:22px 22px}
 .main-col{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
@@ -1132,6 +1136,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .cp-kit-fav>.cp-sec-hd{background:#FFFBEB}
 .cp-qty-save{background:none;border:none;color:#CBD5E1;cursor:pointer;padding:2px;font-size:13px;flex-shrink:0;display:flex;align-items:center}
 .cp-qty-save:hover{color:#6D28D9}
+.cp-sec-already{font-size:9.5px;font-weight:700;color:#15803D;background:#DCFCE7;padding:1px 7px;border-radius:20px;margin-left:6px;display:inline-flex;align-items:center;gap:3px;text-transform:none;letter-spacing:0}
 .cp-search{width:100%;border:1px solid #E2E8F0;border-radius:9px;padding:10px 12px 10px 36px;font-size:14px;font-family:inherit;outline:none;background:#F8FAFC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 12px center}
 .cp-search:focus{border-color:#6D28D9;background-color:#fff}
 .cp-tile.sel{border-color:#6D28D9;background:#F5F3FF}
@@ -3120,6 +3125,39 @@ function cpDragStart(e){
    deuxi\u00e8me : additionne simplement les quantit\u00e9s. Sans \u00e7a, ajouter deux fois
    « Mousquetons » cr\u00e9ait deux lignes distinctes au lieu d'une quantit\u00e9 juste \u2014 un
    vrai irritant silencieux sur une longue appro. */
+/* ═══ Annuler une insertion (article ou kit) ═══
+   On capture un instantan\u00e9 des sections AVANT modification et on le restaure tel
+   quel si la personne clique « Annuler » \u2014 plus simple et plus s\u00fbr que d'essayer
+   de d\u00e9faire chaque changement un par un (quantit\u00e9s fusionn\u00e9es comprises). */
+function _snapshotSections(secs){
+  var snap={};
+  secs.forEach(function(s){snap[s]=cur&&cur[s]?JSON.parse(JSON.stringify(cur[s])):[];});
+  return snap;
+}
+function _restoreSections(snap){
+  if(!cur||!snap)return;
+  Object.keys(snap).forEach(function(s){cur[s]=snap[s];});
+  saved=false;renderForm();
+  try{var p=document.getElementById("cp-panel");if(p&&p.classList.contains("open"))renderCpItems(window._cpQ||"");}catch(e){}
+  toast("Annul\u00e9","ti-arrow-back-up");
+}
+/* Toast avec un bouton « Annuler » cliquable (le toast normal a pointer-events:none
+   pour ne jamais bloquer l'\u00e9cran, donc on utilise ici un \u00e9l\u00e9ment \u00e0 part). */
+function toastUndo(msg,undoFn){
+  var old=document.getElementById("toast-undo");if(old)old.remove();
+  var el=document.createElement("div");el.id="toast-undo";el.className="toast-undo";
+  var span=document.createElement("span");span.innerHTML="<i class=\"ti ti-circle-check\" style=\"font-size:15px\"></i> "+msg;
+  el.appendChild(span);
+  var btn=document.createElement("button");btn.className="toast-undo-btn";btn.textContent="Annuler";
+  btn.onclick=function(){try{undoFn();}catch(e){}el.remove();};
+  el.appendChild(btn);
+  document.body.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.remove();},6000);
+}
+/* Fusionne avec une ligne D\u00c9J\u00c0 PR\u00c9SENTE (m\u00eame d\u00e9signation) au lieu d'en cr\u00e9er une
+   deuxi\u00e8me : additionne simplement les quantit\u00e9s. Sans \u00e7a, ajouter deux fois
+   « Mousquetons » cr\u00e9ait deux lignes distinctes au lieu d'une quantit\u00e9 juste \u2014 un
+   vrai irritant silencieux sur une longue appro. */
 function _mergeOrPushRow(sec,row){
   if(!cur)return {merged:false,row:row};
   if(!cur[sec])cur[sec]=[];
@@ -3141,12 +3179,15 @@ function _mergeOrPushRow(sec,row){
   cur[sec].push(row);
   return {merged:false,row:row};
 }
-function addCatItemDirect(sec,name,qty){
+function addCatItemDirect(sec,name,qty,silent){
   if(!cur)return;
+  var snap=_snapshotSections(["consommables","fournitures","outillage"]);
   var r=mkR(name,qty||"");
   var res=_mergeOrPushRow(sec,r);
   saved=false;renderForm();
-  toast(res.merged?("\u00ab "+name+" \u00bb : quantit\u00e9 mise \u00e0 jour ("+res.row.quantite+")"):("\u00ab "+name+" \u00bb ajout\u00e9 \u00e0 l'appro"),"ti-plus");
+  if(silent)return res;
+  var msg=res.merged?("\u00ab "+name+" \u00bb : quantit\u00e9 mise \u00e0 jour ("+res.row.quantite+")"):("\u00ab "+name+" \u00bb ajout\u00e9 \u00e0 l'appro");
+  toastUndo(msg,function(){_restoreSections(snap);});
 }
 function detachCp(){
   if(!cur){toast("Ouvrez une appro d'abord","ti-alert-circle");return;}
@@ -3191,7 +3232,8 @@ function renderCpPopup(w){
     ".kitfav{border-color:#FDE68A}.kitfav .sec-h{background:#FFFBEB}"+
     ".sec-h{cursor:default}"+
     ".qsave{background:none;border:none;color:#CBD5E1;cursor:pointer;padding:2px;font-size:13px;flex-shrink:0;display:flex;align-items:center}"+
-    ".qsave:hover{color:#6D28D9}";
+    ".qsave:hover{color:#6D28D9}"+
+    ".already{font-size:9.5px;font-weight:700;color:#15803D;background:#DCFCE7;padding:1px 7px;border-radius:20px;margin-left:6px;display:inline-flex;align-items:center;gap:3px}";
   d.head.appendChild(st);
   var top=d.createElement("div");top.className="top";top.innerHTML="<i class=\"ti ti-package\"></i> Catalogue \u2014 li\u00e9 \u00e0 l'appro ouverte";d.body.appendChild(top);
   var wrap=d.createElement("div");wrap.className="wrap";d.body.appendChild(wrap);
@@ -3309,20 +3351,26 @@ function renderCpPopup(w){
       kitStarBtn.title=_isFavoriteKit(cat)?"Retirer ce kit des favoris":"\u00c9pingler ce kit en favori";
       kitStarBtn.onclick=function(){toggleFavoriteKit(cat);build(search.value||"");};
       hd.appendChild(kitStarBtn);
-      var hdTxt=d.createElement("span");hdTxt.innerHTML="<i class=\"ti "+ic+"\"></i> "+esc(cat)+"<span class=\"cnt\">"+groups[cat].length+" article"+(groups[cat].length>1?"s":"")+"</span>";
+      var alreadyN=_catAlreadyInAppro(cat);
+      var alreadyHtml=alreadyN>0?("<span class=\"already\"><i class=\"ti ti-check\"></i> "+alreadyN+" d\u00e9j\u00e0 dans l'appro</span>"):"";
+      var hdTxt=d.createElement("span");hdTxt.innerHTML="<i class=\"ti "+ic+"\"></i> "+esc(cat)+"<span class=\"cnt\">"+groups[cat].length+" article"+(groups[cat].length>1?"s":"")+"</span>"+alreadyHtml;
       hd.appendChild(hdTxt);
       var kitAdd=d.createElement("div");kitAdd.className="kit-add";
       var kitN=d.createElement("input");kitN.type="number";kitN.min="1";kitN.value="1";kitAdd.appendChild(kitN);
       var kitBtn=d.createElement("button");kitBtn.innerHTML="<i class=\"ti ti-package\"></i> Kit";kitAdd.appendChild(kitBtn);
       kitBtn.onclick=function(){
         var mult=Math.max(1,Math.round(parseFloat(kitN.value)||1));
+        var snap=_snapshotSections(["consommables","fournitures","outillage"]);
+        var n=0;
         groups[cat].forEach(function(o){
           var base=parseFloat(o.item.q);if(isNaN(base))base=1;
           var qv=String(base*mult);
-          addCatItemDirect(o.item.sec,o.item.n,qv);
+          addCatItemDirect(o.item.sec,o.item.n,qv,true); // silencieux : un seul toast group\u00e9 ci-dessous
+          n++;
         });
         kitBtn.innerHTML="<i class=\"ti ti-check\"></i>";
         setTimeout(function(){kitBtn.innerHTML="<i class=\"ti ti-package\"></i> Kit";},700);
+        toastUndo("Kit "+cat+" ajout\u00e9 ("+n+" article"+(n>1?"s":"")+")",function(){_restoreSections(snap);});
       };
       hd.appendChild(kitAdd);
       sec.appendChild(hd);
@@ -3621,6 +3669,18 @@ function _isInCatalogue(name){
   for(var i=0;i<CAT_ITEMS.length;i++){if((CAT_ITEMS[i].n||"").toLowerCase()===key)return true;}
   return false;
 }
+/* Combien d'articles de ce KIT sont d\u00e9j\u00e0 dans l'appro ouverte : \u00e9vite de piocher
+   \u00e0 nouveau dans un kit d\u00e9j\u00e0 en partie pris sans s'en rendre compte. */
+function _catAlreadyInAppro(cat){
+  if(!cur)return 0;
+  var names={};
+  CAT_ITEMS.forEach(function(it){if(it.cat===cat)names[_cpNorm(it.n)]=1;});
+  var n=0;
+  ["consommables","fournitures","outillage"].forEach(function(sec){
+    (cur[sec]||[]).forEach(function(r){if(r.designation&&names[_cpNorm(r.designation)])n++;});
+  });
+  return n;
+}
 function _maybeSuggestToCatalogue(){
   if(!MY_FREQ||!MY_FREQ.length)return;
   MY_FREQ.forEach(function(it){
@@ -3758,9 +3818,11 @@ function renderCpItems(q){
     var ic=CAT_CAT_I[cat]||"ti-box";
     var matchCount=groups[cat].filter(function(o){return o.sc>0;}).length;
     var cntBadge=res?("<span class=\"cp-sec-cnt\">"+groups[cat].length+" article"+(groups[cat].length>1?"s":"")+"</span>"):"";
+    var alreadyN=_catAlreadyInAppro(cat);
+    var alreadyBadge=alreadyN>0?("<span class=\"cp-sec-already\"><i class=\"ti ti-check\"></i> "+alreadyN+" d\u00e9j\u00e0 dans l'appro</span>"):"";
     var kitFavOn=_isFavoriteKit(cat);
     var kitStar="<button type=\"button\" class=\"cp-kit-star"+(kitFavOn?" on":"")+"\" onclick=\"toggleFavoriteKit('"+esc(cat).replace(/'/g,"&#39;")+"')\" title=\""+(kitFavOn?"Retirer ce kit des favoris":"\u00c9pingler ce kit en favori")+"\"><i class=\"ti "+(kitFavOn?"ti-star-filled":"ti-star")+"\"></i></button>";
-    html+="<div class=\"cp-sec"+(kitFavOn?" cp-kit-fav":"")+"\"><div class=\"cp-sec-hd\"><div class=\"cp-sec-title\">"+kitStar+"<i class=\"ti "+ic+"\" style=\"font-size:14px\"></i> "+esc(cat)+cntBadge+"</div><div class=\"cp-sec-actions\"><div class=\"cp-kit-add\"><span class=\"cp-kit-x\">\u00d7</span><input type=\"number\" min=\"1\" value=\"1\" id=\"knc_"+ci+"\" class=\"cp-kit-n\" onclick=\"event.stopPropagation()\" title=\"Nombre de kits \u00e0 ajouter\"/><button class=\"btn-kit\" onclick=\"selKit(this.getAttribute(\u0027data-c\u0027),\u0027knc_"+ci+"\u0027)\" data-c=\""+esc(cat)+"\"><i class=\"ti ti-package\"></i> Ajouter le kit</button></div><button class=\"btn-all\" onclick=\"selAllCat(this.getAttribute(\u0027data-c\u0027))\" data-c=\""+esc(cat)+"\">Tout cocher</button></div></div>";
+    html+="<div class=\"cp-sec"+(kitFavOn?" cp-kit-fav":"")+"\"><div class=\"cp-sec-hd\"><div class=\"cp-sec-title\">"+kitStar+"<i class=\"ti "+ic+"\" style=\"font-size:14px\"></i> "+esc(cat)+cntBadge+alreadyBadge+"</div><div class=\"cp-sec-actions\"><div class=\"cp-kit-add\"><span class=\"cp-kit-x\">\u00d7</span><input type=\"number\" min=\"1\" value=\"1\" id=\"knc_"+ci+"\" class=\"cp-kit-n\" onclick=\"event.stopPropagation()\" title=\"Nombre de kits \u00e0 ajouter\"/><button class=\"btn-kit\" onclick=\"selKit(this.getAttribute(\u0027data-c\u0027),\u0027knc_"+ci+"\u0027)\" data-c=\""+esc(cat)+"\"><i class=\"ti ti-package\"></i> Ajouter le kit</button></div><button class=\"btn-all\" onclick=\"selAllCat(this.getAttribute(\u0027data-c\u0027))\" data-c=\""+esc(cat)+"\">Tout cocher</button></div></div>";
     if(typeof _cpLayout!=="undefined"&&_cpLayout==="grid"){
       html+="<div class=\"cp-grid\">";
       groups[cat].forEach(function(o){var item=o.item,i=o.i;
@@ -3855,6 +3917,7 @@ function insertCp(){
   var idx=Object.keys(window._cpSel);
   if(!idx.length){toast("Aucun article s\u00e9lectionn\u00e9","ti-alert-circle");return;}
   if(!cur){toast("Ouvrez une appro d\u2019abord","ti-alert-circle");return;}
+  var snap=_snapshotSections(["consommables","fournitures","outillage"]);
   var cnt=0,mergedCnt=0;
   idx.forEach(function(i){
     var item=CAT_ITEMS[i];if(!item)return;
@@ -3884,7 +3947,7 @@ function insertCp(){
   if(_panel&&_panel.classList.contains("open"))renderCpItems(window._cpQ||"");
   var msg=cnt+" article"+(cnt>1?"s":"")+" ins\u00e9r\u00e9"+(cnt>1?"s":"")+" \u2014 catalogue toujours ouvert";
   if(mergedCnt)msg+=" (dont "+mergedCnt+" quantit\u00e9"+(mergedCnt>1?"s":"")+" mise"+(mergedCnt>1?"s":"")+" \u00e0 jour, d\u00e9j\u00e0 pr\u00e9sent"+(mergedCnt>1?"s":"")+")";
-  toast(msg,"ti-circle-check");
+  toastUndo(msg,function(){_restoreSections(snap);});
 }
 
 
