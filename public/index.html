@@ -998,7 +998,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .cp-panel.open:not(.floating){animation:cpSlide .34s var(--ease)}
 .cp-panel.floating.open{animation:annPop .3s var(--ease)}
 .cp-body.stagger>*{opacity:0;animation:fadeUp .45s var(--ease) both;animation-delay:calc(var(--i,0)*45ms)}
-.cp-panel.floating{right:auto;top:78px;left:calc(100vw - 430px);width:400px;height:72vh;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.28);resize:both;overflow:hidden;min-width:300px;min-height:320px;max-width:96vw;max-height:88vh}
+.cp-panel.floating{right:auto;top:78px;left:calc(100vw - 490px);width:460px;height:72vh;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.28);resize:both;overflow:hidden;min-width:300px;min-height:320px;max-width:96vw;max-height:88vh}
 .cp-panel.floating .cp-hd{cursor:move;border-radius:14px 14px 0 0}
 .cp-panel.floating .cp-body{overflow-y:auto;min-height:0}
 .btn-cp-ic{background:none;border:1px solid #E2E8F0;border-radius:8px;padding:5px 7px;cursor:pointer;color:#64748B;line-height:1;display:inline-flex;align-items:center}
@@ -1078,8 +1078,8 @@ table.at tr.kit-row td.td-d{position:relative}
 .btn-cp-close{background:none;border:1px solid #E2E8F0;border-radius:8px;padding:5px 8px;cursor:pointer;color:#64748B;line-height:1}
 .cp-body{flex:1;padding:14px;display:flex;flex-direction:column;gap:14px}
 .cp-sec{border:1px solid #E2E8F0;border-radius:10px;overflow:hidden}
-.cp-sec-hd{background:#F8FAFC;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #E2E8F0}
-.cp-sec-title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#0F172A;text-transform:uppercase;letter-spacing:.5px}
+.cp-sec-hd{background:#F8FAFC;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #E2E8F0}
+.cp-sec-title{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:#0F172A;text-transform:uppercase;letter-spacing:.4px}
 .btn-all{background:none;border:none;font-size:11px;color:#6D28D9;cursor:pointer;font-family:inherit;font-weight:600;padding:2px 6px;border-radius:4px}
 .cp-sec-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .cp-kit-add{display:inline-flex;align-items:center;gap:5px;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:3px 4px 3px 8px}
@@ -1087,7 +1087,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .cp-kit-n{width:40px;padding:4px;border:1px solid #C4B5FD;border-radius:6px;text-align:center;font-family:inherit;font-size:12px;color:#6D28D9;font-weight:700;background:#fff;outline:none}
 .btn-kit{background:#6D28D9;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;padding:5px 9px;display:inline-flex;align-items:center;gap:4px}
 .btn-kit:hover{background:#5B21B6}
-@media(max-width:768px){.cp-panel{width:100vw}.cp-sec-hd{flex-wrap:wrap;gap:7px}.cp-sec-actions{width:100%;justify-content:flex-start}}
+@media(max-width:768px){.cp-panel{width:100vw}.cp-sec-hd{flex-wrap:wrap;gap:7px}.cp-sec-actions{width:100%;justify-content:flex-start}.cp-hd{padding-top:calc(16px + env(safe-area-inset-top))}}
 .cp-row{display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid #F8FAFC;gap:10px;transition:background .14s var(--ease)}
 .cp-row:last-child{border-bottom:none}
 .cp-row:hover{background:#F5F3FF}
@@ -1096,6 +1096,16 @@ table.at tr.kit-row td.td-d{position:relative}
 .cp-row-n{flex:1;font-size:13px;color:#1E293B}
 .cp-qty{width:60px;border:1px solid #E2E8F0;border-radius:6px;padding:5px 8px;font-size:13px;text-align:center;font-family:inherit;outline:none;background:#F8FAFC}
 .cp-qty-l{font-size:10px;color:#94A3B8;text-align:center;margin-top:2px}
+/* ═══ Densité : plusieurs colonnes côte à côte, police réduite (vues Liste/Compact) ═══ */
+.cp-items-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));background:#F1F5F9;gap:1px}
+.cp-items-wrap .cp-row{background:#fff;padding:6px 9px;border-bottom:none;gap:6px}
+.cp-items-wrap .cp-row-n{font-size:11.5px;line-height:1.25}
+.cp-items-wrap .cp-qty{width:36px;padding:3px 4px;font-size:10.5px}
+.cp-items-wrap .cp-qty-l{display:none}
+.cp-row.weak,.cp-tile.weak{opacity:.5}
+.cp-row.weak:hover,.cp-tile.weak:hover{opacity:.8}
+.cp-hl{background:#FEF3C7;color:#92400E;border-radius:3px;padding:0 1px;font-weight:700}
+.cp-sec-cnt{font-size:9.5px;color:#94A3B8;font-weight:600;text-transform:none;letter-spacing:0;margin-left:2px}
 .cp-search{width:100%;border:1px solid #E2E8F0;border-radius:9px;padding:10px 12px 10px 36px;font-size:14px;font-family:inherit;outline:none;background:#F8FAFC url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 12px center}
 .cp-search:focus{border-color:#6D28D9;background-color:#fff}
 .cp-tile.sel{border-color:#6D28D9;background:#F5F3FF}
@@ -1208,7 +1218,7 @@ table.at tr.kit-row td.td-d{position:relative}
 }
 
 /* ═══ SÉLECTEUR DE CHANTIER ALOBEES ═══ */
-#alo-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:18px}
+#alo-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))}
 .alo-modal{background:#fff;border-radius:18px;max-width:520px;width:100%;max-height:82vh;display:flex;flex-direction:column;box-shadow:0 24px 60px -12px rgba(15,23,42,.45);overflow:hidden}
 .alo-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px 12px;border-bottom:1px solid #F1F5F9}
 .alo-title{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:800;color:#0F172A;letter-spacing:-.2px}
@@ -3089,50 +3099,118 @@ function addCatItemDirect(sec,name,qty){
 }
 function detachCp(){
   if(!cur){toast("Ouvrez une appro d'abord","ti-alert-circle");return;}
-  var w=window.open("","catalogueJarnias","width=430,height=680,menubar=no,toolbar=no");
+  var w=window.open("","catalogueJarnias","width=480,height=720,menubar=no,toolbar=no");
   if(!w){toast("Autorise les pop-ups pour d\u00e9tacher le catalogue","ti-alert-circle");return;}
   renderCpPopup(w);
 }
+/* Fen\u00eatre 100% ind\u00e9pendante (utile sur un 2e \u00e9cran) : elle r\u00e9utilise le MEME moteur
+   que le catalogue principal (classement kit-first, r\u00e9v\u00e9lation du kit entier, grille
+   dense, quantit\u00e9s pr\u00e9f\u00e9r\u00e9es) au lieu d'une version simplifi\u00e9e \u00e0 part \u2014 sinon elle
+   prend du retard \u00e0 chaque am\u00e9lioration du catalogue, comme c'\u00e9tait le cas avant. */
 function renderCpPopup(w){
-  var SEC_C={consommables:"#1D4ED8",fournitures:"#B45309",outillage:"#0F766E"};
-  var SEC_L={consommables:"Consommables",fournitures:"Fournitures",outillage:"Outillage"};
   var d=w.document;
-  d.open();d.write("<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Catalogue \u2014 AppROVISIO</title></head><body></body></html>");d.close();
+  d.open();d.write("<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Catalogue \u2014 AppROVISIO</title><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css'/></head><body></body></html>");d.close();
   var st=d.createElement("style");
-  st.textContent="body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;background:#F8FAFC;color:#0F172A}.top{position:sticky;top:0;background:#6D28D9;color:#fff;padding:12px 14px;font-weight:700}#search{box-sizing:border-box;padding:10px 12px;border:1px solid #E2E8F0;border-radius:8px;margin:10px;width:calc(100% - 20px);font-size:14px}.sec{margin:0 10px 12px;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;background:#fff}.sec-h{background:#F1F5F9;padding:7px 12px;font-size:12px;font-weight:700;text-transform:uppercase;color:#475569}.row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #F1F5F9;gap:8px}.row:last-child{border-bottom:none}.nm{font-size:13px;padding-left:8px;display:flex;flex-direction:column}.nm small{color:#94A3B8;font-size:10px}input[type=number]{width:48px;padding:5px;border:1px solid #E2E8F0;border-radius:6px;text-align:center}.addb{margin-left:6px;background:#15803D;color:#fff;border:none;border-radius:6px;width:30px;height:30px;font-size:16px;font-weight:700;cursor:pointer}.hint{font-size:11px;color:#94A3B8;padding:0 14px 12px;text-align:center}";
+  st.textContent="*{box-sizing:border-box}body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;margin:0;background:#F8FAFC;color:#0F172A}"+
+    ".top{position:sticky;top:0;z-index:2;background:#6D28D9;color:#fff;padding:12px 14px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px}"+
+    ".wrap{padding:10px}"+
+    "#search{box-sizing:border-box;padding:9px 12px;border:1px solid #E2E8F0;border-radius:8px;width:100%;font-size:13px;font-family:inherit;margin-bottom:10px}"+
+    ".sec{margin-bottom:10px;border:1px solid #E2E8F0;border-radius:10px;overflow:hidden;background:#fff}"+
+    ".sec-h{background:#F1F5F9;padding:7px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:#475569;display:flex;align-items:center;gap:6px}"+
+    ".sec-h .cnt{margin-left:auto;font-size:9.5px;color:#94A3B8;font-weight:600;text-transform:none}"+
+    ".kit-add{display:flex;align-items:center;gap:5px;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:7px;padding:2px 3px 2px 7px;margin-left:6px}"+
+    ".kit-add input{width:34px;padding:2px;border:1px solid #C4B5FD;border-radius:5px;text-align:center;font-family:inherit;font-size:11px;color:#6D28D9}"+
+    ".kit-add button{background:#6D28D9;color:#fff;border:none;border-radius:5px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;padding:3px 7px}"+
+    ".grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));background:#F1F5F9;gap:1px}"+
+    ".row{background:#fff;display:flex;align-items:center;padding:6px 8px;gap:6px}"+
+    ".row.weak{opacity:.5}"+
+    ".nm{flex:1;font-size:11.5px;line-height:1.25}"+
+    "mark{background:#FEF3C7;color:#92400E;border-radius:3px;padding:0 1px;font-weight:700}"+
+    "input[type=number]{width:34px;padding:3px;border:1px solid #E2E8F0;border-radius:5px;text-align:center;font-family:inherit;font-size:10.5px}"+
+    ".addb{flex-shrink:0;background:#15803D;color:#fff;border:none;border-radius:6px;width:24px;height:24px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}"+
+    ".empty{text-align:center;color:#94A3B8;font-size:12px;padding:30px 14px}"+
+    ".hint{font-size:10.5px;color:#94A3B8;padding:0 14px 14px;text-align:center}";
   d.head.appendChild(st);
-  var top=d.createElement("div");top.className="top";top.textContent="\ud83d\udce6 Catalogue \u2014 cliquez + pour ajouter \u00e0 l'appro";d.body.appendChild(top);
-  var search=d.createElement("input");search.id="search";search.placeholder="Rechercher...";d.body.appendChild(search);
-  var allRows=[];
-  (CAT_ORDER||[]).forEach(function(cat){
-    var items=[];CAT_ITEMS.forEach(function(it,idx){if(it.cat===cat)items.push({it:it,idx:idx});});
-    if(!items.length)return;
-    var sec=d.createElement("div");sec.className="sec";
-    var hd=d.createElement("div");hd.className="sec-h";hd.textContent=cat;sec.appendChild(hd);
-    items.forEach(function(o){
-      var it=o.it;
-      var row=d.createElement("div");row.className="row";
-      row._search=((it.n||"")+" "+(it.cat||"")).toLowerCase();
-      var nm=d.createElement("span");nm.className="nm";nm.style.borderLeft="3px solid "+(SEC_C[it.sec]||"#999");
-      var nmt=d.createElement("span");nmt.textContent=it.n;nm.appendChild(nmt);
-      var sm=d.createElement("small");sm.textContent=SEC_L[it.sec]||it.sec;nm.appendChild(sm);
-      row.appendChild(nm);
-      var right=d.createElement("span");
-      var qin=d.createElement("input");qin.type="number";qin.min="1";qin.value=it.q||1;qin.style.width="48px";right.appendChild(qin);
-      var btn=d.createElement("button");btn.className="addb";btn.textContent="+";
-      (function(sec2,name,qinput,b){
-        b.onclick=function(){
-          try{addCatItemDirect(sec2,name,qinput.value||1);b.textContent="\u2713";b.style.background="#0F766E";setTimeout(function(){b.textContent="+";b.style.background="#15803D";},700);}
-          catch(e){alert("Reviens sur l'appro puis r\u00e9essaie");}
-        };
-      })(it.sec,it.n,qin,btn);
-      right.appendChild(btn);row.appendChild(right);
-      sec.appendChild(row);allRows.push(row);
+  var top=d.createElement("div");top.className="top";top.innerHTML="<i class=\"ti ti-package\"></i> Catalogue \u2014 li\u00e9 \u00e0 l'appro ouverte";d.body.appendChild(top);
+  var wrap=d.createElement("div");wrap.className="wrap";d.body.appendChild(wrap);
+  var search=d.createElement("input");search.id="search";search.placeholder="Rechercher : ma\u00e7onnerie, corde, ciment\u2026";wrap.appendChild(search);
+  var results=d.createElement("div");wrap.appendChild(results);
+  var hint=d.createElement("div");hint.className="hint";hint.textContent="Fen\u00eatre ind\u00e9pendante \u00b7 d\u00e9pla\u00e7able sur un 2e \u00e9cran";d.body.appendChild(hint);
+
+  function qtyFor(item){
+    var pref=_myQtyFor(item.n);
+    if(pref!=null&&(""+pref).trim()!=="")return pref;
+    return (""+(item.q||"")).trim()||"1";
+  }
+  function build(q){
+    var resSearch=q?_cpSearch(q):null;
+    var tokens=resSearch?_cpNorm(q).split(" ").filter(Boolean):[];
+    var groups={};
+    CAT_ITEMS.forEach(function(item,i){
+      if(resSearch&&!resSearch.cats[item.cat])return;
+      if(!groups[item.cat])groups[item.cat]=[];
+      groups[item.cat].push({item:item,i:i,sc:resSearch?(resSearch.items[i]||0):0});
     });
-    d.body.appendChild(sec);
-  });
-  var hint=d.createElement("div");hint.className="hint";hint.textContent="Fen\u00eatre li\u00e9e \u00e0 l'appro ouverte \u00b7 d\u00e9pla\u00e7able sur un 2e \u00e9cran";d.body.appendChild(hint);
-  search.oninput=function(){var v=(search.value||"").toLowerCase();allRows.forEach(function(r){r.style.display=(!v||r._search.indexOf(v)>=0)?"flex":"none";});};
+    var order=CAT_ORDER.slice();
+    Object.keys(groups).forEach(function(c){if(order.indexOf(c)<0)order.push(c);});
+    if(resSearch){
+      order.forEach(function(c){if(groups[c])groups[c].sort(function(a,b){return b.sc-a.sc;});});
+      order.sort(function(a,b){return (resSearch.cats[b]||0)-(resSearch.cats[a]||0);});
+    }
+    results.innerHTML="";
+    var any=false;
+    order.forEach(function(cat){
+      if(!groups[cat]||!groups[cat].length)return;
+      any=true;
+      var ci=CAT_ORDER.indexOf(cat);if(ci<0)ci=order.indexOf(cat)+900;
+      var ic=CAT_CAT_I[cat]||"ti-box";
+      var sec=d.createElement("div");sec.className="sec";
+      var hd=d.createElement("div");hd.className="sec-h";
+      hd.innerHTML="<i class=\"ti "+ic+"\"></i> "+esc(cat)+"<span class=\"cnt\">"+groups[cat].length+" article"+(groups[cat].length>1?"s":"")+"</span>";
+      var kitAdd=d.createElement("div");kitAdd.className="kit-add";
+      var kitN=d.createElement("input");kitN.type="number";kitN.min="1";kitN.value="1";kitAdd.appendChild(kitN);
+      var kitBtn=d.createElement("button");kitBtn.innerHTML="<i class=\"ti ti-package\"></i> Kit";kitAdd.appendChild(kitBtn);
+      kitBtn.onclick=function(){
+        var mult=Math.max(1,Math.round(parseFloat(kitN.value)||1));
+        var toRemember=[];
+        groups[cat].forEach(function(o){
+          var base=parseFloat(o.item.q);if(isNaN(base))base=1;
+          var qv=String(base*mult);
+          addCatItemDirect(o.item.sec,o.item.n,qv);
+          toRemember.push({n:o.item.n,q:qv});
+        });
+        _saveQtyPrefs(toRemember);
+        kitBtn.innerHTML="<i class=\"ti ti-check\"></i>";
+        setTimeout(function(){kitBtn.innerHTML="<i class=\"ti ti-package\"></i> Kit";},700);
+      };
+      hd.appendChild(kitAdd);
+      sec.appendChild(hd);
+      var grid=d.createElement("div");grid.className="grid";
+      groups[cat].forEach(function(o){
+        var item=o.item;
+        var row=d.createElement("div");row.className="row"+((resSearch&&o.sc<=0)?" weak":"");
+        var nm=d.createElement("span");nm.className="nm";
+        nm.innerHTML=(o.sc>0&&tokens.length)?_hlMatch(item.n,tokens):esc(item.n);
+        row.appendChild(nm);
+        var qin=d.createElement("input");qin.type="number";qin.min="1";qin.value=qtyFor(item);row.appendChild(qin);
+        var btn=d.createElement("button");btn.className="addb";btn.innerHTML="<i class=\"ti ti-plus\"></i>";
+        btn.onclick=function(){
+          var qv=qin.value||"1";
+          addCatItemDirect(item.sec,item.n,qv);
+          _saveQtyPrefs([{n:item.n,q:qv}]);
+          btn.innerHTML="<i class=\"ti ti-check\"></i>";btn.style.background="#0F766E";
+          setTimeout(function(){btn.innerHTML="<i class=\"ti ti-plus\"></i>";btn.style.background="#15803D";},700);
+        };
+        row.appendChild(btn);
+        grid.appendChild(row);
+      });
+      sec.appendChild(grid);
+      results.appendChild(sec);
+    });
+    if(!any){var e=d.createElement("div");e.className="empty";e.innerHTML="<i class=\"ti ti-search-off\" style=\"font-size:22px\"></i><div style=\"margin-top:6px\">Aucun article trouv\u00e9</div>";results.appendChild(e);}
+  }
+  search.oninput=function(){build(search.value||"");};
+  build("");
 }
 /* ═══ CATALOGUE — recherche intelligente (intention, catégories, synonymes, fautes de frappe) ═══ */
 var CP_SYN={
@@ -3180,20 +3258,37 @@ function _cpExpand(tokens){
   });
   return Object.keys(out);
 }
-/* Score d'un article pour une recherche : nom > catégorie > synonyme > faute de frappe. */
+/* Score d'un article pour une recherche : le nom de l'article lui-m\u00eame (le nom du
+   KIT est not\u00e9 \u00e0 part par _catNameScore, pour ne pas fausser la distinction entre
+   « article vraiment trouv\u00e9 » et « article r\u00e9v\u00e9l\u00e9 parce qu'il fait partie du kit »). */
 function _cpScore(item,tokens,syns){
   var nn=_cpNorm(item.n),cn=_cpNorm(item.cat),sc=0;
   tokens.forEach(function(t){
     if(!t)return;
     if(nn.indexOf(t)>=0){sc+=10;if(nn.indexOf(t)===0)sc+=4;}
-    else if(cn.indexOf(t)>=0)sc+=7;
     else if(t.length>=4){
       var words=nn.split(" ");
       for(var w=0;w<words.length;w++){if(words[w].length>=4&&_lev(words[w],t)<=1){sc+=4;break;}}
-      if(!sc&&_lev(cn,t)<=1)sc+=5;
     }
   });
   if(syns.length){for(var k=0;k<syns.length;k++){if(syns[k]&&nn.indexOf(syns[k])>=0){sc+=3;break;}}}
+  return sc;
+}
+/* Score du NOM DU KIT lui-m\u00eame (ind\u00e9pendant des articles) : c'est ce qui manquait
+   pour que « corde » fasse remonter le kit « Cordes & Mousquetonnerie » en premier,
+   au lieu d'un article isol\u00e9 sans rapport log\u00e9 ailleurs par co\u00efncidence. */
+function _catNameScore(cat,tokens,syns){
+  var cn=_cpNorm(cat),sc=0;
+  tokens.forEach(function(t){
+    if(!t)return;
+    if(cn.indexOf(t)===0)sc+=300;
+    else if(cn.indexOf(t)>=0)sc+=150;
+    else if(t.length>=4){
+      var words=cn.split(" ");
+      for(var w=0;w<words.length;w++){if(words[w].length>=4&&_lev(words[w],t)<=1){sc+=80;break;}}
+    }
+  });
+  if(syns.length){for(var k=0;k<syns.length;k++){if(syns[k]&&cn.indexOf(syns[k])>=0){sc+=40;break;}}}
   return sc;
 }
 function _cpSearch(q){
@@ -3201,14 +3296,22 @@ function _cpSearch(q){
   if(!nq)return null;
   var tokens=nq.split(" ").filter(Boolean);
   var syns=_cpExpand(tokens);
-  var scores={};
-  CAT_ITEMS.forEach(function(item,i){var s=_cpScore(item,tokens,syns);if(s>0)scores[i]=s;});
-  return scores;
+  var items={},catSum={},catsSeen={};
+  CAT_ITEMS.forEach(function(item,i){
+    catsSeen[item.cat]=1;
+    var s=_cpScore(item,tokens,syns);
+    if(s>0){items[i]=s;catSum[item.cat]=(catSum[item.cat]||0)+s;}
+  });
+  var cats={};
+  Object.keys(catsSeen).forEach(function(c){
+    var total=_catNameScore(c,tokens,syns)+(catSum[c]||0);
+    if(total>0)cats[c]=total;
+  });
+  return {items:items,cats:cats};
 }
-/* ═══ Autocomplétion « Tab » sur les désignations (le catalogue sert de dictionnaire) ═══ */
-function _cpSuggest(v){
-  var nv=_cpNorm(v);
-  if(!nv||nv.length<2||typeof CAT_ITEMS==="undefined")return "";
+/* ═══ Autocomplétion sur les désignations : catalogue d'abord, puis « redondance
+   personnelle » (articles que CETTE personne tape souvent, même hors catalogue) ═══ */
+function _catSuggest(nv){
   var best="",bestScore=0,seen={};
   CAT_ITEMS.forEach(function(it){
     var n=it&&it.n;if(!n||seen[n])return;seen[n]=1;
@@ -3220,6 +3323,114 @@ function _cpSuggest(v){
     if(sc>bestScore){bestScore=sc;best=n;}
   });
   return bestScore>0?best:"";
+}
+function _freqSuggest(nv){
+  if(!window.MY_FREQ||!MY_FREQ.length)return "";
+  var best="",bestScore=0,seen={};
+  MY_FREQ.forEach(function(it){
+    var n=it&&it.n;if(!n||seen[n])return;seen[n]=1;
+    var nn=_cpNorm(n),sc=0,bonus=Math.min(it.c||1,50)*10;
+    if(nn===nv)return;
+    /* L'usage compte plus que la longueur du nom : un article tap\u00e9 souvent doit
+       gagner face \u00e0 un autre juste plus court, sinon la « redondance » ne sert \u00e0 rien. */
+    if(nn.indexOf(nv)===0)sc=500+bonus-nn.length;
+    else if(nn.indexOf(nv)>0)sc=250+bonus-nn.length;
+    if(sc>bestScore){bestScore=sc;best=n;}
+  });
+  return bestScore>0?best:"";
+}
+function _cpSuggest(v){
+  var nv=_cpNorm(v);
+  if(!nv||nv.length<2)return "";
+  if(typeof CAT_ITEMS!=="undefined"){
+    var c=_catSuggest(nv);
+    if(c)return c;
+  }
+  /* Rien dans le catalogue : on propose ce que la personne tape souvent elle-m\u00eame,
+     m\u00eame si l'article n'existe pas dans le catalogue partag\u00e9. */
+  return _freqSuggest(nv);
+}
+/* Compl\u00e9tion EN DIRECT pendant la frappe (technique « barre d'adresse » : le reste
+   du mot appara\u00eet d\u00e9j\u00e0 SELECTIONN\u00e9 ; continuer \u00e0 taper l'efface, Tab/Entr\u00e9e l'accepte). */
+function _liveComplete(e,el,sec,i){
+  if(e&&e.isComposing)return;
+  var it=e&&e.inputType;
+  if(it&&it.indexOf("delete")>=0)return; // jamais après une suppression
+  if(el.selectionStart!==el.value.length||el.selectionEnd!==el.value.length)return; // curseur pas en bout de texte
+  var v=el.value;
+  if(!v||v.length<2)return;
+  var sug=_cpSuggest(v);
+  if(!sug)return;
+  var nv=_cpNorm(v),ns=_cpNorm(sug);
+  if(ns===nv||ns.indexOf(nv)!==0)return; // ne propose que si \u00e7a PROLONGE ce qui est tap\u00e9
+  el.value=sug;
+  try{el.setSelectionRange(v.length,sug.length);}catch(x){}
+  if(cur&&cur[sec]&&cur[sec][i])cur[sec][i].designation=sug;
+}
+/* Entr\u00e9e depuis une ligne d'article : direction la ligne suivante (ou une nouvelle
+   ligne si on est d\u00e9j\u00e0 sur la derni\u00e8re) SANS quitter le clavier. */
+function _rowKeyNav(e,sec,i){
+  if(e.key!=="Enter"||e.shiftKey)return;
+  e.preventDefault();
+  _gotoNextRow(sec,i);
+}
+function _gotoNextRow(sec,i){
+  if(!cur||!cur[sec])return;
+  var next=document.getElementById("dsg_"+sec+"_"+(i+1));
+  if(next){next.focus();try{next.setSelectionRange(next.value.length,next.value.length);}catch(x){}return;}
+  addRowFocus(sec);
+}
+function addRowFocus(sec){
+  addR(sec); // pousse une ligne vide + renderForm() (synchrone)
+  var idx=cur[sec].length-1;
+  var el=document.getElementById("dsg_"+sec+"_"+idx);
+  if(el)el.focus();
+}
+/* ═══ Articles fr\u00e9quents personnels (redondance) ═══ */
+var MY_FREQ=[];
+function loadMyFrequentItems(){
+  apiCall("GET","/my/frequent-items").then(function(list){
+    MY_FREQ=Array.isArray(list)?list:[];
+  }).catch(function(){});
+}
+/* ═══ Quantit\u00e9s pr\u00e9f\u00e9r\u00e9es par article (ex. toujours 2 mousquetons) ═══ */
+var MY_QTY_PREFS=[];
+function loadMyQtyPrefs(){
+  apiCall("GET","/my/qty-prefs").then(function(list){
+    MY_QTY_PREFS=Array.isArray(list)?list:[];
+  }).catch(function(){});
+}
+function _myQtyFor(name){
+  if(!name||!MY_QTY_PREFS.length)return null;
+  var key=(""+name).toLowerCase();
+  for(var k=0;k<MY_QTY_PREFS.length;k++){if((MY_QTY_PREFS[k].n||"").toLowerCase()===key)return MY_QTY_PREFS[k].q;}
+  return null;
+}
+function _saveQtyPrefs(items){
+  if(!items||!items.length)return;
+  // met \u00e0 jour la copie locale tout de suite, sans attendre la r\u00e9ponse serveur
+  items.forEach(function(it){
+    var key=(it.n||"").toLowerCase(),found=null;
+    for(var k=0;k<MY_QTY_PREFS.length;k++){if((MY_QTY_PREFS[k].n||"").toLowerCase()===key){found=MY_QTY_PREFS[k];break;}}
+    if(found)found.q=it.q;else MY_QTY_PREFS.push({n:it.n,q:it.q,t:new Date().toISOString()});
+  });
+  apiCall("POST","/my/qty-prefs/set",{items:items}).then(function(d){
+    if(d&&Array.isArray(d.data))MY_QTY_PREFS=d.data;
+  }).catch(function(){});
+}
+function _bumpFrequentItems(){
+  if(!cur)return;
+  var seen={},names=[];
+  ["consommables","fournitures","outillage"].forEach(function(sec){
+    (cur[sec]||[]).forEach(function(r){
+      var n=(r.designation||"").trim();
+      if(n&&!seen[n]){seen[n]=1;names.push(n);}
+    });
+  });
+  if(!names.length)return;
+  apiCall("POST","/my/frequent-items/bump",{names:names}).then(function(d){
+    if(d&&Array.isArray(d.data))MY_FREQ=d.data;
+  }).catch(function(){});
 }
 document.addEventListener("keydown",function(e){
   if(e.key!=="Tab"||e.shiftKey||e.ctrlKey||e.metaKey)return;
@@ -3239,25 +3450,50 @@ document.addEventListener("keydown",function(e){
 /* ═══ CATALOGUE — sélection PERSISTANTE (survit à la recherche et au re-render) ═══ */
 function _cpSelInit(){if(!window._cpSel)window._cpSel={};if(!window._cpQty)window._cpQty={};if(!window._cpKit)window._cpKit={};}
 function _cpQtySet(el){_cpSelInit();window._cpQty[el.id.replace("cq_","")]=el.value;}
-function _cpQtyOf(i){_cpSelInit();return (window._cpQty[i]!==undefined)?window._cpQty[i]:((CAT_ITEMS[i]&&CAT_ITEMS[i].q)||"1");}
+function _cpQtyOf(i){
+  _cpSelInit();
+  var v=window._cpQty[i];
+  if(v!==undefined&&(""+v).trim()!=="")return v; // l'utilisateur a explicitement changé la quantité pour cette session
+  var item=CAT_ITEMS[i];
+  var pref=item?_myQtyFor(item.n):null;
+  if(pref!=null&&(""+pref).trim()!=="")return pref; // sa quantit\u00e9 pr\u00e9f\u00e9r\u00e9e habituelle
+  return (item&&(""+item.q).trim())||"1"; // sinon le d\u00e9faut du catalogue, sinon 1
+}
+/* Surligne le(s) terme(s) recherch\u00e9s dans un nom d'article (simple, insensible \u00e0 la casse). */
+function _hlMatch(name,tokens){
+  var out=esc(name);
+  if(!tokens||!tokens.length)return out;
+  tokens.slice().sort(function(a,b){return b.length-a.length;}).forEach(function(t){
+    if(!t||t.length<2)return;
+    try{
+      var re=new RegExp("("+t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","i");
+      out=out.replace(re,function(m){return "<mark class=\"cp-hl\">"+m+"</mark>";});
+    }catch(e){}
+  });
+  return out;
+}
 function renderCpItems(q){
   _cpSelInit();
   window._cpQ=q||"";
   var container=document.getElementById("cp-results");
   if(!container)return;
-  var scores=_cpSearch(q);
+  var res=_cpSearch(q); // {items,cats} ou null si pas de recherche
+  var tokens=res?_cpNorm(q).split(" ").filter(Boolean):[];
   var groups={};
   CAT_ITEMS.forEach(function(item,i){
-    if(scores&&!scores[i])return;
+    /* Une fois qu'un KIT matche (par son nom ou par ses articles), on affiche TOUT
+       le kit — y compris les articles qui ne contiennent pas litt\u00e9ralement le terme
+       tap\u00e9 (ex. « corde » r\u00e9v\u00e8le aussi les mousquetons du m\u00eame kit). */
+    if(res&&!res.cats[item.cat])return;
     if(!groups[item.cat])groups[item.cat]=[];
-    groups[item.cat].push({item:item,i:i,sc:scores?scores[i]:0});
+    groups[item.cat].push({item:item,i:i,sc:res?(res.items[i]||0):0});
   });
   var order=CAT_ORDER.slice();
   Object.keys(groups).forEach(function(c){if(order.indexOf(c)<0)order.push(c);});
-  if(scores){
+  if(res){
     order.forEach(function(c){if(groups[c])groups[c].sort(function(a,b){return b.sc-a.sc;});});
     order.sort(function(a,b){
-      var ma=groups[a]?groups[a][0].sc:-1, mb=groups[b]?groups[b][0].sc:-1;
+      var ma=res.cats[a]||0, mb=res.cats[b]||0;
       return mb-ma;
     });
   }
@@ -3266,19 +3502,27 @@ function renderCpItems(q){
     var ci=CAT_ORDER.indexOf(cat);if(ci<0)ci=order.indexOf(cat)+900;
     if(!groups[cat]||!groups[cat].length)return;
     var ic=CAT_CAT_I[cat]||"ti-box";
-    html+="<div class=\"cp-sec\"><div class=\"cp-sec-hd\"><div class=\"cp-sec-title\"><i class=\"ti "+ic+"\" style=\"font-size:14px\"></i> "+esc(cat)+"</div><div class=\"cp-sec-actions\"><div class=\"cp-kit-add\"><span class=\"cp-kit-x\">\u00d7</span><input type=\"number\" min=\"1\" value=\"1\" id=\"knc_"+ci+"\" class=\"cp-kit-n\" onclick=\"event.stopPropagation()\" title=\"Nombre de kits \u00e0 ajouter\"/><button class=\"btn-kit\" onclick=\"selKit(this.getAttribute(\u0027data-c\u0027),\u0027knc_"+ci+"\u0027)\" data-c=\""+esc(cat)+"\"><i class=\"ti ti-package\"></i> Ajouter le kit</button></div><button class=\"btn-all\" onclick=\"selAllCat(this.getAttribute(\u0027data-c\u0027))\" data-c=\""+esc(cat)+"\">Tout cocher</button></div></div>";
+    var matchCount=groups[cat].filter(function(o){return o.sc>0;}).length;
+    var cntBadge=res?("<span class=\"cp-sec-cnt\">"+groups[cat].length+" article"+(groups[cat].length>1?"s":"")+"</span>"):"";
+    html+="<div class=\"cp-sec\"><div class=\"cp-sec-hd\"><div class=\"cp-sec-title\"><i class=\"ti "+ic+"\" style=\"font-size:14px\"></i> "+esc(cat)+cntBadge+"</div><div class=\"cp-sec-actions\"><div class=\"cp-kit-add\"><span class=\"cp-kit-x\">\u00d7</span><input type=\"number\" min=\"1\" value=\"1\" id=\"knc_"+ci+"\" class=\"cp-kit-n\" onclick=\"event.stopPropagation()\" title=\"Nombre de kits \u00e0 ajouter\"/><button class=\"btn-kit\" onclick=\"selKit(this.getAttribute(\u0027data-c\u0027),\u0027knc_"+ci+"\u0027)\" data-c=\""+esc(cat)+"\"><i class=\"ti ti-package\"></i> Ajouter le kit</button></div><button class=\"btn-all\" onclick=\"selAllCat(this.getAttribute(\u0027data-c\u0027))\" data-c=\""+esc(cat)+"\">Tout cocher</button></div></div>";
     if(typeof _cpLayout!=="undefined"&&_cpLayout==="grid"){
       html+="<div class=\"cp-grid\">";
       groups[cat].forEach(function(o){var item=o.item,i=o.i;
-        var _ck=window._cpSel[i]?" checked":"";html+="<div class=\"cp-tile"+(window._cpSel[i]?" sel":"")+"\" onclick=\"_cpTileToggle(event,"+i+")\"><input type=\"checkbox\" id=\"ci_"+i+"\" class=\"ccb\" data-sec=\""+item.sec+"\" data-n=\""+esc(item.n)+"\" data-cat=\""+esc(item.cat)+"\" data-i=\""+i+"\" style=\"display:none\""+_ck+" onchange=\"_cpChk(this)\"/><div class=\"cp-tile-n\">"+esc(item.n)+"</div><div class=\"cp-tile-b\"><input type=\"number\" id=\"cq_"+i+"\" class=\"cp-qty\" value=\""+_cpQtyOf(i)+"\" data-base=\""+item.q+"\" min=\"1\" onclick=\"event.stopPropagation()\" onchange=\"_cpQtySet(this)\"/><span class=\"cp-tile-check\"><i class=\"ti ti-check\"></i></span></div></div>";
+        var _ck=window._cpSel[i]?" checked":"";
+        var nmHtml=o.sc>0?_hlMatch(item.n,tokens):esc(item.n);
+        html+="<div class=\"cp-tile"+(window._cpSel[i]?" sel":"")+(o.sc>0?"":" weak")+"\" onclick=\"_cpTileToggle(event,"+i+")\"><input type=\"checkbox\" id=\"ci_"+i+"\" class=\"ccb\" data-sec=\""+item.sec+"\" data-n=\""+esc(item.n)+"\" data-cat=\""+esc(item.cat)+"\" data-i=\""+i+"\" style=\"display:none\""+_ck+" onchange=\"_cpChk(this)\"/><div class=\"cp-tile-n\">"+nmHtml+"</div><div class=\"cp-tile-b\"><input type=\"number\" id=\"cq_"+i+"\" class=\"cp-qty\" value=\""+_cpQtyOf(i)+"\" data-base=\""+item.q+"\" min=\"1\" onclick=\"event.stopPropagation()\" onchange=\"_cpQtySet(this)\"/><span class=\"cp-tile-check\"><i class=\"ti ti-check\"></i></span></div></div>";
       });
       html+="</div>";
     } else {
+    html+="<div class=\"cp-items-wrap\">";
     groups[cat].forEach(function(o){
       var item=o.item,i=o.i;
       var del=isAdmin()?"<button onclick=\"event.stopPropagation();delCatItem("+i+")\" title=\"Supprimer du catalogue\" style=\"background:none;border:none;color:#DC2626;cursor:pointer;padding:0 4px;font-size:13px;flex-shrink:0\"><i class=\"ti ti-trash\"></i></button>":"";
-      var _ck=window._cpSel[i]?" checked":"";html+="<div class=\"cp-row\"><input type=\"checkbox\" id=\"ci_"+i+"\" class=\"ccb\" data-sec=\""+item.sec+"\" data-n=\""+esc(item.n)+"\" data-cat=\""+esc(item.cat)+"\" data-i=\""+i+"\""+_ck+" onchange=\"_cpChk(this)\"/><label for=\"ci_"+i+"\" class=\"cp-row-n\" style=\"cursor:pointer\">"+esc(item.n)+"</label><div style=\"display:flex;flex-direction:column;align-items:center\"><input type=\"number\" id=\"cq_"+i+"\" class=\"cp-qty\" value=\""+_cpQtyOf(i)+"\" data-base=\""+item.q+"\" min=\"1\" onchange=\"_cpQtySet(this)\"/><div class=\"cp-qty-l\">qt&#233;</div></div>"+del+"</div>";
+      var _ck=window._cpSel[i]?" checked":"";
+      var nmHtml=o.sc>0?_hlMatch(item.n,tokens):esc(item.n);
+      html+="<div class=\"cp-row"+(o.sc>0?"":" weak")+"\"><input type=\"checkbox\" id=\"ci_"+i+"\" class=\"ccb\" data-sec=\""+item.sec+"\" data-n=\""+esc(item.n)+"\" data-cat=\""+esc(item.cat)+"\" data-i=\""+i+"\""+_ck+" onchange=\"_cpChk(this)\"/><label for=\"ci_"+i+"\" class=\"cp-row-n\" style=\"cursor:pointer\">"+nmHtml+"</label><div style=\"display:flex;flex-direction:column;align-items:center\"><input type=\"number\" id=\"cq_"+i+"\" class=\"cp-qty\" value=\""+_cpQtyOf(i)+"\" data-base=\""+item.q+"\" min=\"1\" onchange=\"_cpQtySet(this)\"/><div class=\"cp-qty-l\">qt&#233;</div></div>"+del+"</div>";
     });
+    html+="</div>";
     }
     html+="</div>";
   });
@@ -3347,10 +3591,12 @@ function insertCp(){
   var idx=Object.keys(window._cpSel);
   if(!idx.length){toast("Aucun article s\u00e9lectionn\u00e9","ti-alert-circle");return;}
   if(!cur){toast("Ouvrez une appro d\u2019abord","ti-alert-circle");return;}
-  var cnt=0;
+  var cnt=0,qtyToRemember=[];
   idx.forEach(function(i){
     var item=CAT_ITEMS[i];if(!item)return;
     var sec=item.sec,name=item.n,qty=_cpQtyOf(i);
+    if(!(""+qty).trim())qty="1"; // filet de s\u00e9curit\u00e9 : jamais de quantit\u00e9 vide ins\u00e9r\u00e9e
+    qtyToRemember.push({n:name,q:qty});
     var row=mkR(name,qty);
     if(window._cpKit[i])row.kit=window._cpKit[i];
     if(currentRole==="depot"){row.depotAdded=true;}
@@ -3363,6 +3609,9 @@ function insertCp(){
     if(cur[sec].length&&!cur[sec][cur[sec].length-1].designation)cur[sec].splice(cur[sec].length-1,1);
     cur[sec].push(row);cnt++;
   });
+  /* M\u00e9morise la quantit\u00e9 choisie pour chaque article : reprise la prochaine fois
+     comme quantit\u00e9 par d\u00e9faut (« redondance » sur les quantit\u00e9s pr\u00e9f\u00e9r\u00e9es). */
+  if(qtyToRemember.length)_saveQtyPrefs(qtyToRemember);
   if(cur.statut==="prete")cur.modifPrep=true;else if(cur.statut==="sur_chantier")cur.addToPrepare=true;
   /* On garde le catalogue OUVERT : on vide juste la sélection pour enchaîner. */
   window._cpSel={};window._cpQty={};window._cpKit={};
@@ -4211,18 +4460,22 @@ function tblH(sec,secColor){
     var row="";
     row+="<tr class=\"tr"+(isKit?" kit-row":"")+"\" id=\"tr_"+sec+"_"+i+"\" style=\"background:"+bg+";--sec:"+trSec+"\">";
     row+="<td data-label=\"D&#233;signation\" class=\"td-d\" style=\"border-left:"+dLeft+"\">";
-    row+="<input class=\"cin cin-d\" value=\""+esc(r.designation)+"\"";
+    row+="<input class=\"cin cin-d\" id=\"dsg_"+sec+"_"+i+"\" value=\""+esc(r.designation)+"\"";
     row+=" placeholder=\"D&#233;signation...\"";
     row+=" list=\"cat-datalist\"";
-    row+=" oninput=\"upR('"+sec+"',"+i+",'designation',this.value)\"";
+    row+=" oninput=\"upR('"+sec+"',"+i+",'designation',this.value);_liveComplete(event,this,'"+sec+"',"+i+")\"";
+    row+=" onkeydown=\"_rowKeyNav(event,'"+sec+"',"+i+")\"";
     row+=" style=\""+st+"\"/>"+(r.truckQ?"<div style=\"font-size:10px;color:#A16207;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px\"><i class=\"ti ti-truck\" style=\"font-size:11px\"></i> "+r.truckQ+" d\u00e9j\u00e0 dans le camion"+(_qtyNum(r.quantite)>r.truckQ?" \u00b7 "+(_qtyNum(r.quantite)-r.truckQ)+" \u00e0 pr\u00e9parer":" \u00b7 rien \u00e0 pr\u00e9parer")+"</div>":"")+_cmdRowBadge(r)+"</td>";
-    row+="<td data-label=\"Qt&#233;\" class=\"td-q\"><input class=\"cin\" value=\""+esc(r.quantite)+"\"";
+    row+="<td data-label=\"Qt&#233;\" class=\"td-q\"><input class=\"cin\" id=\"qte_"+sec+"_"+i+"\" value=\""+esc(r.quantite)+"\"";
     row+=" placeholder=\"0\" style=\"text-align:center;"+st+"\"";
+    row+=" onkeydown=\"_rowKeyNav(event,'"+sec+"',"+i+")\"";
+    row+=" onblur=\"_qtyDefault1('"+sec+"',"+i+",this)\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'quantite',this.value)\"/></td>";
     row+="<td data-label=\"Dispo\" class=\"td-av\"><select class=\"csel\" onchange=\"upR('"+sec+"',"+i+",'disponibilite',this.value)\"";
     row+=" style=\""+st+"\">"+dOpts+"</select></td>";
-    row+="<td data-label=\"Commentaire\" class=\"td-c\" id=\"cmt_"+sec+"_"+i+"\"><input class=\"cin\" value=\""+esc(r.commentaire||"")+"\"";
+    row+="<td data-label=\"Commentaire\" class=\"td-c\" id=\"cmt_"+sec+"_"+i+"\"><input class=\"cin\" id=\"ncm_"+sec+"_"+i+"\" value=\""+esc(r.commentaire||"")+"\"";
     row+=" placeholder=\"Commentaire...\"";
+    row+=" onkeydown=\"_rowKeyNav(event,'"+sec+"',"+i+")\"";
     row+=" oninput=\"upR('"+sec+"',"+i+",'commentaire',this.value)\"";
     row+=" style=\""+st+"\"/></td>";
     row+="<td class=\"cact cmt-cell\" style=\"text-align:center;padding:0 4px\">";
@@ -4670,6 +4923,16 @@ function upF(f,v){
   if(sb&&sb.classList.contains("saved")){sb.innerHTML="Enregistrer";sb.classList.remove("saved");sb.disabled=false;sb.onclick=doSave;}
   _scheduleAutosave();
 }
+/* En quittant le champ quantit\u00e9 : si la personne n'a rien mis mais qu'un article
+   est bien indiqu\u00e9 sur la ligne, on met 1 par d\u00e9faut plut\u00f4t que de laisser vide. */
+function _qtyDefault1(sec,i,el){
+  if(!cur||!cur[sec]||!cur[sec][i])return;
+  var row=cur[sec][i];
+  if(!row.designation)return; // ligne encore vide : rien \u00e0 forcer
+  if((""+(el.value||"")).trim()!=="")return;
+  el.value="1";
+  upR(sec,i,"quantite","1");
+}
 function upR(sec,i,f,v){
   if(!cur)return;cur[sec][i][f]=v;
   var row=cur[sec][i];
@@ -4936,6 +5199,7 @@ function doSave(){
     if(_autosaveTimer){clearTimeout(_autosaveTimer);_autosaveTimer=null;}
     _autosaveClearLocal();_setSaveState("saved");
     if(typeof syncApproCommandes==="function"&&syncApproCommandes(cur)){saveCommandes();}
+    try{_bumpFrequentItems();}catch(e){}
     var sb2=document.querySelector(".btn-save");
     if(sb2){sb2.innerHTML="<i class=\"ti ti-check\"></i> Enregistr\u00e9";sb2.classList.add("saved");sb2.disabled=true;} /* enregistrement = action courante : le bouton suffit */
     renderList();toast("Appro enregistr\u00e9e");
@@ -6632,7 +6896,7 @@ function showAnnoncePopups(){
   if(!todo.length)return;
   var ov=document.createElement("div");
   ov.id="annonce-ov";
-  ov.style.cssText="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px";
+  ov.style.cssText="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))";
   var inner="<div class=\"ann-pop\" style=\"background:#fff;border-radius:18px;max-width:460px;width:100%;max-height:85vh;overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,.35)\">";
   inner+="<div style=\"padding:17px 22px 14px;display:flex;align-items:center;gap:11px;border-bottom:1px solid #F1F5F9\"><div style=\"width:40px;height:40px;border-radius:12px;background:#FFE4E6;display:flex;align-items:center;justify-content:center;flex-shrink:0\"><i class=\"ti ti-speakerphone\" style=\"font-size:20px;color:#BE123C\"></i></div><div><div style=\"font-size:17px;font-weight:800;color:#0F172A\">"+(todo.length>1?todo.length+" annonces \u00e0 lire":"Nouvelle annonce")+"</div><div style=\"font-size:12px;color:#94A3B8\">Message de l'\u00e9quipe</div></div></div>";
   inner+="<div style=\"padding:16px 20px\">";
@@ -7545,7 +7809,7 @@ function showShare(){
   var ov=document.getElementById("share-ov");
   if(!ov){
     ov=document.createElement("div");ov.id="share-ov";
-    ov.style.cssText="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:18px";
+    ov.style.cssText="position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))";
     ov.onclick=function(e){if(e.target===ov)hideShare();};
     document.body.appendChild(ov);
   }
@@ -9196,6 +9460,12 @@ function enterApp(){
   /* Les messages en attente : on les charge d'embl\u00e9e pour que le badge soit juste
      d\u00e8s l'arriv\u00e9e, sans attendre que l'utilisateur ouvre l'onglet. */
   try{loadPending();}catch(e){}
+  /* Articles que CETTE personne tape souvent, m\u00eame hors catalogue : alimente
+     l'autocompl\u00e9tion « redondance personnelle » pendant la saisie des appros. */
+  try{loadMyFrequentItems();}catch(e){}
+  /* Quantit\u00e9s pr\u00e9f\u00e9r\u00e9es (ex. toujours 2 mousquetons) : reprises comme valeur
+     par d\u00e9faut la prochaine fois que l'article est choisi dans le catalogue. */
+  try{loadMyQtyPrefs();}catch(e){}
   var initials=currentUser.name.split(" ").map(function(w){return w[0];}).join("").slice(0,2).toUpperCase();
   var av=document.getElementById("sb-avatar");
   av.style.background=ri.bg;av.style.color=ri.color;av.textContent=initials;
@@ -9648,7 +9918,7 @@ function _pwaShowIosHelp(){
   var ov=document.createElement("div");
   ov.style.cssText="position:fixed;inset:0;z-index:9998;background:rgba(15,23,42,.55);display:flex;align-items:flex-end;justify-content:center;padding:0";
   ov.onclick=function(e){if(e.target===ov)ov.remove();};
-  ov.innerHTML="<div style=\"background:#fff;border-radius:18px 18px 0 0;max-width:440px;width:100%;padding:22px 20px 30px;animation:tourPop .3s var(--spring)\">"+
+  ov.innerHTML="<div style=\"background:#fff;border-radius:18px 18px 0 0;max-width:440px;width:100%;padding:22px 20px calc(30px + env(safe-area-inset-bottom));animation:tourPop .3s var(--spring)\">"+
     "<div style=\"width:44px;height:5px;border-radius:3px;background:#E2E8F0;margin:0 auto 16px\"></div>"+
     "<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:14px\"><div style=\"width:40px;height:40px;border-radius:11px;background:rgba(109,40,217,.12);color:#6D28D9;display:flex;align-items:center;justify-content:center\"><i class=\"ti ti-device-mobile\" style=\"font-size:20px\"></i></div><div style=\"font-size:17px;font-weight:800;color:#0F172A\">Installer sur iPhone</div></div>"+
     "<p style=\"font-size:13.5px;color:#64748B;line-height:1.6;margin-bottom:16px\">Safari ne propose pas de bouton automatique. En 3 étapes :</p>"+
