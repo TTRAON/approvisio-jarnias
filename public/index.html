@@ -49,7 +49,15 @@ html[data-amb="frais"]{--accent:#0F766E;--accent-2:#1D4ED8}
 /* JARNIAS : le thème de la marque elle-même (vert / noir / or), calqué sur
    l'écran de connexion. Traité comme les autres ambiances (choix personnel,
    par appareil) mais mis en avant en tête de liste. */
-html[data-amb="jarnias"]{--accent:#123528;--accent-2:#C9A24B}
+html[data-amb="jarnias"]{--accent:#123528;--accent-2:#123528}
+/* --accent ET --accent-2 sont VOLONTAIREMENT identiques (contrairement aux
+   16 autres thèmes) : une bonne quinzaine de composants dans toute l'appli
+   (boutons d'action, badges, le bandeau "prochaine étape", la barre de
+   progression du tuto, le bouton flottant du catalogue...) sont écrits en
+   dégradé entre ces deux variables. Les laisser identiques transforme
+   AUTOMATIQUEMENT chacun de ces dégradés en aplat, partout, sans avoir à
+   retoucher chaque composant un par un. L'or reste réservé à la typographie
+   (voir .sb-brand-name / .home-title / .home-hello ci-dessous). */
 
 /* le hero devient un bandeau coloré quand une ambiance est choisie */
 .home-hero{position:relative;overflow:hidden;transition:padding .2s var(--ease)}
