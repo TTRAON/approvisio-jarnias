@@ -266,7 +266,18 @@ html[data-amb="verre"] .sb-brand>*,html[data-amb="verre"] .doc-band>*{position:r
 .stagger-i>*{opacity:0;animation:fadeUp .5s var(--ease) both;animation-delay:calc(var(--i,0)*55ms)}
 
 /* apparition d'un écran entier au rendu */
-.view-in{animation:fadeUp .4s var(--ease) both}
+/* Anim dédiée à l'écran entier (pas fadeUp, partagé par plein de petits éléments
+   où 16px+scale passe bien). Sur tout un écran, ce même mouvement lisait comme
+   un « pop » de rechargement. Ici : translation plus courte, pas de scale. */
+@keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.view-in{animation:viewIn .32s var(--ease) both}
+/* Ligne ajoutée/supprimée dans une appro : un signal LOCAL et discret,
+   à la place du fondu de tout l'écran (c'est lui qui « flashait »).
+   Opacity uniquement : transform sur <tr> reste capricieux selon les navigateurs. */
+@keyframes rowFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes rowFadeOut{from{opacity:1}to{opacity:0}}
+tr.row-in{animation:rowFadeIn .24s var(--ease) both}
+tr.row-out{animation:rowFadeOut .15s ease-in both}
 
 /* --- boutons vivants (survol / appui / ondulation) --- */
 .liv{position:relative;overflow:hidden;transition:transform .22s var(--spring),box-shadow .22s var(--ease),background .18s var(--ease)}
@@ -795,7 +806,7 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
 .tour-ov>*{pointer-events:auto}
 .tour-ov>.tour-hole{pointer-events:none}
 /* écran d'accueil plein écran */
-.tour-welcome{position:fixed;inset:0;background:linear-gradient(150deg,#0F172A,#1E293B);display:flex;align-items:center;justify-content:center;padding:24px;z-index:6100;animation:tourFade .3s var(--ease)}
+.tour-welcome{position:fixed;inset:0;background:linear-gradient(150deg,#0F172A,#1E293B);display:flex;align-items:center;justify-content:center;padding:calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));z-index:6100;animation:tourFade .3s var(--ease)}
 @keyframes tourFade{from{opacity:0}to{opacity:1}}
 .tour-w-card{background:#fff;border-radius:22px;max-width:440px;width:100%;padding:32px 30px;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,.4);animation:tourPop .4s var(--spring)}
 @keyframes tourPop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
@@ -1959,6 +1970,16 @@ html.dark .tour-hole{box-shadow:0 0 0 3px #0F172A,0 0 0 6px var(--accent,#6D28D9
 .hdr-btn:hover .hdr-lbl{opacity:1;transform:translateX(-50%) translateY(0)}
 html.dark .hdr-grp{background:rgba(30,41,59,.6);border-color:rgba(71,85,105,.6)}
 @media(max-width:768px){.hdr-lbl{display:none}}
+/* ═══ Zones tactiles agrandies sur t\u00e9l\u00e9phone/tablette (Apple recommande ~44px) ═══
+   Plusieurs petits boutons \u00e0 ic\u00f4ne seule (\u00e9toile favori, enregistrer la quantit\u00e9,
+   ic\u00f4nes du menu) faisaient \u00e0 peine 18-20px de zone cliquable r\u00e9elle : trop petit
+   pour un doigt, m\u00eame si l'ic\u00f4ne elle-m\u00eame reste visuellement discr\u00e8te. */
+@media(pointer:coarse){
+  .hdr-btn{width:36px;height:36px}
+  .cp-star,.cp-kit-star,.cp-qty-save{padding:9px;margin:-7px}
+  .tour-skip-x{padding:10px;top:6px;right:7px}
+  .cp-qty-stp button{width:26px;height:26px}
+}
 /* Le bouton « activer les notifications » est une ACTION ponctuelle, pas un réglage :
    on le teinte pour qu'il ressorte des autres icônes, et il DISPARAÎT une fois les
    notifications activées (cf. _syncPushIcon) — comme le bouton d'installation. */
@@ -2307,20 +2328,38 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
 })();
 
 /* Entrée d'écran automatique : à chaque réécriture de #main-area, on rejoue
-   une apparition douce (fadeUp) sur le conteneur. Un seul hook, aucun call-site
-   à modifier. Se coupe si reduced-motion. */
+   une apparition douce sur le conteneur — mais SEULEMENT si l'écran a vraiment
+   changé (autre onglet, autre appro ouverte). Sans ce filtre, la moindre mise à
+   jour EN PLACE (ajouter une ligne, cocher une case, enregistrer) rejouait le
+   même fondu que la navigation : le contenu redevenait invisible puis réapparaissait
+   d'un coup, ce qui se voit comme un flash / rechargement de page — c'est le bug
+   signalé. La « clé d'écran » (onglet + appro ouverte) permet de ne réserver le
+   fondu qu'aux vrais changements d'écran ; les mises à jour en place se font
+   sans transition de conteneur (silencieuses), avec au besoin une petite
+   animation locale sur ce qui a changé (voir _rowEnter / .row-in / .row-out).
+   Un seul hook, aucun call-site à modifier. Se coupe si reduced-motion. */
 (function(){
   var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
   if(reduce)return;
+  function screenKey(){
+    var id=(typeof cur!=="undefined"&&cur)?(cur._id||cur.id||"new"):"";
+    return (typeof currentTab!=="undefined"?currentTab:"")+"|"+id;
+  }
+  var lastKey=null;
   function hook(){
     var m=document.getElementById("main-area");
     if(!m){setTimeout(hook,50);return;}
+    lastKey=screenKey();
     var mo=new MutationObserver(function(muts){
       for(var i=0;i<muts.length;i++){
         if(muts[i].type==="childList"&&muts[i].addedNodes.length){
-          m.classList.remove("view-in");
-          void m.offsetWidth;      /* reflow pour rejouer l'animation */
-          m.classList.add("view-in");
+          var k=screenKey();
+          if(k!==lastKey){
+            lastKey=k;
+            m.classList.remove("view-in");
+            void m.offsetWidth;      /* reflow pour rejouer l'animation */
+            m.classList.add("view-in");
+          }
           if(window.scanReveal)window.scanReveal(m);
           break;
         }
@@ -5357,14 +5396,48 @@ function upR(sec,i,f,v){
   if(heads[idx])heads[idx].textContent=cnt+" article"+(cnt!==1?"s":"");
   _scheduleAutosave();
 }
+/* Anime UNE ligne (ajout ou avant suppression), sans toucher au reste de l'écran.
+   Remplace le fondu de tout le conteneur qui rejouait à chaque ligne ajoutée
+   (le « flash » signalé) — on ne fait plus bouger que ce qui a vraiment changé. */
+function _rowEnter(sec,i){
+  if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  var tr=document.getElementById("tr_"+sec+"_"+i);
+  if(!tr)return;
+  tr.classList.add("row-in");
+  var done=function(){tr.classList.remove("row-in");tr.removeEventListener("animationend",done);};
+  tr.addEventListener("animationend",done);
+  setTimeout(done,400); // filet de sécurité si animationend ne se déclenche pas
+}
 function addR(sec){
   if(!cur)return;var r=mkR();
   if(currentRole==="depot"){r.depotAdded=true;}
   if(addMode&&addDate){r.addBatch=addDate;if(!cur.additionDates)cur.additionDates=[];if(cur.additionDates.indexOf(addDate)<0)cur.additionDates.push(addDate);}
   if(cur.statut==="prete")cur.modifPrep=true;else if(cur.statut==="sur_chantier")cur.addToPrepare=true;
   cur[sec].push(r);renderForm();
+  _rowEnter(sec,cur[sec].length-1);
 }
-function delR(sec,i){if(!cur)return;cur[sec].splice(i,1);if(!cur[sec].length)cur[sec].push(mkR());renderForm();}
+function delR(sec,i){
+  if(!cur)return;
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  var tr=document.getElementById("tr_"+sec+"_"+i);
+  var rid=cur[sec][i]&&cur[sec][i].id;
+  function commit(){
+    /* On retrouve la ligne par SON id, pas par l'index capturé au clic : si deux
+       suppressions sont lancées coup sur coup, le tableau a déjà bougé entre les
+       deux — un index resterait périmé et supprimerait la mauvaise ligne. */
+    var idx=i;
+    if(rid){var found=cur[sec].findIndex(function(r){return r.id===rid;});if(found>=0)idx=found;}
+    cur[sec].splice(idx,1);
+    if(!cur[sec].length)cur[sec].push(mkR());
+    renderForm();
+  }
+  if(tr&&!reduce){
+    tr.classList.add("row-out");
+    setTimeout(commit,150); // laisse voir la ligne s'effacer avant de reconstruire le tableau
+  }else{
+    commit();
+  }
+}
 function removeKitFromAppro(kit){
   if(!cur||!kit)return;
   var cnt=0;["consommables","fournitures","outillage"].forEach(function(sec){(cur[sec]||[]).forEach(function(r){if(r.kit===kit)cnt++;});});
@@ -9788,6 +9861,23 @@ function _tourPosition(){
   _tourMaskSet("tm-r",l+w,t,Math.max(0,vw-(l+w)),h);
   _tourPlaceBubble(bubble,r);
 }
+/* Lit les vraies marges de s\u00e9curit\u00e9 de l'appareil (encoche, barre du bas) : sans
+   \u00e7a, une marge fixe de 12px peut placer un bouton (Passer/Suivant du tuto, etc.)
+   DERRI\u00e8RE l'encoche ou la barre d'accueil, donc invisible/impossible \u00e0 toucher. */
+function _safeAreaInsets(){
+  if(window.__safeAreaCache)return window.__safeAreaCache;
+  var probe=document.createElement("div");
+  probe.style.cssText="position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;pointer-events:none;"+
+    "padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);"+
+    "padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)";
+  document.body.appendChild(probe);
+  var cs=getComputedStyle(probe);
+  var v={top:parseFloat(cs.paddingTop)||0,bottom:parseFloat(cs.paddingBottom)||0,left:parseFloat(cs.paddingLeft)||0,right:parseFloat(cs.paddingRight)||0};
+  document.body.removeChild(probe);
+  window.__safeAreaCache=v;
+  return v;
+}
+window.addEventListener("resize",function(){window.__safeAreaCache=null;});
 function _tourPlaceBubble(bubble,r){
   bubble.style.transform="none";
   /* On réinitialise TOUJOURS la largeur avant de mesurer, sinon la bulle garde
@@ -9795,41 +9885,43 @@ function _tourPlaceBubble(bubble,r){
   bubble.style.width="";
   var gap=14,vw=window.innerWidth,vh=window.innerHeight,m=12;
   var mobile=_tourIsMobile();
+  var sa=mobile?_safeAreaInsets():{top:0,bottom:0,left:0,right:0};
+  var mTop=m+sa.top, mBot=m+sa.bottom, mLeft=m+sa.left, mRight=m+sa.right;
   var sb=document.getElementById("sidebar");
   var sbOpen=sb&&sb.classList.contains("open")&&mobile;
 
   // ── Cas 1 : mobile + menu ouvert + cible dans le menu ──
   if(sbOpen){
     var sbRect=sb.getBoundingClientRect();
-    var spaceRight=vw-sbRect.right-m;
+    var spaceRight=vw-sbRect.right-mRight;
     if(spaceRight>=230){
       var w1=Math.min(340,spaceRight);bubble.style.width=w1+"px";
       var bh1=bubble.offsetHeight||160;
-      var top1=Math.max(m,Math.min(r.top+r.height/2-bh1/2,vh-bh1-m));
+      var top1=Math.max(mTop,Math.min(r.top+r.height/2-bh1/2,vh-bh1-mBot));
       bubble.style.left=(sbRect.right+8)+"px";bubble.style.top=top1+"px";
     } else {
       // téléphone étroit : barre en bas, pleine largeur, au-dessus du menu
-      var w2=Math.min(vw-2*m,360);bubble.style.width=w2+"px";
+      var w2=Math.min(vw-mLeft-mRight,360);bubble.style.width=w2+"px";
       var bh2=bubble.offsetHeight||160;
       bubble.style.left=Math.round((vw-w2)/2)+"px";
-      bubble.style.top=(vh-bh2-m-8)+"px";
+      bubble.style.top=(vh-bh2-mBot-8)+"px";
     }
     return;
   }
 
   // ── Cas 2 : mobile menu fermé → barre en bas ou en haut selon la cible ──
   if(mobile){
-    var w3=Math.min(vw-2*m,360);bubble.style.width=w3+"px";
+    var w3=Math.min(vw-mLeft-mRight,360);bubble.style.width=w3+"px";
     var bh3=bubble.offsetHeight||160;
     var left3=Math.round((vw-w3)/2);
     // si la cible est dans la moitié basse, on met la bulle en HAUT, sinon en BAS
     var targetMid=r.top+r.height/2;
-    var top3=(targetMid>vh/2)?m:(vh-bh3-m-8);
+    var top3=(targetMid>vh/2)?mTop:(vh-bh3-mBot-8);
     // éviter tout chevauchement avec la cible
     if(top3<r.bottom+gap && top3+bh3>r.top-gap){
-      top3=(vh-r.bottom>=r.top)?Math.min(r.bottom+gap,vh-bh3-m):Math.max(m,r.top-gap-bh3);
+      top3=(vh-r.bottom>=r.top)?Math.min(r.bottom+gap,vh-bh3-mBot):Math.max(mTop,r.top-gap-bh3);
     }
-    bubble.style.left=left3+"px";bubble.style.top=Math.max(m,Math.min(top3,vh-bh3-m))+"px";
+    bubble.style.left=left3+"px";bubble.style.top=Math.max(mTop,Math.min(top3,vh-bh3-mBot))+"px";
     return;
   }
 
