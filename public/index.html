@@ -267,10 +267,11 @@ html[data-amb="verre"] .sb-brand>*,html[data-amb="verre"] .doc-band>*{position:r
 
 /* apparition d'un écran entier au rendu */
 /* Anim dédiée à l'écran entier (pas fadeUp, partagé par plein de petits éléments
-   où 16px+scale passe bien). Sur tout un écran, ce même mouvement lisait comme
-   un « pop » de rechargement. Ici : translation plus courte, pas de scale. */
-@keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.view-in{animation:viewIn .32s var(--ease) both}
+   où 16px+scale passe bien). Chaque section de l'écran qui vient de s'ouvrir
+   apparaît l'une après l'autre (délai posé en JS via style.animationDelay) :
+   c'est la cascade organique — plus vivante qu'un simple fondu d'un bloc. */
+@keyframes cascadeItem{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.cascade-in>*{opacity:0;animation:cascadeItem .3s cubic-bezier(.16,1,.3,1) both}
 /* Ligne ajoutée/supprimée dans une appro : un signal LOCAL et discret,
    à la place du fondu de tout l'écran (c'est lui qui « flashait »).
    Opacity uniquement : transform sur <tr> reste capricieux selon les navigateurs. */
@@ -331,6 +332,14 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 @keyframes jCardIn{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}
 .j-scrim{-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:jScrimIn .26s var(--ease)}
 .j-card{animation:jCardIn .3s var(--ease)}
+/* Le s\u00e9lecteur Alobees a sa propre entr\u00e9e, plus pos\u00e9e que le "pop" g\u00e9n\u00e9rique
+   partag\u00e9 par les autres bo\u00eetes de dialogue (jCardIn zoome depuis .94 : correct
+   pour une petite confirmation, trop brusque pour jumeler un chantier). Ses
+   sections internes (titre, recherche, indice, liste) montent en cascade. */
+@keyframes aloModalIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.alo-modal-in{animation:aloModalIn .36s cubic-bezier(.16,1,.3,1) both}
+@keyframes aloOvOut{to{opacity:0}}
+.alo-ov-out{animation:aloOvOut .16s ease-in both}
 
 /* boutons de statut vivants */
 .stbtn{position:relative;overflow:hidden;transition:transform .12s var(--ease),box-shadow .18s var(--ease),filter .16s var(--ease)}
@@ -2337,13 +2346,45 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
    fondu qu'aux vrais changements d'écran ; les mises à jour en place se font
    sans transition de conteneur (silencieuses), avec au besoin une petite
    animation locale sur ce qui a changé (voir _rowEnter / .row-in / .row-out).
-   Un seul hook, aucun call-site à modifier. Se coupe si reduced-motion. */
+
+   Le fondu simple a été remplacé par une CASCADE : les sections de l'écran qui
+   vient de s'afficher apparaissent l'une après l'autre plutôt que toutes d'un
+   bloc — c'est ce qui donne l'impression que le contenu « s'installe » au lieu
+   de sauter à l'écran. _findStaggerRoot() cherche où appliquer la cascade sans
+   connaître chaque écran : s'il n'y a qu'un seul enfant (les écrans du type
+   « un .xxx-wrap qui contient tout »), on descend dedans ; le formulaire d'appro
+   a sa propre disposition (.fv) reconnue explicitement, ses 13 sections sont
+   exactement ce qu'on veut faire défiler. Un seul hook, aucun call-site à
+   modifier. Se coupe si reduced-motion. */
 (function(){
   var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
   if(reduce)return;
   function screenKey(){
     var id=(typeof cur!=="undefined"&&cur)?(cur._id||cur.id||"new"):"";
     return (typeof currentTab!=="undefined"?currentTab:"")+"|"+id;
+  }
+  function findStaggerRoot(el){
+    if(!el||!el.children||!el.children.length)return el;
+    for(var i=0;i<el.children.length;i++){
+      var c=el.children[i];
+      if(c.classList&&c.classList.contains("fv")&&c.children.length>1)return c;
+    }
+    if(el.children.length===1&&el.children[0].children&&el.children[0].children.length>0)return el.children[0];
+    return el;
+  }
+  function cascade(root){
+    var kids=Array.prototype.slice.call(root.children);
+    if(!kids.length)return;
+    root.classList.remove("cascade-in");
+    void root.offsetWidth;    /* reflow pour rejouer l'animation */
+    var CAP=10,STEP=32;
+    kids.forEach(function(el,i){el.style.animationDelay=(Math.min(i,CAP)*STEP)+"ms";});
+    root.classList.add("cascade-in");
+    var total=Math.min(kids.length-1,CAP)*STEP+340;
+    setTimeout(function(){
+      root.classList.remove("cascade-in");
+      kids.forEach(function(el){el.style.animationDelay="";});
+    },total);
   }
   var lastKey=null;
   function hook(){
@@ -2356,9 +2397,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
           var k=screenKey();
           if(k!==lastKey){
             lastKey=k;
-            m.classList.remove("view-in");
-            void m.offsetWidth;      /* reflow pour rejouer l'animation */
-            m.classList.add("view-in");
+            cascade(findStaggerRoot(m));
           }
           if(window.scanReveal)window.scanReveal(m);
           break;
@@ -8434,8 +8473,13 @@ function showAlobeesPicker(){
       "<div id=\"alo-list\" class=\"alo-list\">"+_aloSkeleton()+"</div>"+
       "<div id=\"alo-foot\" class=\"alo-foot\"></div>"+
     "</div>";
-  ov.style.display="flex";ov.classList.add("j-scrim");
-  if(ov.firstElementChild)ov.firstElementChild.classList.add("j-card");
+  ov.style.display="flex";ov.classList.remove("alo-ov-out");ov.classList.add("j-scrim");
+  if(ov.firstElementChild){
+    var _am=ov.firstElementChild;
+    _am.classList.add("alo-modal-in");
+    Array.prototype.forEach.call(_am.children,function(el,i){el.style.animationDelay=(i*36)+"ms";});
+    _am.classList.add("cascade-in");
+  }
   _aloQ="";_aloCur=-1;
   loadAlobees("");
   setTimeout(function(){var i=document.getElementById("alo-search");if(i)try{i.focus();}catch(e){}},60);
@@ -8513,7 +8557,18 @@ function filterAlobees(q){
   var cl=document.getElementById("alo-clear");if(cl)cl.style.display=(q||"").trim()?"flex":"none";
   _aloTimer=setTimeout(function(){loadAlobees((q||"").trim());},280);
 }
-function hideAlobees(){var ov=document.getElementById("alo-ov");if(ov)ov.style.display="none";}
+function hideAlobees(){
+  var ov=document.getElementById("alo-ov");
+  if(!ov||ov.style.display==="none")return;
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  if(reduce){ov.style.display="none";return;}
+  ov.classList.add("alo-ov-out");
+  /* Si le s\u00e9lecteur est rouvert entre-temps, showAlobeesPicker() retire cette
+     classe : ce d\u00e9lai ne masquera alors PAS la nouvelle ouverture. */
+  setTimeout(function(){
+    if(ov.classList.contains("alo-ov-out")){ov.style.display="none";ov.classList.remove("alo-ov-out");}
+  },160);
+}
 
 function showAloDebug(){
   _aloDebugMode=!_aloDebugMode;
@@ -9289,7 +9344,10 @@ function _tutoNeedAlobees(){
   _tutoNeedAppro();
   try{
     var ov=document.getElementById("alo-ov");
-    if((!ov||ov.style.display!=="flex")&&typeof showAlobeesPicker==="function")showAlobeesPicker();
+    /* alo-ov-out : le s\u00e9lecteur est en train de se refermer (fondu de sortie) ;
+       display vaut encore "flex" pendant ce court instant, donc on l'exclut
+       explicitement, sinon le tuto le croirait ouvert. */
+    if((!ov||ov.style.display!=="flex"||ov.classList.contains("alo-ov-out"))&&typeof showAlobeesPicker==="function")showAlobeesPicker();
   }catch(e){}
 }
 /* Referme le s\u00e9lecteur pour revenir \u00e0 l'appro (derni\u00e8re \u00e9tape du module). */
