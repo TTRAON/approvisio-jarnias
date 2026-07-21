@@ -46,6 +46,10 @@ html[data-amb="halo"]{--accent:#5B21B6;--accent-2:#7C3AED}
 html[data-amb="maille"]{--accent:#6D28D9;--accent-2:#2563EB}
 html[data-amb="teinte"]{--accent:#4338CA;--accent-2:#6D28D9}
 html[data-amb="frais"]{--accent:#0F766E;--accent-2:#1D4ED8}
+/* JARNIAS : le thème de la marque elle-même (vert / noir / or), calqué sur
+   l'écran de connexion. Traité comme les autres ambiances (choix personnel,
+   par appareil) mais mis en avant en tête de liste. */
+html[data-amb="jarnias"]{--accent:#123528;--accent-2:#C9A24B}
 
 /* le hero devient un bandeau coloré quand une ambiance est choisie */
 .home-hero{position:relative;overflow:hidden;transition:padding .2s var(--ease)}
@@ -93,6 +97,7 @@ html.dark .amb-opt.sel{border-color:#fff}
 .amb-sw-chrome{background:linear-gradient(160deg,#1A1633,#2B1055,#B8C6FF)}
 .amb-sw-hybride{background:radial-gradient(circle at 25% 30%,#FF2E97,transparent 55%),radial-gradient(circle at 80% 75%,#2DD4FF,#0E0B24 70%)}
 .amb-sw-foret{background:linear-gradient(160deg,#0B2E20,#1B6B4A 60%,#4ADE80)}
+.amb-sw-jarnias{background:linear-gradient(160deg,#0D2A20,#173F30 55%,#C9A24B)}
 .amb-sw-botanique{background:linear-gradient(160deg,#E3EFE0,#86C79A);color:#14361F!important;text-shadow:none!important;border:1px solid #C6DCC9}
 .amb-sw-terre{background:linear-gradient(160deg,#2B1C14,#7C4A2D 60%,#EA8C50)}
 .amb-sw-ocean{background:linear-gradient(155deg,#0C2A3A,#0E7490 55%,#5EEAD4)}
@@ -191,6 +196,12 @@ html[data-amb="zen"]{--accent:#C8543A;--accent-2:#2C2A24}
 html[data-amb="verre"]{--accent:#38BDF8;--accent-2:#6366F1}
 
 /* --- FORÊT : verts profonds + lueur qui respire --- */
+html[data-amb="jarnias"] .home-hero{background:linear-gradient(165deg,#0D2A20,#173F30 60%,#1F5C42)}
+html[data-amb="jarnias"] .home-hero::before{inset:0;background:radial-gradient(260px 200px at 85% 0%,rgba(201,162,75,.24),transparent 70%)}
+html[data-amb="jarnias"] .home-hello{color:#E4C878!important}
+html[data-amb="jarnias"] .home-title{color:#fff}
+html[data-amb="jarnias"] .sb-brand,html[data-amb="jarnias"] .doc-band{background:linear-gradient(160deg,#0D2A20,#1F5C42)}
+html[data-amb="jarnias"] .sb-brand::before,html[data-amb="jarnias"] .doc-band::before{inset:0;background:radial-gradient(200px 140px at 85% 0%,rgba(201,162,75,.24),transparent 70%)}
 html[data-amb="foret"] .home-hero{background:linear-gradient(165deg,#0B2E20,#134E3A 60%,#1B6B4A)}
 html[data-amb="foret"] .home-hero::before{inset:0;background:radial-gradient(260px 200px at 30% 0%,rgba(74,222,128,.25),transparent 70%);animation:ambBreathe 7s ease-in-out infinite}
 html[data-amb="foret"] .home-hello{color:#86EFAC!important}
@@ -791,6 +802,7 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
 .perso-amb-none{background:#F1F5F9;color:#475569;text-shadow:none;border:1px solid #E2E8F0}
 .amb-80tag{position:absolute;top:5px;left:7px;font-size:8px;font-weight:800;background:rgba(255,255,255,.28);padding:1px 5px;border-radius:8px;text-shadow:none}
 .amb-nattag{background:rgba(34,197,94,.32)}
+.amb-maisontag{background:rgba(201,162,75,.35)}
 
 /* ============================================================
    TUTO INTERACTIF — accueil plein écran + bulles guidées
@@ -1754,44 +1766,32 @@ table.at tr.kit-row td.td-d{position:relative}
 .auth-field label{font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.4px}
 .auth-field input{border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;font-size:14px;color:#1E293B;font-family:inherit;outline:none;background:#F8FAFC}
 .auth-field input:focus{border-color:#334155;background:#fff}
-/* ═══ Page de connexion JARNIAS — ADN cordistes / hauteur ═══ */
-.auth-screen{background:radial-gradient(1100px 700px at 12% -10%,#3B1D6E 0%,transparent 60%),radial-gradient(900px 600px at 110% 0%,#7A1246 0%,transparent 55%),linear-gradient(180deg,#0B1020 0%,#0F172A 55%,#131C31 100%);overflow:hidden;gap:16px}
+/* ═══ Page de connexion JARNIAS — fiche de contrôle EPI ═══
+   Fond vert JARNIAS uni (avant : gradient cosmique violet/rose qui ne
+   correspondait à rien d'autre dans l'appli). L'écran prend l'allure d'une
+   fiche de contrôle d'équipement individuel : cadre pointillé, trou de
+   suspension, numéro de série en pied — un objet que les cordistes
+   manipulent tous les jours, plutôt qu'une scène animée. Rien ne bouge
+   sauf la corde unique (voir .auth-rope), à peine, tout au long du bord. */
+.auth-screen{background:linear-gradient(180deg,#0D2A20,#0F2D22 55%,#0D2A20);overflow:hidden;gap:16px}
 .auth-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.auth-orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;animation:authFloat 14s ease-in-out infinite}
-.auth-orb.o1{width:340px;height:340px;background:#7C3AED;top:-90px;left:-70px}
-.auth-orb.o2{width:300px;height:300px;background:#DB2777;bottom:-80px;right:-60px;animation-delay:-5s}
-.auth-orb.o3{width:230px;height:230px;background:#0EA5E9;top:45%;right:22%;opacity:.22;animation-delay:-9s}
-@keyframes authFloat{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(14px,-22px,0) scale(1.06)}}
-.auth-horizon{position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(180deg,transparent,rgba(124,58,237,.10)),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 46px);mask-image:linear-gradient(180deg,transparent,#000);-webkit-mask-image:linear-gradient(180deg,transparent,#000)}
-.auth-ropes{position:absolute;inset:0}
-/* Corde : toron tressé (diagonales) + âme claire + ombre, léger balancement */
-.rope{position:absolute;top:-12%;height:124%;width:4px;transform-origin:50% 0;
+.auth-tag-frame{position:absolute;inset:22px;border:1.5px dashed rgba(228,200,120,.30);border-radius:18px}
+.auth-tag-hole{position:absolute;top:38px;left:50%;margin-left:-8px;width:16px;height:16px;border-radius:50%;
+  background:#0A1912;box-shadow:inset 0 2px 4px rgba(0,0,0,.55),0 0 0 2px rgba(228,200,120,.28)}
+.auth-tag-serial{position:absolute;bottom:30px;left:0;right:0;text-align:center;
+  font-family:'SF Mono',ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:2.5px;
+  color:rgba(228,200,120,.38);text-transform:uppercase}
+/* Corde unique, tressage repris de l'ancienne version, sans personnage. */
+.auth-rope{position:absolute;left:9%;top:-10%;height:120%;width:5px;transform-origin:50% 0;
   background:
-    linear-gradient(90deg,rgba(0,0,0,.35) 0 1px,transparent 1px 3px,rgba(255,255,255,.10) 3px 4px),
-    repeating-linear-gradient(-34deg,rgba(255,255,255,.24) 0 2px,rgba(255,255,255,.05) 2px 4px,rgba(0,0,0,.16) 4px 6px),
-    linear-gradient(180deg,transparent,#8A8FA3 6%,#8A8FA3 94%,transparent);
-  border-radius:2px;box-shadow:0 0 5px rgba(0,0,0,.5);opacity:.55;
-  animation:ropeSway 9s ease-in-out infinite}
-.rope.r1{left:9%;animation-delay:-1s}
-.rope.r2{left:26%;animation-delay:-4s}
-.rope.r3{left:64%;animation-delay:-2.4s}
-.rope.r4{left:81%;opacity:.35;animation-delay:-6s}
-.rope.r5{left:93%;opacity:.25;animation-delay:-3s}
-@keyframes ropeSway{0%,100%{transform:rotate(-.5deg)}50%{transform:rotate(.6deg)}}
-/* Cordiste + descendeur qui glisse le long de la corde */
-.rope .desc{position:absolute;left:50%;top:-6%;width:26px;margin-left:-13px;filter:drop-shadow(0 5px 10px rgba(0,0,0,.55));
-  animation:ropeDrop 15s cubic-bezier(.45,0,.55,1) infinite}
-.rope .desc svg{width:26px;height:44px;display:block;overflow:visible}
-.rope .desc .dv{fill:#CBD5E1;stroke:#0F172A;stroke-width:.7}        /* descendeur + mousqueton */
-.rope .desc .tech{fill:#1E293B;stroke:#475569;stroke-width:.6}       /* buste + harnais */
-.rope .desc .head{fill:#334155}
-.rope .desc .helm{fill:#F59E0B}                                      /* casque */
-.rope .desc .leg{stroke:#1E293B;stroke-width:2.4;stroke-linecap:round;fill:none}
-.rope.r2 .desc .helm{fill:#DB2777}
-.rope.r3 .desc .helm{fill:#7C3AED}
-.rope.r2 .desc{animation-delay:-5.5s;animation-duration:18s}
-.rope.r3 .desc{animation-delay:-10.5s;animation-duration:13s}
-@keyframes ropeDrop{0%{top:-8%;opacity:0}6%{opacity:1}90%{opacity:1}100%{top:102%;opacity:0}}
+    linear-gradient(90deg,rgba(0,0,0,.32) 0 1px,transparent 1px 3px,rgba(255,255,255,.08) 3px 4px),
+    repeating-linear-gradient(-34deg,rgba(228,200,120,.20) 0 2px,rgba(228,200,120,.04) 2px 4px,rgba(0,0,0,.12) 4px 6px),
+    linear-gradient(180deg,transparent,#5B6B60 6%,#5B6B60 94%,transparent);
+  border-radius:2px;opacity:.5;animation:authRopeSway 22s ease-in-out infinite}
+@keyframes authRopeSway{0%,100%{transform:rotate(-.35deg)}50%{transform:rotate(.45deg)}}
+.auth-biner{position:absolute;left:9%;top:32%;margin-left:-11px;width:22px;height:30px;opacity:.8;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
+
 .auth-logo{position:relative;z-index:2}
 .auth-logo img{width:150px;box-shadow:0 18px 45px -18px rgba(0,0,0,.8)}
 .auth-tag{position:relative;z-index:2;display:flex;align-items:center;gap:10px;color:#94A3B8;font-size:11.5px;font-weight:600;letter-spacing:2.2px;text-transform:uppercase;margin-top:-6px}
@@ -1803,7 +1803,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .btn-auth{transition:transform .14s var(--ease),box-shadow .2s}
 .btn-auth:hover{transform:translateY(-2px);box-shadow:0 12px 26px -12px rgba(109,40,217,.7)}
 .btn-auth:active{transform:scale(.98)}
-@media(prefers-reduced-motion:reduce){.auth-orb,.rope,.rope .desc{animation:none}}
+@media(prefers-reduced-motion:reduce){.auth-rope{animation:none}}
 .auth-err{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:9px 12px;font-size:13px;color:#B91C1C;margin-bottom:13px;display:none}
 .auth-err.show{display:block}
 .btn-auth{background:#0F172A;color:#fff;border:none;border-radius:10px;padding:12px 0;font-size:15px;font-weight:600;cursor:pointer;width:100%;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -1861,7 +1861,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .gen-row{display:flex;gap:8px;flex-wrap:wrap}
 .user-row2{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid #E2E8F0;border-radius:10px;background:#FAFBFF}
 .uav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.loading-screen{position:fixed;inset:0;background:#0B1020;display:flex;align-items:center;justify-content:center;z-index:3500;flex-direction:column;gap:18px;overflow:hidden}
+.loading-screen{position:fixed;inset:0;background:linear-gradient(180deg,#0D2A20,#0F2D22 55%,#0D2A20);display:flex;align-items:center;justify-content:center;z-index:3500;flex-direction:column;gap:18px;overflow:hidden}
 .loading-screen img{position:relative;z-index:2;animation:loadPulse 1.8s ease-in-out infinite}
 .loading-screen .spinner{position:relative;z-index:2}
 @keyframes loadPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
@@ -2093,7 +2093,6 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
 
 <!-- LOADING -->
 <div class="loading-screen" id="loading-screen">
-  <div class="auth-bg" aria-hidden="true"><span class="auth-orb o1"></span><span class="auth-orb o2"></span><span class="auth-orb o3"></span></div>
   <img data-jlogo="1" style="width:150px;border-radius:12px"/>
   <div class="spinner"></div>
 </div>
@@ -2101,40 +2100,17 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
 <!-- AUTH -->
 <div class="auth-screen" id="auth-screen" style="display:none">
   <div class="auth-bg" aria-hidden="true">
-    <span class="auth-orb o1"></span><span class="auth-orb o2"></span><span class="auth-orb o3"></span>
-    <div class="auth-ropes">
-      <i class="rope r1"><b class="desc">
-        <svg viewBox="0 0 26 44" aria-hidden="true">
-          <rect class="dv" x="9.2" y="6" width="7.6" height="9" rx="2"/>
-          <circle class="dv" cx="13" cy="4" r="2.1"/>
-          <path class="tech" d="M13 15.5c-3.4 0-5.6 2-5.6 4.6 0 1.9 1 3.2 2.4 4l-.6 6.1c-.1 1 .6 1.7 1.5 1.7s1.6-.7 1.6-1.6l.2-3.8h1l.2 3.8c0 .9.7 1.6 1.6 1.6s1.6-.7 1.5-1.7l-.6-6.1c1.4-.8 2.4-2.1 2.4-4 0-2.6-2.2-4.6-5.6-4.6z"/>
-          <circle class="head" cx="13" cy="12.2" r="3.4"/>
-          <path class="helm" d="M9.6 12.2a3.4 3.4 0 0 1 6.8 0z"/>
-          <path class="leg" d="M9.4 30.5l-2.6 6.4M16.6 30.5l2.6 6.4"/>
-        </svg>
-      </b></i>
-      <i class="rope r2"><b class="desc">
-        <svg viewBox="0 0 26 44" aria-hidden="true">
-          <rect class="dv" x="9.2" y="6" width="7.6" height="9" rx="2"/><circle class="dv" cx="13" cy="4" r="2.1"/>
-          <path class="tech" d="M13 15.5c-3.4 0-5.6 2-5.6 4.6 0 1.9 1 3.2 2.4 4l-.6 6.1c-.1 1 .6 1.7 1.5 1.7s1.6-.7 1.6-1.6l.2-3.8h1l.2 3.8c0 .9.7 1.6 1.6 1.6s1.6-.7 1.5-1.7l-.6-6.1c1.4-.8 2.4-2.1 2.4-4 0-2.6-2.2-4.6-5.6-4.6z"/>
-          <circle class="head" cx="13" cy="12.2" r="3.4"/><path class="helm" d="M9.6 12.2a3.4 3.4 0 0 1 6.8 0z"/>
-          <path class="leg" d="M9.4 30.5l-3 5.2M16.6 30.5l1.8 6.8"/>
-        </svg>
-      </b></i>
-      <i class="rope r3"><b class="desc">
-        <svg viewBox="0 0 26 44" aria-hidden="true">
-          <rect class="dv" x="9.2" y="6" width="7.6" height="9" rx="2"/><circle class="dv" cx="13" cy="4" r="2.1"/>
-          <path class="tech" d="M13 15.5c-3.4 0-5.6 2-5.6 4.6 0 1.9 1 3.2 2.4 4l-.6 6.1c-.1 1 .6 1.7 1.5 1.7s1.6-.7 1.6-1.6l.2-3.8h1l.2 3.8c0 .9.7 1.6 1.6 1.6s1.6-.7 1.5-1.7l-.6-6.1c1.4-.8 2.4-2.1 2.4-4 0-2.6-2.2-4.6-5.6-4.6z"/>
-          <circle class="head" cx="13" cy="12.2" r="3.4"/><path class="helm" d="M9.6 12.2a3.4 3.4 0 0 1 6.8 0z"/>
-          <path class="leg" d="M9.4 30.5l-2.2 6.9M16.6 30.5l2.9 5.4"/>
-        </svg>
-      </b></i>
-      <i class="rope r4"></i>
-      <i class="rope r5"></i>
-    </div>
-    <div class="auth-horizon"></div>
+    <div class="auth-tag-frame"></div>
+    <div class="auth-tag-hole"></div>
+    <div class="auth-tag-serial">Équipement contrôlé — JARNIAS</div>
+    <div class="auth-rope"></div>
+    <svg class="auth-biner" viewBox="0 0 22 30" aria-hidden="true">
+      <path d="M11 2c-4 0-6.5 3-6.5 7v10c0 4 2.5 7 6.5 7s6.5-3 6.5-7" fill="none" stroke="#E4C878" stroke-width="2.4" stroke-linecap="round"/>
+      <rect x="8.3" y="1" width="5.4" height="4.5" rx="1.4" fill="#E4C878"/>
+    </svg>
   </div>
-  <div class="auth-logo"><img data-jlogo="1" alt="JARNIAS"/></div>
+  
+<div class="auth-logo"><img data-jlogo="1" alt="JARNIAS"/></div>
   <div class="auth-tag"><span class="auth-tag-l"></span> Les experts de la hauteur <span class="auth-tag-l"></span></div>
   <div class="auth-card">
     <div class="auth-tabs">
@@ -7944,15 +7920,16 @@ function renderPersonnalisation(){try{setActiveNav('btn-perso');}catch(e){}
   h+="</div></div>";
   // Apparence — ambiances & thèmes (choix personnel, par appareil)
   var _curAmb=(function(){try{return localStorage.getItem("appro_amb")||"none";}catch(e){return "none";}})();
-  var _ambNames={none:"Aucune (sobre)",aurore:"Aurore",halo:"Halo",maille:"Maille",teinte:"Teinte",frais:"Frais",synthwave:"Synthwave",neon:"N\u00e9on",memphis:"Memphis",chrome:"Chrome",hybride:"Hybride",foret:"For\u00eat",botanique:"Botanique",terre:"Terre",ocean:"Oc\u00e9an",zen:"Zen",verre:"Verre"};
+  var _ambNames={none:"Aucune (sobre)",jarnias:"JARNIAS",aurore:"Aurore",halo:"Halo",maille:"Maille",teinte:"Teinte",frais:"Frais",synthwave:"Synthwave",neon:"N\u00e9on",memphis:"Memphis",chrome:"Chrome",hybride:"Hybride",foret:"For\u00eat",botanique:"Botanique",terre:"Terre",ocean:"Oc\u00e9an",zen:"Zen",verre:"Verre"};
   h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-sparkles\" style=\"color:#6D28D9\"></i> Apparence & th\u00e8mes</div>";
   h+="<div style=\"padding:14px\"><p style=\"font-size:12.5px;color:#64748B;margin:0 0 12px;line-height:1.55\">Choisis une ambiance color\u00e9e ou un th\u00e8me \u00ab ann\u00e9es 80 \u00bb (synthwave, n\u00e9on, chrome\u2026). <b>C'est un choix personnel</b> : il s'applique \u00e0 ton appareil uniquement, pas \u00e0 toute l'\u00e9quipe. Chacun peut donc avoir le style qui lui pla\u00eet.</p>";
   h+="<div class=\"perso-amb-grid\">";
-  var _allThemes=[["none","Aucune"],["aurore","Aurore"],["halo","Halo"],["maille","Maille"],["teinte","Teinte"],["frais","Frais"],["foret","For\u00eat"],["botanique","Botanique"],["terre","Terre"],["ocean","Oc\u00e9an"],["zen","Zen"],["verre","Verre"],["synthwave","Synthwave"],["neon","N\u00e9on"],["memphis","Memphis"],["chrome","Chrome"],["hybride","Hybride"]];
+  var _allThemes=[["none","Aucune"],["jarnias","JARNIAS"],["aurore","Aurore"],["halo","Halo"],["maille","Maille"],["teinte","Teinte"],["frais","Frais"],["foret","For\u00eat"],["botanique","Botanique"],["terre","Terre"],["ocean","Oc\u00e9an"],["zen","Zen"],["verre","Verre"],["synthwave","Synthwave"],["neon","N\u00e9on"],["memphis","Memphis"],["chrome","Chrome"],["hybride","Hybride"]];
   _allThemes.forEach(function(a){
     var is80=["synthwave","neon","memphis","chrome","hybride"].indexOf(a[0])>=0;
     var isNat=["foret","botanique","terre","ocean","zen","verre"].indexOf(a[0])>=0;
-    var tag=is80?"<span class=\"amb-80tag\">80s</span>":(isNat?"<span class=\"amb-80tag amb-nattag\">nature</span>":"");
+    var isMaison=a[0]==="jarnias";
+    var tag=is80?"<span class=\"amb-80tag\">80s</span>":(isNat?"<span class=\"amb-80tag amb-nattag\">nature</span>":(isMaison?"<span class=\"amb-80tag amb-maisontag\">maison</span>":""));
     var swClass=a[0]==="none"?"perso-amb-none":"amb-sw-"+a[0];
     h+="<button class=\"perso-amb-opt "+swClass+(_curAmb===a[0]?" sel":"")+"\" onclick=\"setAmbianceFromPerso('"+a[0]+"')\">"+(a[0]==="none"?"<i class=\"ti ti-ban\"></i> ":"")+a[1]+tag+"</button>";
   });
@@ -8101,7 +8078,9 @@ function toggleAmbPop(){
   if(ex){ex.remove();return;}
   var cur=currentAmb();
   var pop=document.createElement("div");pop.id="amb-pop";pop.className="amb-pop";
-  var h="<h4>Ambiance couleur</h4><div class=\"amb-grid\">";
+  var h="<h4 class=\"amb-sec2\"><i class=\"ti ti-mountain\" style=\"color:#C9A24B\"></i> <span>JARNIAS</span></h4>";
+  h+="<button class=\"amb-opt amb-sw-jarnias"+(cur==="jarnias"?" sel":"")+"\" style=\"width:100%;margin-bottom:10px\" onclick=\"setAmbiance('jarnias')\">JARNIAS \u2014 vert, noir, or</button>";
+  h+="<h4>Ambiance couleur</h4><div class=\"amb-grid\">";
   AMB_LIST.forEach(function(a){
     h+="<button class=\"amb-opt amb-sw-"+a[0]+(cur===a[0]?" sel":"")+"\" onclick=\"setAmbiance('"+a[0]+"')\">"+a[1]+"</button>";
   });
@@ -8139,7 +8118,7 @@ function setAmbianceFromPerso(a){
     var grid=document.querySelector(".perso-amb-grid");
     if(grid){grid.querySelectorAll(".perso-amb-opt").forEach(function(b){b.classList.remove("sel");});
       var sel=grid.querySelector(a==="none"?".perso-amb-none":".amb-sw-"+a);if(sel)sel.classList.add("sel");}
-    var names={none:"Aucune (sobre)",aurore:"Aurore",halo:"Halo",maille:"Maille",teinte:"Teinte",frais:"Frais",synthwave:"Synthwave",neon:"N\u00e9on",memphis:"Memphis",chrome:"Chrome",hybride:"Hybride",foret:"For\u00eat",botanique:"Botanique",terre:"Terre",ocean:"Oc\u00e9an",zen:"Zen",verre:"Verre"};
+    var names={none:"Aucune (sobre)",jarnias:"JARNIAS",aurore:"Aurore",halo:"Halo",maille:"Maille",teinte:"Teinte",frais:"Frais",synthwave:"Synthwave",neon:"N\u00e9on",memphis:"Memphis",chrome:"Chrome",hybride:"Hybride",foret:"For\u00eat",botanique:"Botanique",terre:"Terre",ocean:"Oc\u00e9an",zen:"Zen",verre:"Verre"};
     var lbl=document.getElementById("perso-amb-cur");if(lbl)lbl.innerHTML="<i class=\"ti ti-check\"></i> Th\u00e8me actuel : "+(names[a]||a);
   }catch(e){}
 }
@@ -8153,7 +8132,7 @@ function setAmbiance(a){
   }
   try{localStorage.setItem("appro_amb",a);}catch(e){}
   var pop=document.getElementById("amb-pop");if(pop)pop.remove();
-  var names={none:"sobre",aurore:"Aurore",halo:"Halo",maille:"Maille",teinte:"Teinte",frais:"Frais",synthwave:"Synthwave",neon:"N\u00e9on",memphis:"Memphis",chrome:"Chrome",hybride:"Hybride",foret:"For\u00eat",botanique:"Botanique",terre:"Terre",ocean:"Oc\u00e9an",zen:"Zen",verre:"Verre"};
+  var names={none:"sobre",jarnias:"JARNIAS",aurore:"Aurore",halo:"Halo",maille:"Maille",teinte:"Teinte",frais:"Frais",synthwave:"Synthwave",neon:"N\u00e9on",memphis:"Memphis",chrome:"Chrome",hybride:"Hybride",foret:"For\u00eat",botanique:"Botanique",terre:"Terre",ocean:"Oc\u00e9an",zen:"Zen",verre:"Verre"};
   toast("Ambiance : "+(names[a]||a),"ti-palette");
 }
 document.addEventListener("click",function(e){
