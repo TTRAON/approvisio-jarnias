@@ -269,8 +269,8 @@ html[data-amb="verre"] .sb-brand>*,html[data-amb="verre"] .doc-band>*{position:r
 .view-in{animation:fadeUp .4s var(--ease) both}
 
 /* --- boutons vivants (survol / appui / ondulation) --- */
-.liv{position:relative;overflow:hidden;transition:transform .12s var(--ease),box-shadow .18s var(--ease),background .18s var(--ease)}
-.liv:hover{transform:translateY(-2px)}
+.liv{position:relative;overflow:hidden;transition:transform .22s var(--spring),box-shadow .22s var(--ease),background .18s var(--ease)}
+.liv:hover{transform:translateY(-2px);box-shadow:0 8px 20px -8px rgba(15,23,42,.25)}
 .liv:active{transform:scale(.97)}
 .ripple{position:absolute;border-radius:50%;transform:scale(0);background:rgba(255,255,255,.5);pointer-events:none;animation:rip .6s var(--ease) forwards}
 .ripple-dark{background:rgba(15,23,42,.12)}
@@ -407,8 +407,8 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .cat-arr{font-size:11px;color:#CBD5E1;transition:transform .2s}
 .cat-arr.open{transform:rotate(90deg)}
 .cat-cards{display:flex;flex-direction:column;gap:4px;padding-left:6px;border-left:2px solid #F1F5F9}
-.sc{border:1px solid #E2E8F0;border-radius:8px;padding:10px 11px;cursor:pointer;background:#FAFBFF;transition:border-color .15s,transform .16s var(--ease),box-shadow .18s var(--ease)}
-.sc:hover{border-color:#94A3B8;transform:translateY(-2px);box-shadow:0 6px 16px rgba(15,23,42,.08)}
+.sc{border:1px solid #E2E8F0;border-radius:8px 8px 16px 6px;padding:10px 11px;cursor:pointer;background:#FAFBFF;transition:border-color .15s,transform .2s var(--spring),box-shadow .18s var(--ease),border-radius .25s var(--spring)}
+.sc:hover{border-color:#94A3B8;transform:translateY(-2px);box-shadow:0 6px 16px rgba(15,23,42,.08);border-radius:16px 6px 8px 8px}
 .sc:active{transform:scale(.99)}
 .sc.active{border-color:#3B82F6;background:#EFF6FF}
 .sc-name{font-size:13px;font-weight:600;color:#0F172A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -446,8 +446,8 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .next-step-txt{flex:1;min-width:0}
 .next-step-t{font-size:11px;font-weight:600;opacity:.8;text-transform:uppercase;letter-spacing:.5px}
 .next-step-d{font-size:14px;font-weight:700;margin-top:1px}
-.next-step-btn{background:#fff;color:var(--accent,#6D28D9);border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;transition:transform .12s var(--ease)}
-.next-step-btn:hover{transform:scale(1.04)}
+.next-step-btn{background:#fff;color:var(--accent,#6D28D9);border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;transition:all .26s var(--spring)}
+.next-step-btn:hover{padding-left:20px;padding-right:20px;border-radius:16px;box-shadow:0 6px 16px -6px rgba(0,0,0,.25);transform:translateY(-2px)}
 .next-step-btn:active{transform:scale(.96)}
 @media print{.appro-steps,.next-step{display:none!important}}
 @media(max-width:640px){.next-step{max-width:none;margin-left:8px;margin-right:8px}.next-step-d{font-size:13px}}
@@ -570,10 +570,11 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 /* --- actions rapides --- */
 .home-sec-t{font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.7px;margin:0 2px 12px}
 .home-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:26px}
-.qa{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;background:#fff;border:1px solid #E8EDF4;border-radius:16px;padding:18px;cursor:pointer;text-align:left;font-family:inherit;transition:transform .18s var(--ease),box-shadow .2s var(--ease),border-color .18s}
-.qa:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(15,23,42,.1)}
+.qa{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;background:#fff;border:1px solid #E8EDF4;border-radius:24px 12px 24px 12px;padding:18px;cursor:pointer;text-align:left;font-family:inherit;transition:transform .28s var(--spring),box-shadow .25s var(--ease),border-color .18s,border-radius .28s var(--spring)}
+.qa:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(15,23,42,.1);border-radius:12px 24px 12px 24px}
 .qa:active{transform:scale(.98)}
-.qa-ic{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.qa-ic{width:44px;height:44px;border-radius:50% 50% 50% 10px;display:flex;align-items:center;justify-content:center;font-size:22px;transition:border-radius .28s var(--spring)}
+.qa:hover .qa-ic{border-radius:10px 50% 50% 50%}
 .qa-t{font-size:15px;font-weight:700;color:#0F172A}
 .qa-d{font-size:12px;color:#94A3B8;line-height:1.4}
 .qa-primary{background:linear-gradient(135deg,var(--accent,#0F172A),var(--accent-2,#1E293B));border:none}
@@ -885,15 +886,31 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
 .btn-print:hover{background:#E2E8F0}
 .btn-pdf{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:7px 13px;font-size:13px;font-weight:600;color:#B91C1C;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit}
 .btn-pdf:hover{background:#FEE2E2}
-.btn-save{background:#10B981;border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit}
+.btn-save{background:#10B981;border:none;border-radius:10px;padding:7px 16px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;transition:all .28s var(--spring)}
+.btn-save:hover{padding-left:20px;padding-right:20px;border-radius:16px;box-shadow:0 8px 20px -6px rgba(16,185,129,.5);transform:translateY(-2px)}
+.btn-save:active{transform:scale(.96)}
 .tbi{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid #E2E8F0;background:#fff;cursor:pointer;transition:all .12s;color:#475569;padding:0}
 .tbi:hover{background:#F8FAFC;border-color:#CBD5E1;transform:translateY(-1px)}
 .tbi i{font-size:18px}
+/* ═══ Barre d'outils appro : actions principales avec texte visible ═══ */
+.tbtxt{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 13px;border-radius:9px;border:1px solid #E2E8F0;background:#fff;cursor:pointer;transition:all .26s var(--spring);font-size:12.5px;font-weight:700;font-family:inherit;position:relative;white-space:nowrap}
+.tbtxt:hover{transform:translateY(-2px);box-shadow:0 6px 16px -6px rgba(15,23,42,.22);border-radius:13px}
+.tbtxt:active{transform:scale(.97)}
+.tbtxt i{font-size:16px}
+.tb-more-wrap{position:relative;display:inline-block}
+.tb-more-pop{display:none;position:absolute;top:44px;right:0;background:#fff;border:1px solid #E2E8F0;border-radius:12px;box-shadow:0 14px 34px -8px rgba(15,23,42,.3);padding:6px;width:200px;z-index:120}
+.tb-more-pop.show{display:block}
+.tb-more-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:13px;color:#334155;cursor:pointer;background:none;border:none;width:100%;text-align:left;font-family:inherit}
+.tb-more-item:hover{background:#F5F3FF}
+.tb-more-item i{width:18px;text-align:center;font-size:16px;color:#6D28D9;flex-shrink:0}
+.tb-more-item.danger{color:#B91C1C}
+.tb-more-item.danger i{color:#DC2626}
+@media print{.tb-more-wrap{display:none!important}}
 .ui-sec{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:16px;margin-bottom:16px}
 .ui-sec-hd{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#0F172A;margin-bottom:14px}
 .ui-in{border:1px solid #E2E8F0;border-radius:8px;padding:9px 11px;font-size:13px;font-family:inherit;outline:none;background:#fff}
 /* ═══ PARAMÉTRAGE INTERFACE — DA actuelle ═══ */
-.ui-sec{background:#fff;border:1px solid #E8EDF4;border-radius:16px;padding:0;margin-bottom:14px;box-shadow:0 4px 18px -13px rgba(15,23,42,.4);overflow:hidden;transition:box-shadow .2s}
+.ui-sec{background:#fff;border:1px solid #E8EDF4;border-radius:16px 16px 24px 10px;padding:0;margin-bottom:14px;box-shadow:0 4px 18px -13px rgba(15,23,42,.4);overflow:hidden;transition:box-shadow .25s var(--ease),border-radius .3s var(--spring)}
 .ui-sec:hover{box-shadow:0 10px 26px -16px rgba(15,23,42,.45)}
 .ui-sec>*:not(.ui-sec-hd){padding-left:16px;padding-right:16px}
 .ui-sec>*:last-child{padding-bottom:16px}
@@ -917,7 +934,8 @@ html[data-amb] .dash-hero::before{content:"";position:absolute;inset:0;z-index:1
 .legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 0}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#64748B}
 .leg-sw{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.1)}
-.card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;transition:box-shadow .2s var(--ease),border-color .18s var(--ease)}
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:14px 14px 22px 8px;overflow:hidden;transition:box-shadow .25s var(--ease),border-color .18s var(--ease),border-radius .3s var(--spring)}
+.card:hover{border-radius:14px 14px 8px 22px;box-shadow:0 6px 18px -10px rgba(15,23,42,.18)}
 .fv .card:hover{border-color:#DDE4EE;box-shadow:0 6px 18px rgba(15,23,42,.05)}
 .card-hd{padding:13px 18px;border-bottom:1px solid #F1F5F9;display:flex;justify-content:space-between;align-items:center}
 .card-hd-t{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#0F172A}
@@ -1081,7 +1099,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .cp-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#0F172A}
 .btn-cp-close{background:none;border:1px solid #E2E8F0;border-radius:8px;padding:5px 8px;cursor:pointer;color:#64748B;line-height:1}
 .cp-body{flex:1;padding:14px;display:flex;flex-direction:column;gap:14px}
-.cp-sec{border:1px solid #E2E8F0;border-radius:10px;overflow:hidden}
+.cp-sec{border:1px solid #E2E8F0;border-radius:12px 12px 20px 8px;overflow:hidden;transition:border-radius .3s var(--spring)}
 .cp-sec-hd{background:#F8FAFC;padding:7px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #E2E8F0}
 .cp-sec-title{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:#0F172A;text-transform:uppercase;letter-spacing:.4px}
 .btn-all{background:none;border:none;font-size:11px;color:#6D28D9;cursor:pointer;font-family:inherit;font-weight:600;padding:2px 6px;border-radius:4px}
@@ -1089,8 +1107,8 @@ table.at tr.kit-row td.td-d{position:relative}
 .cp-kit-add{display:inline-flex;align-items:center;gap:5px;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:3px 4px 3px 8px}
 .cp-kit-x{font-size:12px;font-weight:800;color:#6D28D9;line-height:1}
 .cp-kit-n{width:40px;padding:4px;border:1px solid #C4B5FD;border-radius:6px;text-align:center;font-family:inherit;font-size:12px;color:#6D28D9;font-weight:700;background:#fff;outline:none}
-.btn-kit{background:#6D28D9;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;padding:5px 9px;display:inline-flex;align-items:center;gap:4px}
-.btn-kit:hover{background:#5B21B6}
+.btn-kit{background:#6D28D9;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;padding:5px 9px;display:inline-flex;align-items:center;gap:4px;transition:all .22s var(--spring)}
+.btn-kit:hover{background:#5B21B6;padding-left:12px;padding-right:12px;border-radius:9px;box-shadow:0 6px 14px -5px rgba(109,40,217,.5);transform:translateY(-1px)}
 @media(max-width:768px){.cp-panel{width:100vw}.cp-sec-hd{flex-wrap:wrap;gap:7px}.cp-sec-actions{width:100%;justify-content:flex-start}.cp-hd{padding-top:calc(16px + env(safe-area-inset-top))}}
 .cp-row{display:flex;align-items:center;padding:9px 14px;border-bottom:1px solid #F8FAFC;gap:10px;transition:background .14s var(--ease)}
 .cp-row:last-child{border-bottom:none}
@@ -1406,7 +1424,7 @@ table.at tr.kit-row td.td-d{position:relative}
 @media(max-width:640px){.cp-fab{right:14px;bottom:16px;padding:14px;border-radius:50%}.cp-fab .cp-fab-t{display:none}}
 @media print{.cp-fab{display:none!important}}
 /* ═══ Fil de discussion ═══ */
-.thread-card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden}
+.thread-card{background:#fff;border:1px solid #E2E8F0;border-radius:14px 14px 22px 8px;overflow:hidden;transition:border-radius .3s var(--spring)}
 .thread-hd{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid #F1F5F9;font-size:14px;font-weight:700;color:#0F172A}
 .thread-sub{font-size:11.5px;font-weight:500;color:#94A3B8}
 .thread-cnt{margin-left:auto;font-size:11px;font-weight:700;color:#6D28D9;background:#F3EEFF;padding:2px 9px;border-radius:20px;min-width:22px;text-align:center}
@@ -1905,6 +1923,18 @@ html.dark .tour-hole{box-shadow:0 0 0 3px #0F172A,0 0 0 6px var(--accent,#6D28D9
 @media print{html.dark{filter:none!important}html.dark img{filter:none!important}}
 .btn-theme{width:26px;height:26px;border:none;background:rgba(148,163,184,.16);color:#64748B;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .btn-theme:hover{background:rgba(148,163,184,.28)}
+/* ═══ Barre d'icônes du menu : groupes en verre dépoli + nom au survol ═══
+   Mélange de deux essais : les icônes sont rangées en 2 petits groupes logiques
+   (usage courant / réglages), sur un fond semi-transparent flouté, et le nom de
+   chaque action apparaît en douceur au survol au lieu d'une bulle d'aide classique. */
+.hdr-grp{display:flex;gap:2px;background:rgba(255,255,255,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(226,232,240,.9);border-radius:11px;padding:3px;box-shadow:0 2px 8px rgba(15,23,42,.05)}
+.hdr-sep{width:1px;height:20px;background:rgba(148,163,184,.4);margin:0 5px;flex-shrink:0}
+.hdr-btn{position:relative;width:28px;height:28px;border:none;background:none;border-radius:8px;color:#64748B;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .22s var(--spring)}
+.hdr-btn:hover{background:rgba(109,40,217,.14);color:#6D28D9;transform:translateY(-2px)}
+.hdr-lbl{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%) translateY(3px);background:#0F172A;color:#fff;font-size:9px;font-weight:700;padding:3px 7px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:all .18s var(--ease);z-index:200}
+.hdr-btn:hover .hdr-lbl{opacity:1;transform:translateX(-50%) translateY(0)}
+html.dark .hdr-grp{background:rgba(30,41,59,.6);border-color:rgba(71,85,105,.6)}
+@media(max-width:768px){.hdr-lbl{display:none}}
 /* Le bouton « activer les notifications » est une ACTION ponctuelle, pas un réglage :
    on le teinte pour qu'il ressorte des autres icônes, et il DISPARAÎT une fois les
    notifications activées (cf. _syncPushIcon) — comme le bouton d'installation. */
@@ -2108,29 +2138,33 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
         <div style="min-width:0"><div class="sb-user-name" id="sb-user-name"></div><div class="sb-user-role" id="sb-user-role"></div></div>
       </div>
       <div class="sb-user-actions">
-        <div class="news-wrap">
-          <button class="news-bell" onclick="toggleNews()" title="Nouveaut\u00e9s"><i class="ti ti-sparkles" style="font-size:15px"></i><span class="news-badge" id="news-badge" style="display:none"></span></button>
-          <div class="news-panel" id="news-panel">
-            <div class="news-hd"><i class="ti ti-sparkles" style="font-size:17px"></i><span class="news-hd-t">Nouveaut\u00e9s</span></div>
-            <div class="news-list" id="news-list"></div>
+        <div class="hdr-grp">
+          <div class="notif-wrap">
+            <button class="hdr-btn notif-bell" onclick="toggleNotif()" title="Notifications"><i class="ti ti-bell" style="font-size:16px"></i><span class="notif-badge" id="notif-badge" style="display:none">0</span><span class="hdr-lbl">Notifications</span></button>
+            <div class="notif-panel" id="notif-panel">
+              <div class="notif-hd"><span class="notif-hd-t">Notifications</span><button class="notif-readall" onclick="markAllRead()">Tout marquer lu</button></div>
+              <div class="notif-list" id="notif-list"></div>
+              <div class="notif-foot" id="notif-push-foot" style="display:none"><button class="notif-push-btn" id="notif-push-btn" onclick="togglePush()"><i class="ti ti-bell"></i> Activer les notifications sur cet appareil</button></div>
+            </div>
           </div>
+          <button class="hdr-btn" id="help-btn" onclick="startTour()" title="Aide / visite guid&#233;e"><i class="ti ti-help-circle" style="font-size:16px"></i><span class="hdr-lbl">Aide</span></button>
         </div>
-        <div class="notif-wrap">
-          <button class="notif-bell" onclick="toggleNotif()" title="Notifications"><i class="ti ti-bell" style="font-size:16px"></i><span class="notif-badge" id="notif-badge" style="display:none">0</span></button>
-          <div class="notif-panel" id="notif-panel">
-            <div class="notif-hd"><span class="notif-hd-t">Notifications</span><button class="notif-readall" onclick="markAllRead()">Tout marquer lu</button></div>
-            <div class="notif-list" id="notif-list"></div>
-            <div class="notif-foot" id="notif-push-foot" style="display:none"><button class="notif-push-btn" id="notif-push-btn" onclick="togglePush()"><i class="ti ti-bell"></i> Activer les notifications sur cet appareil</button></div>
+        <div class="hdr-sep"></div>
+        <div class="hdr-grp">
+          <div class="news-wrap">
+            <button class="hdr-btn news-bell" onclick="toggleNews()" title="Nouveaut&#233;s"><i class="ti ti-sparkles" style="font-size:15px"></i><span class="news-badge" id="news-badge" style="display:none"></span><span class="hdr-lbl">Nouveaut&#233;s</span></button>
+            <div class="news-panel" id="news-panel">
+              <div class="news-hd"><i class="ti ti-sparkles" style="font-size:17px"></i><span class="news-hd-t">Nouveaut\u00e9s</span></div>
+              <div class="news-list" id="news-list"></div>
+            </div>
           </div>
+          <div id="amb-btn-wrap" style="position:relative;display:inline-block">
+            <button class="hdr-btn" id="amb-btn" onclick="event.stopPropagation();toggleAmbPop()" title="Ambiance couleur"><i class="ti ti-palette" style="font-size:15px"></i><span class="hdr-lbl">Ambiance</span></button>
+          </div>
+          <button class="hdr-btn" id="btn-refresh" onclick="refreshFromServer()" title="Mettre &#224; jour les donn&#233;es"><i class="ti ti-refresh" style="font-size:15px"></i><span class="hdr-lbl">Actualiser</span></button>
+          <button class="hdr-btn" id="pwa-install-btn" onclick="pwaInstall()" style="color:#6D28D9" title="Installer l'application"><i class="ti ti-download" style="font-size:15px"></i><span class="hdr-lbl">Installer l'app</span></button>
+          <button class="hdr-btn" id="theme-btn" onclick="toggleTheme()" title="Th&#232;me clair / sombre"><i class="ti ti-moon" style="font-size:15px"></i><span class="hdr-lbl">Th&#232;me</span></button>
         </div>
-        <button class="btn-theme push-on" id="push-btn" onclick="togglePush()" title="Activer les notifications sur cet appareil" style="display:none"><i class="ti ti-bell-plus" style="font-size:15px"></i></button>
-        <div id="amb-btn-wrap" style="position:relative;display:inline-block">
-          <button class="btn-theme" id="amb-btn" onclick="event.stopPropagation();toggleAmbPop()" title="Ambiance couleur"><i class="ti ti-palette" style="font-size:15px"></i></button>
-        </div>
-        <button class="btn-theme" id="btn-refresh" onclick="refreshFromServer()" title="Mettre &#224; jour les donn&#233;es"><i class="ti ti-refresh" style="font-size:15px"></i></button>
-        <button class="btn-theme" id="help-btn" onclick="startTour()" title="Aide / visite guid&#233;e"><i class="ti ti-help-circle" style="font-size:16px"></i></button>
-        <button class="btn-theme" id="pwa-install-btn" onclick="pwaInstall()" title="Installer l'application" style="background:rgba(109,40,217,.14);color:#6D28D9"><i class="ti ti-download" style="font-size:15px"></i></button>
-        <button class="btn-theme" id="theme-btn" onclick="toggleTheme()" title="Th&#232;me clair / sombre"><i class="ti ti-moon" style="font-size:15px"></i></button>
         </div>
         <button class="sb-logout" onclick="doLogout()"><i class="ti ti-logout"></i> Se d&#233;connecter</button>
     </div>
@@ -2162,7 +2196,6 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
       <img data-jlogo="1" class="mtop-logo" alt="JARNIAS"/>
       <span class="mtop-title">AppROVISIO</span>
       <button class="mtop-btn mtop-pending" id="btn-pending-m" onclick="renderPending()" title="Messages en attente" style="display:none"><i class="ti ti-message-report" style="font-size:19px"></i><span class="pending-badge" id="pending-badge-m" style="display:none">0</span></button>
-      <button class="mtop-btn mtop-push" id="push-mtop" onclick="togglePush()" title="Activer les notifications sur cet appareil" style="display:none"><i class="ti ti-bell-plus" style="font-size:19px"></i></button>
     </div>
     <div id="deadline-banner" class="dl-banner" style="display:none"></div>
     <main class="main" id="main-area"></main>
@@ -5061,8 +5094,8 @@ function renderForm(){
   var ai=(cur.additionDates||[]).indexOf(addDate);
   var ac=ai>=0?AP[ai%AP.length]:AP[0];
   var addBtn=addMode
-    ?"<button class=\"tbi\" style=\"background:"+ac.left+";border-color:"+ac.left+";color:#fff\" title=\"Terminer le mode ajout\" onclick=\"togAdd()\"><i class=\"ti ti-pencil\"></i></button>"
-    :"<button class=\"tbi\" style=\"color:#15803D\" title=\"Mode Ajout (lignes dat\u00e9es)\" onclick=\"togAdd()\"><i class=\"ti ti-circle-plus\"></i></button>";
+    ?"<button class=\"tbtxt\" style=\"color:#fff;background:"+ac.left+";border-color:"+ac.left+"\" title=\"Terminer le mode ajout\" onclick=\"togAdd()\"><i class=\"ti ti-pencil\"></i> Mode Ajout</button>"
+    :"<button class=\"tbtxt\" style=\"color:#15803D;background:#F0FDF4;border-color:#BBF7D0\" title=\"Mode Ajout (lignes dat\u00e9es)\" onclick=\"togAdd()\"><i class=\"ti ti-circle-plus\"></i> Mode Ajout</button>";
   var addBanner=addMode
     ?"<div class=\"add-banner\" style=\"background:"+ac.bg+";border-color:"+ac.left+"\"><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"width:10px;height:10px;border-radius:50%;background:"+ac.left+";flex-shrink:0;display:inline-block\"></span><div><strong style=\"font-size:13px;color:"+ac.text+"\">Mode Ajout actif</strong><div style=\"font-size:11px;color:"+ac.text+";opacity:.8\">Nouvelles lignes en "+ac.label+" &#8212; "+fdB(addDate)+"</div></div></div><button style=\"background:rgba(0,0,0,.12);border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:"+ac.text+"\" onclick=\"togAdd()\">Terminer</button></div>"
     :"";
@@ -5073,7 +5106,7 @@ function renderForm(){
     ?"<button class=\"btn-save saved\" disabled><i class=\"ti ti-check\"></i> Enregistr&#233;</button>"
     :"<button class=\"btn-save\" onclick=\"doSave()\">Enregistrer</button>";
   saveBtn=autoInd+saveBtn;
-  var shareBtn=(cur&&cur._id)?"<button class=\"tbi\" style=\"color:#9A3412\" title=\"Partager (lien + QR code)\" onclick=\"showShare()\"><i class=\"ti ti-qrcode\"></i></button>":"";
+  var shareBtn=(cur&&cur._id)?"<button class=\"tb-more-item\" onclick=\"showShare();closeTbMore()\"><i class=\"ti ti-qrcode\"></i> Partager (lien + QR)</button>":"";
   var aiBanner="";
   var aiErr=window._err?"<div class=\"err-box\"><i class=\"ti ti-alert-circle\" style=\"font-size:14px\"></i> "+esc(window._err)+"</div>":"";
   var typeOpts="<option value=\"\">&#8212; S&#233;lectionner &#8212;</option>";
@@ -5091,8 +5124,11 @@ function renderForm(){
 
   var h="<div class=\"fv\">";
   var canDelCur=(cur&&cur.id&&typeof sheets!=="undefined"&&sheets.some(function(x){return x.id===cur.id;})&&currentUser&&currentUser.role!=="team_leader"&&(currentUser.role==="admin"||currentUser.role==="depot"||!cur._createdBy||_isMyAppro(cur)));
-  var delBtn=canDelCur?"<button class=\"tbi\" style=\"color:#DC2626\" title=\"Supprimer cette appro\" onclick=\"delS(cur.id)\"><i class=\"ti ti-trash\"></i></button>":"";
-  h+="<div class=\"topbar\"><button class=\"btn-back\" onclick=\"goBack()\"><i class=\"ti ti-arrow-left\" style=\"font-size:13px\"></i> Retour</button><div class=\"tb-right\"><button class=\"tbi\" style=\"color:#6D28D9\" title=\"Catalogue\" onclick=\"showCp()\"><i class=\"ti ti-package\"></i></button>"+addBtn+_threadJumpBtn()+"<button class=\"tbi\" style=\"color:#B91C1C\" title=\"Exporter en PDF\" onclick=\"doPDF()\"><i class=\"ti ti-file-type-pdf\"></i></button>"+delBtn+shareBtn+saveBtn+"</div></div>";
+  var delBtn=canDelCur?"<button class=\"tb-more-item danger\" onclick=\"delS(cur.id);closeTbMore()\"><i class=\"ti ti-trash\"></i> Supprimer l'appro</button>":"";
+  var pdfItem="<button class=\"tb-more-item\" onclick=\"doPDF();closeTbMore()\"><i class=\"ti ti-file-type-pdf\"></i> Exporter en PDF</button>";
+  var moreItems=pdfItem+shareBtn+delBtn;
+  var moreBtn=moreItems?("<div class=\"tb-more-wrap\"><button class=\"tbi\" title=\"Plus d'actions\" onclick=\"toggleTbMore(event)\"><i class=\"ti ti-dots-vertical\"></i></button><div class=\"tb-more-pop\" id=\"tb-more-pop\">"+moreItems+"</div></div>"):"";
+  h+="<div class=\"topbar\"><button class=\"btn-back\" onclick=\"goBack()\"><i class=\"ti ti-arrow-left\" style=\"font-size:13px\"></i> Retour</button><div class=\"tb-right\"><button class=\"tbtxt\" style=\"color:#6D28D9;background:#F5F3FF;border-color:#EDE4FF\" title=\"Catalogue\" onclick=\"showCp()\"><i class=\"ti ti-package\"></i> Catalogue</button>"+_threadJumpBtn()+addBtn+moreBtn+saveBtn+"</div></div>";
   _mountCpFab();
   if(typeof _unmountScanFab==="function")_unmountScanFab();
   h+=tplNotice+addBanner;
@@ -7899,6 +7935,29 @@ var AMB_LIST=[["aurore","Aurore"],["halo","Halo"],["maille","Maille"],["teinte",
 var AMB_80S=[["synthwave","Synthwave"],["neon","N\u00e9on"],["memphis","Memphis"],["chrome","Chrome"],["hybride","Hybride"]];
 var AMB_NATURE=[["foret","For\u00eat"],["botanique","Botanique"],["terre","Terre"],["ocean","Oc\u00e9an"],["zen","Zen"],["verre","Verre"]];
 function currentAmb(){try{return localStorage.getItem("appro_amb")||"none";}catch(e){return "none";}}
+/* Menu « Plus » de la barre d'outils appro : regroupe les actions moins fr\u00e9quentes
+   (PDF, partager, supprimer, mode ajout) pour garder Catalogue/Discussion/Enregistrer
+   seuls visibles en permanence. */
+function toggleTbMore(e){
+  if(e)e.stopPropagation();
+  var pop=document.getElementById("tb-more-pop");
+  if(!pop)return;
+  var willOpen=!pop.classList.contains("show");
+  closeTbMore();
+  if(willOpen){
+    pop.classList.add("show");
+    setTimeout(function(){document.addEventListener("click",_tbMoreOutside);},0);
+  }
+}
+function closeTbMore(){
+  var pop=document.getElementById("tb-more-pop");
+  if(pop)pop.classList.remove("show");
+  document.removeEventListener("click",_tbMoreOutside);
+}
+function _tbMoreOutside(e){
+  var pop=document.getElementById("tb-more-pop");
+  if(pop&&!pop.contains(e.target))closeTbMore();
+}
 function toggleAmbPop(){
   var ex=document.getElementById("amb-pop");
   if(ex){ex.remove();return;}
@@ -8014,17 +8073,17 @@ function _threadJumpBtn(){
   if(!cur||!cur._id)return "";
   var p=_threadPendingInfo();
   var n=p?(p.nonLus||1):0;
-  var cls="tbi tbi-thread"+(n?" tbi-thread-on":"");
+  var cls="tbtxt tbi-thread"+(n?" tbi-thread-on":"");
   var badge=n?"<span class=\"tbi-badge\">"+(n>9?"9+":n)+"</span>":"";
   var titre=n?(n+" message"+(n>1?"s":"")+" en attente de r\u00e9ponse"):"Aller \u00e0 la discussion";
-  return "<button class=\""+cls+"\" id=\"tb-thread-btn\" title=\""+titre+"\" onclick=\"goToThread()\"><i class=\"ti ti-messages\"></i>"+badge+"</button>";
+  return "<button class=\""+cls+"\" id=\"tb-thread-btn\" title=\""+titre+"\" onclick=\"goToThread()\"><i class=\"ti ti-messages\"></i> Discussion"+badge+"</button>";
 }
 function _refreshThreadJumpBtn(){
   var b=document.getElementById("tb-thread-btn");
   if(!b||!cur||!cur._id)return;
   var p=_threadPendingInfo();
   var n=p?(p.nonLus||1):0;
-  b.className="tbi tbi-thread"+(n?" tbi-thread-on":"");
+  b.className="tbtxt tbi-thread"+(n?" tbi-thread-on":"");
   b.title=n?(n+" message"+(n>1?"s":"")+" en attente de r\u00e9ponse"):"Aller \u00e0 la discussion";
   var old=b.querySelector(".tbi-badge");if(old)old.remove();
   if(n){
@@ -9211,17 +9270,9 @@ var TUTO_MODULES={
       {before:_navHome,sel:"#pwa-install-btn",ic:"ti-download",t:"Installer l'application",d:"Ajoutez AppROVISIO \u00e0 votre \u00e9cran d'accueil : une ic\u00f4ne, un d\u00e9marrage plein \u00e9cran, un acc\u00e8s plus rapide. Parfait sur le t\u00e9l\u00e9phone.",action:"next"},
       {before:_navHome,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
     ];
-    /* L'\u00e9tape « notifications sur le t\u00e9l\u00e9phone » ne s'ins\u00e8re QUE si le push est
-       r\u00e9ellement possible ici (navigateur compatible, et sur iOS appli install\u00e9e) ET
-       qu'il n'est pas d\u00e9j\u00e0 activ\u00e9 : sinon #push-btn est masqu\u00e9 et on surlignerait du vide. */
-    var _pb=(typeof _tourPick==="function")?_tourPick("#push-mtop,#push-btn"):document.getElementById("push-btn");
-    if(typeof _canOfferPush==="function"&&_canOfferPush()&&_pb&&_tourVisible(_pb)){
-      var iCloche=-1;
-      for(var _i=0;_i<s.length;_i++){if(s[_i].sel===".notif-bell"){iCloche=_i;break;}}
-      var etapePush={sel:"#push-mtop,#push-btn",ic:"ti-bell-plus",t:"Les notifications sur votre t\u00e9l\u00e9phone",
-        d:"Ce bouton violet pr\u00e9vient votre t\u00e9l\u00e9phone m\u00eame quand l'appli est ferm\u00e9e. Un appui, vous acceptez, c'est fait \u2014 et il dispara\u00eet. Pour y revenir : menu, Notifications.",action:"next"};
-      if(iCloche>=0)s.splice(iCloche+1,0,etapePush); else s.push(etapePush);
-    }
+    /* Le bouton d\u00e9di\u00e9 « notifications » a \u00e9t\u00e9 retir\u00e9 de la barre du haut (il faisait
+       doublon avec celui d\u00e9j\u00e0 propos\u00e9 dans le panneau de la cloche) : l'\u00e9tape de tuto
+       correspondante n'a donc plus lieu d'\u00eatre. */
     return s;
   }},
 
@@ -9858,10 +9909,6 @@ function enterApp(){
   // Configure sidebar selon le r\u00f4le
   var ri=ROLE_INFO[currentUser.role]||ROLE_INFO.conducteur;
   try{_syncInstallBtn();}catch(e){}
-  /* Sans cet appel, #push-btn / #push-mtop restent sur leur display:none initial :
-     ils n'\u00e9taient r\u00e9veill\u00e9s que par l'ouverture du panneau cloche ou l'\u00e9cran
-     Personnalisation (admin). Sur t\u00e9l\u00e9phone, on ne les voyait donc JAMAIS. */
-  try{_syncPushIcon();}catch(e){}
   /* Rattache l'abonnement de cet appareil au compte qui vient de se connecter. */
   try{_pushReclaim();}catch(e){}
   /* Les messages en attente : on les charge d'embl\u00e9e pour que le badge soit juste
