@@ -97,7 +97,7 @@ html.dark .amb-opt.sel{border-color:#fff}
 .amb-sw-chrome{background:linear-gradient(160deg,#1A1633,#2B1055,#B8C6FF)}
 .amb-sw-hybride{background:radial-gradient(circle at 25% 30%,#FF2E97,transparent 55%),radial-gradient(circle at 80% 75%,#2DD4FF,#0E0B24 70%)}
 .amb-sw-foret{background:linear-gradient(160deg,#0B2E20,#1B6B4A 60%,#4ADE80)}
-.amb-sw-jarnias{background:linear-gradient(160deg,#0D2A20,#173F30 55%,#C9A24B)}
+.amb-sw-jarnias{background:#123528;color:#E4C878}
 .amb-sw-botanique{background:linear-gradient(160deg,#E3EFE0,#86C79A);color:#14361F!important;text-shadow:none!important;border:1px solid #C6DCC9}
 .amb-sw-terre{background:linear-gradient(160deg,#2B1C14,#7C4A2D 60%,#EA8C50)}
 .amb-sw-ocean{background:linear-gradient(155deg,#0C2A3A,#0E7490 55%,#5EEAD4)}
@@ -196,12 +196,12 @@ html[data-amb="zen"]{--accent:#C8543A;--accent-2:#2C2A24}
 html[data-amb="verre"]{--accent:#38BDF8;--accent-2:#6366F1}
 
 /* --- FORÊT : verts profonds + lueur qui respire --- */
-html[data-amb="jarnias"] .home-hero{background:linear-gradient(165deg,#0D2A20,#173F30 60%,#1F5C42)}
-html[data-amb="jarnias"] .home-hero::before{inset:0;background:radial-gradient(260px 200px at 85% 0%,rgba(201,162,75,.24),transparent 70%)}
+html[data-amb="jarnias"] .home-hero{background:#123528}
 html[data-amb="jarnias"] .home-hello{color:#E4C878!important}
-html[data-amb="jarnias"] .home-title{color:#fff}
-html[data-amb="jarnias"] .sb-brand,html[data-amb="jarnias"] .doc-band{background:linear-gradient(160deg,#0D2A20,#1F5C42)}
-html[data-amb="jarnias"] .sb-brand::before,html[data-amb="jarnias"] .doc-band::before{inset:0;background:radial-gradient(200px 140px at 85% 0%,rgba(201,162,75,.24),transparent 70%)}
+html[data-amb="jarnias"] .home-title{color:#F1EADA!important}
+html[data-amb="jarnias"] .sb-brand,html[data-amb="jarnias"] .doc-band{background:#123528}
+html[data-amb="jarnias"] .sb-brand-name{color:#E4C878}
+html[data-amb="jarnias"] .sb-brand-tag{color:rgba(228,200,120,.55)}
 html[data-amb="foret"] .home-hero{background:linear-gradient(165deg,#0B2E20,#134E3A 60%,#1B6B4A)}
 html[data-amb="foret"] .home-hero::before{inset:0;background:radial-gradient(260px 200px at 30% 0%,rgba(74,222,128,.25),transparent 70%);animation:ambBreathe 7s ease-in-out infinite}
 html[data-amb="foret"] .home-hello{color:#86EFAC!important}
@@ -1773,7 +1773,7 @@ table.at tr.kit-row td.td-d{position:relative}
    suspension, numéro de série en pied — un objet que les cordistes
    manipulent tous les jours, plutôt qu'une scène animée. Rien ne bouge
    sauf la corde unique (voir .auth-rope), à peine, tout au long du bord. */
-.auth-screen{background:linear-gradient(180deg,#0D2A20,#0F2D22 55%,#0D2A20);overflow:hidden;gap:16px}
+.auth-screen{background:#123528;overflow:hidden;gap:16px}
 .auth-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .auth-tag-frame{position:absolute;inset:22px;border:1.5px dashed rgba(228,200,120,.30);border-radius:18px}
 .auth-tag-hole{position:absolute;top:38px;left:50%;margin-left:-8px;width:16px;height:16px;border-radius:50%;
@@ -1861,7 +1861,7 @@ table.at tr.kit-row td.td-d{position:relative}
 .gen-row{display:flex;gap:8px;flex-wrap:wrap}
 .user-row2{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid #E2E8F0;border-radius:10px;background:#FAFBFF}
 .uav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.loading-screen{position:fixed;inset:0;background:linear-gradient(180deg,#0D2A20,#0F2D22 55%,#0D2A20);display:flex;align-items:center;justify-content:center;z-index:3500;flex-direction:column;gap:18px;overflow:hidden}
+.loading-screen{position:fixed;inset:0;background:#123528;display:flex;align-items:center;justify-content:center;z-index:3500;flex-direction:column;gap:18px;overflow:hidden}
 .loading-screen img{position:relative;z-index:2;animation:loadPulse 1.8s ease-in-out infinite}
 .loading-screen .spinner{position:relative;z-index:2}
 @keyframes loadPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
