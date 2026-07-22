@@ -265,6 +265,54 @@ html[data-amb="jarnias"] .qa-primary{border:2px solid rgba(255,255,255,.62)}
 html[data-amb="jarnias"] .qa-t{color:#fff}
 html[data-amb="jarnias"] .qa-d{color:rgba(255,255,255,.5)}
 
+/* ── Correctifs suite aux captures de Su ── */
+
+/* Le nom du compte ("Tanguy TRAON") ne ressortait pas : couleur pensee
+   pour un fond blanc, illisible sur fond vert. */
+html[data-amb="jarnias"] .sb-user-name{color:#fff}
+
+/* Bouton "Se deconnecter" : restait blanc, exactement le genre de carte
+   blanche que Su signale. */
+html[data-amb="jarnias"] .sb-logout{background:transparent;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.85)}
+html[data-amb="jarnias"] .sb-logout:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.5);color:#fff}
+
+/* Barre d'onglets (Mes appros / Bibliotheque) : fond blanc translucide +
+   flou pense pour une page claire -> sur fond vert ça fait une bande
+   trouble, illisible. Fond plein, plus de flou. Le trait actif (::after)
+   était aussi resté en #0F172A, quasi invisible sur vert foncé. */
+html[data-amb="jarnias"] .tabs-bar{background:#0A2118;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom-color:rgba(255,255,255,.15)}
+html[data-amb="jarnias"] .tab-btn::after{background:#E4C878!important}
+
+/* ═══ Ecran Bibliotheque (vue grille/liste, filtres) — meme traitement
+   que les cartes de la sidebar : vert fonce, liseret blanc epais. ═══ */
+html[data-amb="jarnias"] .lib-card,html[data-amb="jarnias"] .lib-row{background:#123528;border:1.5px solid rgba(255,255,255,.26)}
+html[data-amb="jarnias"] .lib-card:hover,html[data-amb="jarnias"] .lib-row:hover{border-color:rgba(255,255,255,.45)}
+html[data-amb="jarnias"] .lib-card .sc-aff{color:#E4C878}
+html[data-amb="jarnias"] .lib-card-name{color:#fff}
+html[data-amb="jarnias"] .lib-card-cond,html[data-amb="jarnias"] .lib-card-meta{color:rgba(255,255,255,.55)}
+html[data-amb="jarnias"] .lib-card .sc-client{color:rgba(255,255,255,.55)}
+html[data-amb="jarnias"] .lib-card-btn{background:transparent;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.85)}
+html[data-amb="jarnias"] .lib-card-del{background:transparent;border:1.5px solid rgba(248,113,113,.4);color:#FCA5A5}
+
+html[data-amb="jarnias"] .lib-search{background:transparent!important;border:1.5px solid rgba(255,255,255,.28)!important;color:#fff!important}
+html[data-amb="jarnias"] .lib-search::placeholder{color:rgba(255,255,255,.4)}
+
+html[data-amb="jarnias"] .pill-group{background:rgba(255,255,255,.08)}
+html[data-amb="jarnias"] .pill{color:rgba(255,255,255,.6)}
+html[data-amb="jarnias"] .pill:hover{color:#fff}
+html[data-amb="jarnias"] .pill.on{background:rgba(255,255,255,.14);color:#fff;box-shadow:none;border:1px solid rgba(255,255,255,.3)}
+
+html[data-amb="jarnias"] .pill-sel{background-color:transparent!important;border:1.5px solid rgba(255,255,255,.28)!important;color:rgba(255,255,255,.85)!important}
+html[data-amb="jarnias"] .pill-reset{background:transparent;border:1.5px dashed rgba(255,255,255,.35);color:rgba(255,255,255,.7)}
+
+html[data-amb="jarnias"] .lib-view-tog{background:rgba(255,255,255,.08)}
+html[data-amb="jarnias"] .lib-view-tog button{color:rgba(255,255,255,.55)}
+html[data-amb="jarnias"] .lib-view-tog button.on{background:rgba(255,255,255,.16);color:#fff;box-shadow:none}
+
+html[data-amb="jarnias"] .lib-empty{background:transparent;border:1.5px dashed rgba(255,255,255,.28)}
+html[data-amb="jarnias"] .lib-empty-t{color:#fff}
+html[data-amb="jarnias"] .lib-empty-d{color:rgba(255,255,255,.5)}
+
 /* Bascule Appros / Brouillons (styles en ligne : on force via des classes ajoutées au balisage) */
 html[data-amb="jarnias"] .seg-btn{background:transparent!important;border-color:rgba(255,255,255,.28)!important;color:rgba(255,255,255,.7)!important}
 html[data-amb="jarnias"] .seg-btn.on{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.6)!important;color:#fff!important}
