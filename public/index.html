@@ -456,6 +456,26 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 @keyframes jScrimIn{from{opacity:0}to{opacity:1}}
 @keyframes jCardIn{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}
 .j-scrim{-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:jScrimIn .26s var(--ease)}
+/* ═══ SIGNATURE DE FIN DE VISITE (technicien) ═══ */
+.tsg-ov{position:fixed;inset:0;z-index:4200;background:rgba(15,23,42,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px;animation:jScrimIn .22s var(--ease)}
+.tsg-ov.tsg-ov-out{animation:aloOvOut .16s ease-in both}
+.tsg-card{background:#fff;border-radius:18px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 30px 60px -25px rgba(15,23,42,.5)}
+.tsg-hd{display:flex;gap:12px;align-items:flex-start;padding:20px 22px 14px}
+.tsg-hd i{width:38px;height:38px;border-radius:11px;background:#ECFEFF;color:#0891B2;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.tsg-t{font-size:15.5px;font-weight:800;color:#0F172A;letter-spacing:-.2px}
+.tsg-s{font-size:12.5px;color:#64748B;margin-top:2px}
+.tsg-body{padding:0 22px 6px}
+.tsg-p{font-size:12.5px;color:#475569;line-height:1.55;margin:0 0 14px}
+.tsg-lbl{display:block;font-size:10.5px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.tsg-opt{text-transform:none;font-weight:500;letter-spacing:0}
+.tsg-in{width:100%;box-sizing:border-box;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-size:13.5px;font-family:inherit;color:#0F172A;background:#F8FAFC;margin-bottom:12px}
+.tsg-in:focus{outline:none;border-color:#0891B2;background:#fff;box-shadow:0 0 0 3px rgba(8,145,178,.12)}
+.tsg-ta{resize:vertical;min-height:64px}
+.tsg-err{display:none;align-items:center;gap:6px;font-size:11.5px;color:#DC2626;margin:-6px 0 12px}
+.tsg-foot{padding:14px 22px 22px}
+.tsg-go{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#0891B2;color:#fff;border:none;border-radius:10px;padding:12px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .15s}
+.tsg-go:hover:not(:disabled){transform:translateY(-1px)}
+.tsg-go:disabled{opacity:.4;cursor:not-allowed}
 .j-card{animation:jCardIn .3s var(--ease)}
 /* Le s\u00e9lecteur Alobees a sa propre entr\u00e9e, plus pos\u00e9e que le "pop" g\u00e9n\u00e9rique
    partag\u00e9 par les autres bo\u00eetes de dialogue (jCardIn zoome depuis .94 : correct
@@ -1590,6 +1610,25 @@ table.at tr.kit-row td.td-d{position:relative}
 .thread-cnt:empty{display:none}
 .thread-list{max-height:340px;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px;background:#FBFCFD}
 .thread-loading,.thread-empty{position:relative;color:#94A3B8;font-size:12.5px;text-align:center;padding:18px 10px;line-height:1.5;overflow:hidden}
+/* ═══ Bas de l'appro : discussion + signatures, côte à côte ═══
+   Le fil prend l'essentiel de la largeur (c'est là que ça se passe le plus
+   souvent), les signatures restent une colonne étroite mais toujours
+   visible — pas un onglet caché qu'on oublie de consulter. Empilé sur
+   téléphone (une colonne ne tient pas deux panneaux côte à côte). */
+.bottom-panels{max-width:920px;margin:0 auto 20px;padding:0 18px;display:flex;gap:16px;align-items:flex-start}
+#thread-anchor{flex:1;min-width:0}
+#sig-anchor{width:280px;flex-shrink:0}
+@media(max-width:760px){.bottom-panels{flex-direction:column}#sig-anchor{width:100%}}
+.sig-card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;overflow:hidden}
+.sig-hd{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid #F1F5F9;font-size:13.5px;font-weight:700;color:#0F172A}
+.sig-cnt{margin-left:auto;font-size:11px;font-weight:700;color:#0891B2;background:#ECFEFF;padding:2px 9px;border-radius:20px;min-width:22px;text-align:center}
+.sig-list{max-height:340px;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px;background:#FBFCFD}
+.sig-item{display:flex;gap:9px;align-items:flex-start}
+.sig-av{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;background:#0891B2}
+.sig-main{min-width:0;flex:1}
+.sig-name{font-size:12.5px;font-weight:700;color:#0F172A}
+.sig-when{font-size:11px;color:#94A3B8;margin-top:1px}
+.sig-comment{font-size:12px;color:#475569;line-height:1.5;margin-top:5px;background:#ECFEFF;border-radius:8px;padding:7px 10px}
 .thread-empty::before{content:"";position:absolute;width:120px;height:120px;background:radial-gradient(circle,rgba(109,40,217,.06),transparent 70%);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);animation:emptyFloat 5s ease-in-out infinite;pointer-events:none}
 .thread-empty i{position:relative;font-size:20px;display:block;margin-bottom:6px;color:#CBD5E1;animation:floaty 3s ease-in-out infinite}
 .thread-msg{display:flex;gap:9px;align-items:flex-start}
@@ -2482,16 +2521,71 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
     if(!m){setTimeout(hook,50);return;}
     lastKey=screenKey();
     var mo=new MutationObserver(function(muts){
+      /* Même précaution que pour le détecteur de signature : ne pas dériver
+         l'état d'un MutationRecord précis, sinon des mutations synchrones
+         groupées dans un seul appel peuvent faire comparer un état
+         intermédiaire et rater la vraie navigation. */
+      var touched=false;
       for(var i=0;i<muts.length;i++){
-        if(muts[i].type==="childList"&&muts[i].addedNodes.length){
-          var k=screenKey();
-          if(k!==lastKey){
-            lastKey=k;
-            cascade(findStaggerRoot(m));
-          }
-          if(window.scanReveal)window.scanReveal(m);
-          break;
-        }
+        if(muts[i].type==="childList"&&muts[i].addedNodes.length){touched=true;break;}
+      }
+      if(!touched)return;
+      var k=screenKey();
+      if(k!==lastKey){
+        lastKey=k;
+        cascade(findStaggerRoot(m));
+      }
+      if(window.scanReveal)window.scanReveal(m);
+    });
+    mo.observe(m,{childList:true});
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",hook);
+  else hook();
+})();
+/* ═══ SIGNATURE DE FIN DE VISITE (technicien) — DÉTECTEUR INDÉPENDANT ═══
+   Volontairement séparé de l'observateur de la cascade ci-dessus : celui-là
+   se coupe entièrement si l'utilisateur a réduit les animations
+   (prefers-reduced-motion), ce qui est le bon choix pour une transition
+   visuelle, mais ce serait une FAILLE ici — la vérification doit s'appliquer
+   à tout le monde, indépendamment des préférences d'affichage.
+   Principe (Su) : une seule fois par visite, au moment où le technicien
+   QUITTE l'appro qu'il vient de modifier — pas à chaque ligne ajoutée. On
+   détecte ce départ en surveillant le même identifiant d'écran (onglet +
+   appro ouverte) : dès qu'il change alors qu'une appro « sale » était encore
+   affichée, on montre la signature avant de laisser continuer. */
+function _scKey(){
+  var id=(typeof cur!=="undefined"&&cur)?(cur._id||cur.id||"new"):"";
+  return (typeof currentTab!=="undefined"?currentTab:"")+"|"+id;
+}
+var _techDirty=false,_techDirtySnap=null;
+function _techMarkDirty(){
+  if(!cur||!isField())return;
+  _techDirty=true;
+  /* La clé d'écran est capturée ICI, tout de suite, pas déduite plus tard
+     d'un historique de mutations : si plusieurs rendus s'enchaînent sans
+     qu'aucune micro-tâche n'ait eu l'occasion de tourner entre eux (ex. un
+     script qui ajoute une ligne PUIS navigue dans la foulée), un suivi basé
+     sur "la dernière clé vue par l'observateur" resterait bloqué sur une
+     valeur périmée et raterait la sortie d'écran. Comparer à une clé prise
+     sur le fait, à la source, ne dépend d'aucun ordre de traitement. */
+  _techDirtySnap={id:cur.id,nomChantier:cur.nomChantier||"Sans titre",noAffaire:cur.noAffaire||"",key:_scKey()};
+}
+(function(){
+  function hook(){
+    var m=document.getElementById("main-area");
+    if(!m){setTimeout(hook,50);return;}
+    var mo=new MutationObserver(function(muts){
+      var touched=false;
+      for(var i=0;i<muts.length;i++){
+        if(muts[i].type==="childList"&&muts[i].addedNodes.length){touched=true;break;}
+      }
+      if(!touched)return;
+      /* On ne compare pas à un "dernier écran vu" tenu à jour au fil des
+         appels : on compare directement à la clé capturée au moment de la
+         modification. Fiable quel que soit le nombre de rendus qui se sont
+         enchaînés entre-temps. */
+      if(_techDirty&&_techDirtySnap&&_techDirtySnap.key&&_scKey()!==_techDirtySnap.key){
+        try{_openTechSignature();}catch(e){}
       }
     });
     mo.observe(m,{childList:true});
@@ -2499,6 +2593,61 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",hook);
   else hook();
 })();
+function _techSignatureHTML(){
+  var s=_techDirtySnap||{nomChantier:"",noAffaire:""};
+  var h="<div class=\"tsg-ov\" id=\"tsg-ov\"><div class=\"tsg-card j-card\">";
+  h+="<div class=\"tsg-hd\"><i class=\"ti ti-signature\"></i><div><div class=\"tsg-t\">Confirmez votre passage</div>";
+  h+="<div class=\"tsg-s\">"+esc(s.nomChantier)+(s.noAffaire?" — "+esc(s.noAffaire):"")+"</div></div></div>";
+  h+="<div class=\"tsg-body\">";
+  h+="<p class=\"tsg-p\">Vous avez modifié cette appro. Tapez votre nom pour confirmer que c'est bien vous qui avez pris ou ajouté ce matériel.</p>";
+  h+="<label class=\"tsg-lbl\">Votre nom</label>";
+  h+="<input type=\"text\" id=\"tsg-name\" class=\"tsg-in\" placeholder=\""+esc((currentUser&&currentUser.name)||"Nom Pr\u00e9nom")+"\" autocomplete=\"off\" oninput=\"_tsgCheck()\"/>";
+  h+="<div class=\"tsg-err\" id=\"tsg-err\" style=\"display:none\">Le nom tapé ne correspond pas à celui de votre compte.</div>";
+  h+="<label class=\"tsg-lbl\">Un commentaire, s'il manque quelque chose <span class=\"tsg-opt\">(optionnel)</span></label>";
+  h+="<textarea id=\"tsg-comment\" class=\"tsg-in tsg-ta\" rows=\"3\" placeholder=\"Ex. il manquait 2 mousquetons, ou tout \u00e9tait complet\"></textarea>";
+  h+="</div>";
+  h+="<div class=\"tsg-foot\"><button class=\"tsg-go\" id=\"tsg-go\" onclick=\"_tsgConfirm()\" disabled><i class=\"ti ti-signature\"></i> Confirmer et signer</button></div>";
+  h+="</div></div>";
+  return h;
+}
+function _openTechSignature(){
+  if(document.getElementById("tsg-ov"))return; /* déjà ouverte */
+  var d=document.createElement("div");
+  d.innerHTML=_techSignatureHTML();
+  document.body.appendChild(d.firstElementChild);
+  setTimeout(function(){var el=document.getElementById("tsg-name");if(el)el.focus();},50);
+}
+function _tsgNormalise(s){return _stripAccents((""+(s||"")).toLowerCase().trim().replace(/\s+/g," "));}
+function _tsgCheck(){
+  var el=document.getElementById("tsg-name"),err=document.getElementById("tsg-err"),go=document.getElementById("tsg-go");
+  if(!el||!go)return;
+  var typed=_tsgNormalise(el.value);
+  var expect=_tsgNormalise((currentUser&&currentUser.name)||"");
+  var ok=typed.length>0&&typed===expect;
+  go.disabled=!ok;
+  if(err)err.style.display=(el.value.trim()&&!ok)?"flex":"none";
+}
+function _tsgConfirm(){
+  var nameEl=document.getElementById("tsg-name"),cEl=document.getElementById("tsg-comment"),go=document.getElementById("tsg-go");
+  if(!nameEl||!_techDirtySnap)return;
+  var name=nameEl.value.trim(),comment=(cEl&&cEl.value.trim())||"";
+  if(go)go.disabled=true;
+  apiCall("POST","/appros/"+_techDirtySnap.id+"/signatures",{name:name,comment:comment}).then(function(){
+    _techDirty=false;_techDirtySnap=null;
+    var ov=document.getElementById("tsg-ov");
+    if(ov){ov.classList.add("tsg-ov-out");setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov);},180);}
+    toast("Signature enregistr\u00e9e","ti-signature");
+    if(cur&&document.getElementById("sig-list"))try{loadSignatures();}catch(e){}
+  }).catch(function(){
+    if(go)go.disabled=false;
+    toast("Signature non enregistr\u00e9e, r\u00e9essayez","ti-alert-circle");
+  });
+}
+/* Filet de sécurité : fermer l'onglet/l'appli sans signer ne doit pas passer
+   totalement inaperçu — le navigateur affichera son avertissement natif. */
+window.addEventListener("beforeunload",function(e){
+  if(_techDirty){e.preventDefault();e.returnValue="";}
+});
 var SK="appro_v1";
 var WT=["Ma\u00e7onnerie","\u00c9lectricit\u00e9","Plomberie / Sanitaire","Charpente / Menuiserie","Peinture / Rev\u00eatements","Terrassement / VRD","Isolation / \u00c9tanch\u00e9it\u00e9","M\u00e9tallerie / Serrurerie","Climatisation / CVC","Nettoyage","Ligne de vie","Ligne de vie provisoire","\u00c9v\u00e9nement","Multi-corps d\u2019\u00e9tat","Autre"];
 var DIS=["En stock","En commande","Indisponible","\u00c0 v\u00e9rifier"];
@@ -2530,6 +2679,7 @@ var AP=[
   {bg:"#FFF1F2",left:"#F43F5E",text:"#BE123C",label:"Rose"}
 ];
 var DEPOT_C={bg:"#E2E8F0",left:"#475569",text:"#334155",label:"D\u00e9p\u00f4t"};
+var TECH_C={bg:"#ECFEFF",left:"#0891B2",text:"#155E75",label:"Technicien"};
 var TRUCKS=[];
 var COMMANDES=[];
 var ANNONCES=[];
@@ -3052,13 +3202,13 @@ function mig(s){
   if(!s.dateChantier)s.dateChantier="";
   if(!s.additionDates)s.additionDates=[];
   ["consommables","fournitures","outillage"].forEach(function(k){
-    if(s[k])s[k]=s[k].map(function(r){r=Object.assign({addBatch:null,returned:false,depotAdded:false,commentaire:""},r);if(r.disponibilite==="\u00c0 commander")r.disponibilite="En commande";return r;});
+    if(s[k])s[k]=s[k].map(function(r){r=Object.assign({addBatch:null,returned:false,depotAdded:false,techAdded:false,commentaire:""},r);if(r.disponibilite==="\u00c0 commander")r.disponibilite="En commande";return r;});
   });
   return s;
 }
 function persist(){/* remplac\u00e9 par sync serveur */}
 function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36);}
-function mkR(n,q){return{id:uid(),designation:n||"",quantite:q||"",disponibilite:"",commentaire:"",addBatch:null,returned:false,depotAdded:false};}
+function mkR(n,q){return{id:uid(),designation:n||"",quantite:q||"",disponibilite:"",commentaire:"",addBatch:null,returned:false,depotAdded:false,techAdded:false};}
 function mkS(){
   return{id:uid(),
     reference:(function(){var n=new Date();return"REFJA"+n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0");})(),
@@ -4130,6 +4280,7 @@ function addKit(cat){
   items.forEach(function(it){
     var row=mkR(it.n,it.q||"1");row.kit=cat;
     if(currentRole==="depot")row.depotAdded=true;
+    else if(isField()){row.techAdded=true;_techMarkDirty();}
     if(addMode&&addDate){row.addBatch=addDate;if(!cur.additionDates)cur.additionDates=[];if(cur.additionDates.indexOf(addDate)<0)cur.additionDates.push(addDate);}
     if(cur[it.sec]&&cur[it.sec].length&&!cur[it.sec][cur[it.sec].length-1].designation)cur[it.sec].splice(cur[it.sec].length-1,1);
     if(!cur[it.sec])cur[it.sec]=[];
@@ -4153,6 +4304,7 @@ function insertCp(){
     var row=mkR(name,qty);
     if(window._cpKit[i])row.kit=window._cpKit[i];
     if(currentRole==="depot"){row.depotAdded=true;}
+    else if(isField()){row.techAdded=true;_techMarkDirty();}
     if(addMode&&addDate){
       row.addBatch=addDate;
       if(!cur.additionDates)cur.additionDates=[];
@@ -4676,9 +4828,9 @@ function takeBaseFromLib(id){
   var s=null;sheets.forEach(function(x){if(x.id===id)s=x;});
   if(!s)return;
   var ns=mkS();
-  ns.consommables=s.consommables.map(function(r){return Object.assign({},r,{id:uid(),addBatch:null,returned:false,depotAdded:false});});
-  ns.fournitures=s.fournitures.map(function(r){return Object.assign({},r,{id:uid(),addBatch:null,returned:false,depotAdded:false});});
-  ns.outillage=s.outillage.map(function(r){return Object.assign({},r,{id:uid(),addBatch:null,returned:false,depotAdded:false});});
+  ns.consommables=s.consommables.map(function(r){return Object.assign({},r,{id:uid(),addBatch:null,returned:false,depotAdded:false,techAdded:false});});
+  ns.fournitures=s.fournitures.map(function(r){return Object.assign({},r,{id:uid(),addBatch:null,returned:false,depotAdded:false,techAdded:false});});
+  ns.outillage=s.outillage.map(function(r){return Object.assign({},r,{id:uid(),addBatch:null,returned:false,depotAdded:false,techAdded:false});});
   ns.typeChantiers=getTypes(s).slice();ns.typeConfirmed=s.typeConfirmed;
   tpl=s.nomChantier||"appro pr\u00e9c\u00e9dente";
   currentTab="mes";
@@ -4999,9 +5151,10 @@ function tblH(sec,secColor){
     var isR=r.returned===true;
     var isRTL=(r.returnedTL===true)&&!isR;
     var isDep=r.depotAdded===true;
+    var isTech=r.techAdded===true;
     var retCol=isR?"#EF4444":(isRTL?"#EA580C":"");
-    var bg=isR?"#FFF5F5":(isRTL?"#FFF7ED":(isDep?DEPOT_C.bg:(ac?ac.bg:"")));
-    var lb=retCol?("3px solid "+retCol):(isDep?"3px solid "+DEPOT_C.left:(ac?"3px solid "+ac.left:"none"));
+    var bg=isR?"#FFF5F5":(isRTL?"#FFF7ED":(isDep?DEPOT_C.bg:(isTech?TECH_C.bg:(ac?ac.bg:""))));
+    var lb=retCol?("3px solid "+retCol):(isDep?"3px solid "+DEPOT_C.left:(isTech?"3px solid "+TECH_C.left:(ac?"3px solid "+ac.left:"none")));
     var isKit=!!r.kit;var ks=isKit?_kitStyle(r.kit):null;
     if(isKit&&!bg)bg="#FBFCFE"; /* teinte de kit tr\u00e8s sobre (une seule couleur d'accent : le liser\u00e9) */
     var dLeft=(lb!=="none")?lb:(isKit?("3px solid "+ks.spine):"none");
@@ -5087,6 +5240,8 @@ function legH(){
   if(hasR)h+="<span class=\"leg-item\"><span class=\"leg-sw\" style=\"background:#FEE2E2;border-color:#FECACA\"></span> Retourn&#233; d&#233;p&#244;t</span>";
   var hasDep=[].concat(cur.consommables,cur.fournitures,cur.outillage).some(function(r){return r.depotAdded;});
   if(hasDep)h+="<span class=\"leg-item\"><span class=\"leg-sw\" style=\"background:"+DEPOT_C.bg+";border-color:"+DEPOT_C.left+"\"></span> Ajout/modif d&#233;p&#244;t</span>";
+  var hasTech=[].concat(cur.consommables,cur.fournitures,cur.outillage).some(function(r){return r.techAdded;});
+  if(hasTech)h+="<span class=\"leg-item\"><span class=\"leg-sw\" style=\"background:"+TECH_C.bg+";border-color:"+TECH_C.left+"\"></span> Ajout/modif technicien</span>";
   return h+"</div>";
 }
 
@@ -5369,9 +5524,13 @@ h+="<div class=\"card\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class
   h+="<div style=\"height:16px\"></div></div>";
   if(cur&&cur._id){
     // Fil de discussion conducteur ↔ dépôt (chargé après le rendu)
-    h+="<div id=\"thread-anchor\" style=\"max-width:920px;margin:0 auto 20px;padding:0 18px\"><div class=\"thread-card\"><div class=\"thread-hd\"><i class=\"ti ti-messages\" style=\"font-size:18px;color:#6D28D9\"></i> Discussion <span class=\"thread-sub\">conducteur &amp; d&#233;p&#244;t</span><span class=\"thread-cnt\" id=\"thread-cnt\"></span></div><div class=\"thread-list\" id=\"thread-list\"><div class=\"thread-loading\">Chargement&#8230;</div></div><div class=\"thread-read\" id=\"thread-read\" style=\"display:none\"></div>"+
+    h+="<div class=\"bottom-panels\"><div id=\"thread-anchor\"><div class=\"thread-card\"><div class=\"thread-hd\"><i class=\"ti ti-messages\" style=\"font-size:18px;color:#6D28D9\"></i> Discussion <span class=\"thread-sub\">conducteur &amp; d&#233;p&#244;t</span><span class=\"thread-cnt\" id=\"thread-cnt\"></span></div><div class=\"thread-list\" id=\"thread-list\"><div class=\"thread-loading\">Chargement&#8230;</div></div><div class=\"thread-read\" id=\"thread-read\" style=\"display:none\"></div>"+
       (isField()?"":"<div class=\"thread-compose\"><textarea id=\"thread-input\" class=\"thread-input\" rows=\"1\" placeholder=\"\u00c9crire un message\u2026\" oninput=\"_threadGrow(this)\"></textarea><button class=\"thread-send\" onclick=\"postThreadMsg()\" title=\"Envoyer\"><i class=\"ti ti-send\"></i></button></div>")+
-      "</div></div>";
+      "</div></div>"+
+      "<div id=\"sig-anchor\"><div class=\"sig-card\"><div class=\"sig-hd\"><i class=\"ti ti-signature\" style=\"font-size:17px;color:#0891B2\"></i> Signatures<span class=\"sig-cnt\" id=\"sig-cnt\"></span></div><div class=\"sig-list\" id=\"sig-list\"><div class=\"thread-loading\">Chargement\u2026</div></div></div></div>"+
+      "</div>"; /* fin .bottom-panels */
+  }
+  if(cur&&cur._id){try{loadSignatures();}catch(e){}
   }
   if(cur&&cur._id){
     h+="<div style=\"max-width:920px;margin:0 auto 24px;padding:0 18px\"><div style=\"background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden\"><button type=\"button\" onclick=\"toggleHistory()\" style=\"width:100%;display:flex;align-items:center;gap:8px;background:none;border:none;padding:14px 16px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#0F172A\"><i class=\"ti ti-history\" style=\"font-size:17px;color:#64748B\"></i> Historique &amp; acc\u00e8s <i class=\"ti ti-chevron-down\" id=\"hist-chev\" style=\"margin-left:auto;color:#94A3B8\"></i></button><div id=\"hist-box\" style=\"display:none;padding:0 16px 16px\"></div></div></div>";
@@ -5499,6 +5658,8 @@ function upR(sec,i,f,v){
   if(f==="designation"&&v){
     if(currentRole==="depot"){
       row.depotAdded=true;
+    } else if(isField()){
+      row.techAdded=true;_techMarkDirty();
     } else if(addMode&&addDate&&!row.addBatch&&!row.depotAdded){
       row.addBatch=addDate;
       if(!cur.additionDates)cur.additionDates=[];
@@ -5510,6 +5671,7 @@ function upR(sec,i,f,v){
       var ac=null;
       if(row.addBatch){var ai=cur.additionDates.indexOf(row.addBatch);if(ai>=0)ac=AP[ai%AP.length];}
       if(row.depotAdded){tr.style.background=DEPOT_C.bg;var td0=tr.querySelector("td");if(td0)td0.style.borderLeft="3px solid "+DEPOT_C.left;}
+      else if(row.techAdded){tr.style.background=TECH_C.bg;var tdT=tr.querySelector("td");if(tdT)tdT.style.borderLeft="3px solid "+TECH_C.left;}
       else if(ac){tr.style.background=ac.bg;var td1=tr.querySelector("td");if(td1)td1.style.borderLeft="3px solid "+ac.left;}
     }
   }
@@ -5540,6 +5702,7 @@ function _rowEnter(sec,i){
 function addR(sec){
   if(!cur)return;var r=mkR();
   if(currentRole==="depot"){r.depotAdded=true;}
+  if(isField()){r.techAdded=true;_techMarkDirty();}
   if(addMode&&addDate){r.addBatch=addDate;if(!cur.additionDates)cur.additionDates=[];if(cur.additionDates.indexOf(addDate)<0)cur.additionDates.push(addDate);}
   if(cur.statut==="prete")cur.modifPrep=true;else if(cur.statut==="sur_chantier")cur.addToPrepare=true;
   cur[sec].push(r);renderForm();
@@ -5547,6 +5710,7 @@ function addR(sec){
 }
 function delR(sec,i){
   if(!cur)return;
+  if(isField())_techMarkDirty();
   var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
   var tr=document.getElementById("tr_"+sec+"_"+i);
   var rid=cur[sec][i]&&cur[sec][i].id;
@@ -5739,6 +5903,7 @@ function setStatut(st){
   if(!cur)return;
   cur.statut=st;
   if(isField()&&(st==="sur_chantier"||st==="rendu")&&currentUser.name)cur.tlName=currentUser.name;
+  if(isField())_techMarkDirty();
   if(st==="prete"&&!cur.preparedAt)cur.preparedAt=new Date().toLocaleDateString("fr-FR");
   if(st==="en_attente")cur.preparedAt=null;
   if(st==="sur_chantier")cur.surChantierAt=new Date().toLocaleDateString("fr-FR");
@@ -8458,6 +8623,40 @@ function _threadWhen(iso){
   if(d.toDateString()===y.toDateString())return"hier "+hh;
   return ("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+d.getFullYear()+" "+hh;
 }
+/* ═══ SIGNATURES (encadré à côté de la discussion) ═══
+   Réutilise volontairement les mêmes helpers que le fil (_threadWhen,
+   _threadInitials) : c'est le même genre d'historique, pas la peine de
+   dupliquer le formatage. */
+var _sigList=[];
+function loadSignatures(){
+  if(!cur||!cur._id)return;
+  apiCall("GET","/appros/"+cur._id+"/signatures").then(function(d){
+    _sigList=Array.isArray(d)?d:[];
+    renderSignatures();
+  }).catch(function(){
+    var l=document.getElementById("sig-list");
+    if(l)l.innerHTML="<div class=\"thread-empty\">Impossible de charger les signatures.</div>";
+  });
+}
+function renderSignatures(){
+  var l=document.getElementById("sig-list");if(!l)return;
+  var cnt=document.getElementById("sig-cnt");if(cnt)cnt.textContent=_sigList.length?String(_sigList.length):"";
+  if(!_sigList.length){
+    l.innerHTML="<div class=\"thread-empty\"><i class=\"ti ti-signature\"></i> Aucune signature pour l'instant. Elle appara\u00eetra ici d\u00e8s qu'un technicien confirmera son passage.</div>";
+    return;
+  }
+  var h="";
+  _sigList.forEach(function(sg){
+    h+="<div class=\"sig-item\">";
+    h+="<div class=\"sig-av\">"+_threadInitials(sg.signed_name||sg.author_name)+"</div>";
+    h+="<div class=\"sig-main\">";
+    h+="<div class=\"sig-name\">"+esc(sg.signed_name||sg.author_name)+"</div>";
+    h+="<div class=\"sig-when\">"+esc(_threadWhen(sg.created_at))+"</div>";
+    if(sg.comment)h+="<div class=\"sig-comment\">"+esc(sg.comment).replace(/\n/g,"<br>")+"</div>";
+    h+="</div></div>";
+  });
+  l.innerHTML=h;
+}
 function _threadGrow(ta){ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight,120)+"px";}
 function postThreadMsg(){
   if(!cur||!cur._id)return;
@@ -9168,7 +9367,8 @@ var NOTIF_ICONS={
   appro_prete:{ic:"ti-package-import",bg:"#D1FAE5",col:"#065F46"},
   appro_rendue:{ic:"ti-checks",bg:"#DBEAFE",col:"#1D4ED8"},
   appro_modifiee:{ic:"ti-edit",bg:"#F1F5F9",col:"#475569"},
-  appro_message:{ic:"ti-message-2",bg:"#F3EEFF",col:"#6D28D9"}
+  appro_message:{ic:"ti-message-2",bg:"#F3EEFF",col:"#6D28D9"},
+  appro_signature:{ic:"ti-signature",bg:"#ECFEFF",col:"#0891B2"}
 };
 
 function loadNotifs(){
