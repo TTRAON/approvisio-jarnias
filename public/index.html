@@ -9,7 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="AppRO"/>
+<meta name="apple-mobile-web-app-title" content="AppROVISIO"/>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -635,6 +635,14 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 .astep-dot{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;background:#EEF1F6;color:#94A3B8;transition:all .25s var(--ease)}
 .astep-lbl{font-size:12.5px;font-weight:600;color:#94A3B8;white-space:nowrap;transition:color .25s var(--ease)}
 .astep-line{flex:1;height:2px;background:#EEF1F6;border-radius:2px;min-width:14px;transition:background .25s var(--ease)}
+/* Bannière "Depuis votre dernière visite" — cachée par défaut, affichée en JS
+   uniquement quand il y a réellement quelque chose de nouveau à signaler. */
+.since-visit{display:flex;align-items:center;gap:10px;background:#EFF6FF;border:1px solid #BFDBFE;border-left:4px solid #3B82F6;border-radius:12px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:#1E40AF}
+.since-visit i{font-size:17px;flex-shrink:0}
+.since-visit span{flex:1}
+.since-visit button{flex-shrink:0;background:#fff;border:1px solid #BFDBFE;color:#1D4ED8;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.since-visit button:hover{background:#DBEAFE}
+@media print{.since-visit{display:none!important}}
 .astep.now .astep-dot{background:linear-gradient(135deg,var(--accent,#6D28D9),var(--accent-2,#7C3AED));color:#fff;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent,#6D28D9) 15%,transparent)}
 .astep.now .astep-lbl{color:var(--accent,#6D28D9);font-weight:700}
 .astep.done .astep-dot{background:#16A34A;color:#fff}
@@ -5563,6 +5571,7 @@ function renderForm(){
   if(typeof _unmountScanFab==="function")_unmountScanFab();
   h+=tplNotice+addBanner;
   h+=_approStepperHTML();
+  h+="<div class=\"since-visit\" id=\"since-visit\" style=\"display:none\"><i class=\"ti ti-history\"></i><span id=\"since-visit-txt\"></span><button onclick=\"markThreadRead()\">Marquer comme vu</button></div>";
   if(cur.draft&&!isField()){
     h+="<div style=\"background:#fff;border:1px solid #FDE9C8;border-left:4px solid #F59E0B;border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 3px 12px -7px rgba(245,158,11,.5)\"><div style=\"display:flex;align-items:center;gap:11px\"><div style=\"width:38px;height:38px;border-radius:11px;background:#FEF3C7;color:#D97706;display:flex;align-items:center;justify-content:center;flex-shrink:0\"><i class=\"ti ti-pencil\" style=\"font-size:19px\"></i></div><div><div style=\"font-size:14px;font-weight:700;color:#0F172A\">Brouillon</div><div style=\"font-size:12px;color:#78716C\">Le chef d\u00e9p\u00f4t ne voit pas encore cette appro. Envoie-la en production quand elle est pr\u00eate.</div></div></div><button onclick=\"sendToProduction()\" class=\"liv\" style=\"background:#15803D;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;box-shadow:0 5px 14px -6px rgba(21,128,61,.6)\"><i class=\"ti ti-send\"></i> Envoyer en production</button></div>";
   }
@@ -8679,6 +8688,7 @@ function loadThread(){
       _threadMaLecture=(d&&d.maLecture)||null;
     }
     renderThread();
+    try{_updateSinceVisit();}catch(e){}
   }).catch(function(){
     var l=document.getElementById("thread-list");
     if(l)l.innerHTML="<div class=\"thread-empty\">Impossible de charger la discussion.</div>";
@@ -8710,12 +8720,41 @@ function markThreadRead(){
     _threadLectures.forEach(function(x){if(x.user_id===me){x.read_at=_threadMaLecture;vu=true;}});
     if(!vu&&me)_threadLectures.push({user_id:me,name:(currentUser&&currentUser.name)||"Moi",role:(currentUser&&currentUser.role)||"",read_at:_threadMaLecture});
     renderThread();
+    try{_updateSinceVisit();}catch(e){}
     toast("Marqu\u00e9 comme lu","ti-checks");
     try{loadPending();}catch(e){}
   }).catch(function(){
     if(b)b.disabled=false;
     toast("Impossible de marquer comme lu","ti-alert-circle");
   });
+}
+/* « Depuis votre dernière visite » : pas de nouvelle table nécessaire — on
+   compare la date de dernière lecture (déjà suivie pour les messages en
+   attente) aux dates déjà connues : dernière modification de l'appro,
+   nouveaux messages, nouvelles signatures. Appelée après le chargement du
+   fil ET des signatures (les deux sont indépendants, la fonction est
+   idempotente : le dernier des deux à répondre affiche l'état complet). */
+function _updateSinceVisit(){
+  var el=document.getElementById("since-visit");
+  if(!el||!cur)return;
+  if(!_threadMaLecture){el.style.display="none";return;} // jamais visité avant : rien à comparer
+  var since=new Date(_threadMaLecture).getTime();
+  var me=(currentUser&&currentUser.id)||null;
+  var newMsgs=(_threadMsgs||[]).filter(function(m){
+    return new Date(m.created_at).getTime()>since && m.user_id!==me;
+  }).length;
+  var newSigs=(_sigList||[]).filter(function(s){
+    return new Date(s.created_at).getTime()>since;
+  }).length;
+  var modified=cur._updatedAt && (new Date(cur._updatedAt).getTime()>since);
+  var parts=[];
+  if(modified)parts.push("l'appro a \u00e9t\u00e9 modifi\u00e9e");
+  if(newMsgs)parts.push(newMsgs+" nouveau"+(newMsgs>1?"x":"")+" message"+(newMsgs>1?"s":""));
+  if(newSigs)parts.push(newSigs+" nouvelle"+(newSigs>1?"s":"")+" signature"+(newSigs>1?"s":""));
+  if(!parts.length){el.style.display="none";return;}
+  var txt=document.getElementById("since-visit-txt");
+  if(txt)txt.textContent="Depuis votre derni\u00e8re visite : "+parts.join(", ")+".";
+  el.style.display="flex";
 }
 function renderThread(){
   var l=document.getElementById("thread-list");if(!l)return;
@@ -8782,6 +8821,7 @@ function loadSignatures(){
   apiCall("GET","/appros/"+cur._id+"/signatures").then(function(d){
     _sigList=Array.isArray(d)?d:[];
     renderSignatures();
+    try{_updateSinceVisit();}catch(e){}
   }).catch(function(){
     var l=document.getElementById("sig-list");
     if(l)l.innerHTML="<div class=\"thread-empty\">Impossible de charger les signatures.</div>";
