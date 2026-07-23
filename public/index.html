@@ -211,6 +211,22 @@ html[data-amb="jarnias"] .sb-brand,html[data-amb="jarnias"] .doc-band{background
 html[data-amb="jarnias"] .sb-brand-name{color:#E4C878}
 html[data-amb="jarnias"] .sb-brand-tag{color:rgba(228,200,120,.55)}
 
+/* Capture de Su : le centre d'aide restait sur un dégradé bleu marine codé en
+   dur (.tour-welcome), indépendant du système de thème — c'est lui qui
+   encadre .help-card, pas .help-card elle-même. */
+html[data-amb="jarnias"] .tour-welcome{background:#123528}
+
+/* La barre d'étapes en haut de l'appro (Chantier / Équipe / Matériel / Envoyer)
+   n'avait jamais été reprise : fond blanc resté tel quel. */
+html[data-amb="jarnias"] .appro-steps{background:#123528;border:1.5px solid rgba(255,255,255,.26)}
+html[data-amb="jarnias"] .astep-lbl{color:rgba(255,255,255,.5)}
+/* Piège déjà croisé ailleurs (.sc-aff, .dstat.cmd-on) : le libellé de l'étape
+   EN COURS lit var(--accent), qui vaut #123528 pour ce thème — sur la carte
+   désormais assombrie, ce serait vert sur vert, invisible. */
+html[data-amb="jarnias"] .astep.now .astep-lbl{color:#E4C878!important}
+html[data-amb="jarnias"] .astep-dot{background:rgba(255,255,255,.12);color:rgba(255,255,255,.55)}
+html[data-amb="jarnias"] .astep-line{background:rgba(255,255,255,.18)}
+
 /* ═══ JARNIAS — immersion (Su : plus de zone blanche, tout en vert,
    liseré blanc autour des cartes/boutons, texte blanc, or réservé aux
    titres et points d'attention). Périmètre : sidebar, liste des appros,
@@ -312,6 +328,27 @@ html[data-amb="jarnias"] .lib-view-tog button.on{background:rgba(255,255,255,.16
 html[data-amb="jarnias"] .lib-empty{background:transparent;border:1.5px dashed rgba(255,255,255,.28)}
 html[data-amb="jarnias"] .lib-empty-t{color:#fff}
 html[data-amb="jarnias"] .lib-empty-d{color:rgba(255,255,255,.5)}
+
+/* ═══ Centre d'aide ═══ Encore blanc/bleu marine sur la capture de Su —
+   jamais repris depuis le début de ce thème. Même traitement que le reste :
+   aplat vert, liseret blanc, texte blanc, or pour le titre et l'avancement. */
+html[data-amb="jarnias"] .help-card{background:#123528}
+html[data-amb="jarnias"] .help-card h2{color:#fff}
+html[data-amb="jarnias"] .help-card p{color:rgba(255,255,255,.6)}
+html[data-amb="jarnias"] .tour-skip-x{color:rgba(255,255,255,.45)}
+html[data-amb="jarnias"] .tour-skip-x:hover{color:#fff}
+html[data-amb="jarnias"] .tour-w-role{color:#E4C878;background:rgba(228,200,120,.15)}
+html[data-amb="jarnias"] .help-prog-bar{background:rgba(255,255,255,.14)}
+html[data-amb="jarnias"] .help-prog-bar span{background:#E4C878!important}
+html[data-amb="jarnias"] .help-prog-t{color:rgba(255,255,255,.5)}
+html[data-amb="jarnias"] .help-mod{background:transparent;border:1.5px solid rgba(255,255,255,.26)}
+html[data-amb="jarnias"] .help-mod:hover{border-color:rgba(255,255,255,.45)}
+html[data-amb="jarnias"] .help-mod-ic{background:rgba(255,255,255,.1);color:#E4C878}
+html[data-amb="jarnias"] .help-mod-t{color:#fff}
+html[data-amb="jarnias"] .help-mod-s{color:rgba(255,255,255,.5)}
+html[data-amb="jarnias"] .help-mod-chk{color:rgba(255,255,255,.35)}
+html[data-amb="jarnias"] .help-reset{background:transparent;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.8)}
+html[data-amb="jarnias"] .help-reset:hover{background:rgba(255,255,255,.08);color:#fff}
 
 /* Bascule Appros / Brouillons (styles en ligne : on force via des classes ajoutées au balisage) */
 html[data-amb="jarnias"] .seg-btn{background:transparent!important;border-color:rgba(255,255,255,.28)!important;color:rgba(255,255,255,.7)!important}
@@ -630,7 +667,16 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
    cr\u00e9ait un trou, et la 3e carte d\u00e9marrait au niveau de la plus haute. R\u00e9sultat : bas de
    cartes en escalier. En \u00e9tirant (d\u00e9faut "stretch"), les cartes d'une m\u00eame ligne
    se terminent au m\u00eame endroit. */
-@media(min-width:1100px){.fv{max-width:1180px}.info-grid{grid-template-columns:1fr 1fr}}
+@media(min-width:1100px){.fv{max-width:1180px}.info-grid{grid-template-columns:1fr 1fr}
+/* Le trou visible dans la capture de Su : 3 cartes dans une grille à 2 colonnes
+   laissent la 3e toute seule, avec une case vide à côté qui montre le fond.
+   Plutôt que d'inventer du contenu pour la combler, on fait s'étaler la
+   DERNIÈRE carte sur toute la largeur — mais UNIQUEMENT quand elle est à la
+   fois la 3e ET la dernière (donc seule dans sa ligne). Si une 4e carte
+   arrive un jour, cette règle ne matchera plus et la grille redevient
+   normale toute seule, sans rien à retoucher ici. */
+.info-grid>.info-sec:nth-child(3):nth-last-child(1){grid-column:1/-1}
+}
 @media print{.info-grid{display:block!important}}
 .sc-foot{display:flex;justify-content:space-between;align-items:center;margin-top:5px}
 .sc-acts{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
@@ -1618,6 +1664,9 @@ table.at tr.kit-row td.td-d{position:relative}
 .bottom-panels{max-width:920px;margin:0 auto 20px;padding:0 18px;display:flex;gap:16px;align-items:flex-start}
 #thread-anchor{flex:1;min-width:0}
 #sig-anchor{width:280px;flex-shrink:0}
+/* Si l'admin a désactivé l'un des deux panneaux, l'autre prend toute la largeur
+   plutôt que de rester coincé dans une colonne étroite pensée pour deux. */
+.bottom-panels.single #thread-anchor,.bottom-panels.single #sig-anchor{width:100%;flex:1 1 100%}
 @media(max-width:760px){.bottom-panels{flex-direction:column}#sig-anchor{width:100%}}
 .sig-card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;overflow:hidden}
 .sig-hd{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid #F1F5F9;font-size:13.5px;font-weight:700;color:#0F172A}
@@ -2559,7 +2608,7 @@ function _scKey(){
 }
 var _techDirty=false,_techDirtySnap=null;
 function _techMarkDirty(){
-  if(!cur||!isField())return;
+  if(!cur||!isField()||!featureOn("tech_signature"))return;
   _techDirty=true;
   /* La clé d'écran est capturée ICI, tout de suite, pas déduite plus tard
      d'un historique de mutations : si plusieurs rendus s'enchaînent sans
@@ -2685,6 +2734,31 @@ var COMMANDES=[];
 var ANNONCES=[];
 var TICKETS=[];
 var CONFIG={};
+/* ═══ FONCTIONNALITÉS DÉSACTIVABLES (admin) ═══
+   Registre unique : sert à la fois à générer l'écran de réglage (Personnalisation)
+   ET à décider, partout dans le code, si une fonctionnalité doit s'afficher.
+   Stocké dans CONFIG.features (même mécanisme que le reste de la personnalisation :
+   partagé par toute l'équipe, pas un réglage par appareil comme les ambiances).
+   Absent ou non explicitement à false = ACTIVÉ : une équipe qui n'a jamais ouvert
+   cet écran garde tout comme avant, rien ne se désactive tout seul. */
+var FEATURES=[
+  {key:"tech_signature",label:"Signature de fin de visite",role:"Technicien",ic:"ti-signature",
+   d:"En quittant une appro qu'il a modifiée, le technicien doit taper son nom pour confirmer, avec un commentaire s'il manque quelque chose. Les articles qu'il ajoute sont aussi mis en évidence dans le tableau."},
+  {key:"depot_trucks",label:"Gestion des camions",role:"Dépôt",ic:"ti-truck",
+   d:"L'écran de suivi de la flotte : team leaders, plaques, état, révisions."},
+  {key:"appro_discussion",label:"Discussion sur les appros",role:"Tous",ic:"ti-messages",
+   d:"Le fil de messages sur chaque appro, et l'onglet « Messages en attente » qui les rassemble."},
+  {key:"annonces",label:"Annonces d'équipe",role:"Dépôt",ic:"ti-speakerphone",
+   d:"Les messages du dépôt qui s'affichent en pop-up à toute l'équipe."},
+  {key:"commandes",label:"Commandes",role:"Conducteur / Dépôt",ic:"ti-clipboard-list",
+   d:"L'écran de suivi des commandes fournisseurs."},
+  {key:"terrain_requests",label:"Demandes du terrain",role:"Technicien / Dépôt",ic:"ti-message-report",
+   d:"Permet à un technicien de réclamer du matériel depuis le chantier, et au dépôt de les traiter. Désactiver coupe les deux côtés ensemble."}
+];
+function featureOn(key){
+  if(!CONFIG||!CONFIG.features)return true;
+  return CONFIG.features[key]!==false;
+}
 var _DEF_STATUT_LABELS={en_attente:"En attente",prete:"Pr\u00eate au d\u00e9p\u00f4t",sur_chantier:"Sur chantier",rendu:"Rendu \u00e0 traiter",sortie:"Chantier fini"};
 var CAT_ITEMS=[
   // SÉCURITÉ / EPI
@@ -4280,7 +4354,7 @@ function addKit(cat){
   items.forEach(function(it){
     var row=mkR(it.n,it.q||"1");row.kit=cat;
     if(currentRole==="depot")row.depotAdded=true;
-    else if(isField()){row.techAdded=true;_techMarkDirty();}
+    else if(isField()&&featureOn("tech_signature")){row.techAdded=true;_techMarkDirty();}
     if(addMode&&addDate){row.addBatch=addDate;if(!cur.additionDates)cur.additionDates=[];if(cur.additionDates.indexOf(addDate)<0)cur.additionDates.push(addDate);}
     if(cur[it.sec]&&cur[it.sec].length&&!cur[it.sec][cur[it.sec].length-1].designation)cur[it.sec].splice(cur[it.sec].length-1,1);
     if(!cur[it.sec])cur[it.sec]=[];
@@ -4304,7 +4378,7 @@ function insertCp(){
     var row=mkR(name,qty);
     if(window._cpKit[i])row.kit=window._cpKit[i];
     if(currentRole==="depot"){row.depotAdded=true;}
-    else if(isField()){row.techAdded=true;_techMarkDirty();}
+    else if(isField()&&featureOn("tech_signature")){row.techAdded=true;_techMarkDirty();}
     if(addMode&&addDate){
       row.addBatch=addDate;
       if(!cur.additionDates)cur.additionDates=[];
@@ -5658,7 +5732,7 @@ function upR(sec,i,f,v){
   if(f==="designation"&&v){
     if(currentRole==="depot"){
       row.depotAdded=true;
-    } else if(isField()){
+    } else if(isField()&&featureOn("tech_signature")){
       row.techAdded=true;_techMarkDirty();
     } else if(addMode&&addDate&&!row.addBatch&&!row.depotAdded){
       row.addBatch=addDate;
@@ -5702,7 +5776,7 @@ function _rowEnter(sec,i){
 function addR(sec){
   if(!cur)return;var r=mkR();
   if(currentRole==="depot"){r.depotAdded=true;}
-  if(isField()){r.techAdded=true;_techMarkDirty();}
+  if(isField()&&featureOn("tech_signature")){r.techAdded=true;_techMarkDirty();}
   if(addMode&&addDate){r.addBatch=addDate;if(!cur.additionDates)cur.additionDates=[];if(cur.additionDates.indexOf(addDate)<0)cur.additionDates.push(addDate);}
   if(cur.statut==="prete")cur.modifPrep=true;else if(cur.statut==="sur_chantier")cur.addToPrepare=true;
   cur[sec].push(r);renderForm();
@@ -6233,6 +6307,15 @@ var NEWS=[
     {t:"nouveau",z:"Appros",txt:"Nouvel onglet \u00ab Messages en attente \u00bb : toutes les appros dont un message est rest\u00e9 sans r\u00e9ponse, au m\u00eame endroit. D\u00e8s que vous r\u00e9pondez, l'appro en sort. Un compteur rouge signale ce qu'il reste \u00e0 traiter."},
     {t:"corrige",z:"Notifications",txt:"Sur un appareil partag\u00e9, les notifications restaient rattach\u00e9es au compte pr\u00e9c\u00e9dent : la personne qui se connectait ensuite ne recevait rien et voyait les alertes de l'autre. Corrig\u00e9."},
     {t:"nouveau",z:"Aide",txt:"La visite guid\u00e9e « Les bases » explique d\u00e9sormais comment activer les notifications sur son t\u00e9l\u00e9phone."}
+  ]},
+  {v:2,date:"22 juillet 2026",items:[
+    {t:"nouveau",z:"Appros",txt:"Un fil de discussion en bas de chaque appro : posez une question au d\u00e9p\u00f4t ou au conducteur, la r\u00e9ponse reste attach\u00e9e au chantier au lieu de partir par t\u00e9l\u00e9phone."},
+    {t:"nouveau",z:"Appros",txt:"Les articles ajout\u00e9s par un technicien depuis le chantier ressortent en cyan, avec leur propre l\u00e9gende \u2014 comme les ajouts du d\u00e9p\u00f4t."},
+    {t:"nouveau",z:"Appros",txt:"Un technicien qui ajoute du mat\u00e9riel ou prend une appro en charge doit d\u00e9sormais taper son nom pour confirmer en la quittant, avec un commentaire s'il manque quelque chose. Visible ensuite \u00e0 c\u00f4t\u00e9 de la discussion."},
+    {t:"nouveau",z:"Personnalisation",txt:"Un nouveau th\u00e8me « JARNIAS », vert et or aux couleurs de l'entreprise, disponible dans le s\u00e9lecteur d'ambiance \u00e0 c\u00f4t\u00e9 de votre nom."},
+    {t:"ameliore",z:"Connexion",txt:"L'\u00e9cran de connexion a \u00e9t\u00e9 repens\u00e9 : plus sobre, aux couleurs JARNIAS."},
+    {t:"ameliore",z:"Interface",txt:"Les \u00e9crans s'affichent d\u00e9sormais en douceur, section par section, au lieu d'un chargement brut."},
+    {t:"corrige",z:"Appros",txt:"Une case vide apparaissait parfois \u00e0 c\u00f4t\u00e9 de la 3e carte du formulaire (Planning & camion). Corrig\u00e9."}
   ]}
 ];
 
@@ -7034,6 +7117,7 @@ function _autoSujetCheck(){
 function renderTrucksSettings(){try{setActiveNav('btn-trucks');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   if(!canManage()){toast("Acc\u00e8s admin ou d\u00e9p\u00f4t","ti-lock");return;}
+  if(!featureOn("depot_trucks")){toast("Fonctionnalit\u00e9 d\u00e9sactiv\u00e9e par l'administrateur","ti-lock");goHome();return;}
   cur=null;currentTab="trucks";
   var m=document.getElementById("main-area");
   var h="<div class=\"settings-page\" style=\"max-width:880px;margin:0 auto;padding:22px 18px\">";
@@ -7453,6 +7537,7 @@ function renderCommandes(){try{setActiveNav('btn-cmd');}catch(e){}if(typeof _mou
   if(typeof _unmountCpFab==="function")_unmountCpFab();
   if(typeof closeSidebar==="function")closeSidebar();
   if(isField())return;
+  if(!featureOn("commandes")){toast("Fonctionnalité désactivée par l'administrateur","ti-lock");goHome();return;}
   cur=null;currentTab="commande";
   var m=document.getElementById("main-area");
   var enAttente=_cmdList().filter(function(c){return c.statut!=="recu";}).length;
@@ -7597,6 +7682,7 @@ function saveAnnonces(cb){
 function renderAnnonces(){try{setActiveNav('btn-annonce');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   if(!canManage()){toast("Acc\u00e8s admin ou d\u00e9p\u00f4t","ti-lock");return;}
+  if(!featureOn("annonces")){toast("Fonctionnalit\u00e9 d\u00e9sactiv\u00e9e par l'administrateur","ti-lock");goHome();return;}
   cur=null;currentTab="annonces";
   annEnsureUsers();
   var m=document.getElementById("main-area");
@@ -7782,6 +7868,7 @@ function updateTicketBadge(){
 function renderTickets(){try{setActiveNav('btn-tickets');}catch(e){}
   if(typeof closeSidebar==="function")closeSidebar();
   if(!canManage()){toast("Acc\u00e8s admin ou d\u00e9p\u00f4t","ti-lock");return;}
+  if(!featureOn("terrain_requests")){toast("Fonctionnalit\u00e9 d\u00e9sactiv\u00e9e par l\u0027administrateur","ti-lock");renderDepot();return;}
   cur=null;currentTab="tickets";
   // recharge pour limiter les conflits
   apiCall("GET","/lists").then(function(d){if(d&&d.tickets)TICKETS=d.tickets.slice();_renderTicketsView();}).catch(function(){_renderTicketsView();});
@@ -7894,6 +7981,7 @@ function renderTerrainDemande(){
   if(typeof closeSidebar==="function")closeSidebar();
   if(typeof _unmountCpFab==="function")_unmountCpFab();
   if(typeof _unmountNextBar==="function")_unmountNextBar();
+  if(!featureOn("terrain_requests")){toast("Fonctionnalit\u00e9 d\u00e9sactiv\u00e9e par l'administrateur","ti-lock");goHome();return;}
   cur=null;currentTab="terrain";
   var m=document.getElementById("main-area");
   var me=(currentUser&&currentUser.name)||"";
@@ -8038,7 +8126,7 @@ function setAccentPreview(c){if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};C
    les postes. Répondre fait sortir l'appro de la liste \u2014 rien \u00e0 cocher. */
 var PENDING=[];
 function loadPending(cb){
-  if(!authToken){if(cb)cb();return;}
+  if(!authToken||!featureOn("appro_discussion")){if(cb)cb();return;}
   apiCall("GET","/appros/pending-messages").then(function(list){
     PENDING=Array.isArray(list)?list:[];
     _renderPendingBadge();
@@ -8059,7 +8147,7 @@ function _renderPendingBadge(){
   /* Sur t\u00e9l\u00e9phone, l'acc\u00e8s de la barre du haut n'appara\u00eet que s'il y a \u00e0 traiter :
      pas d'\u00e9l\u00e9ment mort dans la barre quand tout est \u00e0 jour. */
   var mb=document.getElementById("btn-pending-m");
-  if(mb)mb.style.display=n?"inline-flex":"none";
+  if(mb)mb.style.display=(n&&featureOn("appro_discussion"))?"inline-flex":"none";
 }
 function _pendingQuand(iso){
   try{
@@ -8175,6 +8263,16 @@ function renderPersonnalisation(){try{setActiveNav('btn-perso');}catch(e){}
   var h="<div class=\"settings-page\" style=\"max-width:680px;margin:0 auto;padding:22px 18px\">";
   h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-palette\" style=\"font-size:24px;color:#6D28D9\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Personnalisation</h2></div>";
   h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 20px\">Adapte l'appli à ton entreprise. Ces réglages sont partagés par toute l'équipe.</p>";
+  // Fonctionnalités désactivables — en tête, c'est le seul réglage qui change
+  // vraiment ce que l'équipe peut faire, pas juste l'apparence.
+  h+="<div class=\"ui-sec\" style=\"margin-bottom:16px;border-color:#FDE68A\"><div class=\"ui-sec-hd\"><i class=\"ti ti-toggle-right\" style=\"color:#D97706\"></i> Fonctionnalités de l'équipe</div>";
+  h+="<div style=\"padding:0 14px 12px;font-size:12.5px;color:#64748B;line-height:1.55\">Désactive ce dont ton équipe n'a pas besoin. Chacune s'applique à tout le monde, immédiatement.</div>";
+  FEATURES.forEach(function(f){
+    var on=featureOn(f.key);
+    h+="<div class=\"jsetting-row\"><div class=\"jsetting-txt\"><div class=\"jsetting-t\"><i class=\"ti "+f.ic+"\" style=\"font-size:14px;color:#94A3B8;margin-right:5px\"></i>"+esc(f.label)+" <span style=\"font-size:10.5px;font-weight:700;color:#94A3B8;background:#F1F5F9;padding:1px 8px;border-radius:20px;margin-left:4px\">"+esc(f.role)+"</span></div><div class=\"jsetting-d\">"+esc(f.d)+"</div></div>";
+    h+="<label class=\"jswitch\"><input type=\"checkbox\" id=\"feat-"+f.key+"\" "+(on?"checked":"")+" onchange=\"toggleFeature('"+f.key+"',this.checked)\"/><span class=\"jswitch-tr\"></span></label></div>";
+  });
+  h+="</div>";
   h+="<div style=\"border-radius:12px;overflow:hidden;border:1px solid #E2E8F0;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,.05)\"><div style=\"background:"+(CONFIG.accent||"#0F172A")+";padding:14px 18px;display:flex;align-items:center;gap:12px\"><img src=\""+(CONFIG.logo||("data:image/png;base64,"+(typeof LB64!=="undefined"?LB64:"")))+"\" style=\"width:54px;height:54px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,.06)\"/><div><div style=\"color:#F1F5F9;font-weight:800;font-size:18px\">"+esc(CONFIG.appName||"AppROVISIO")+"</div><div style=\"color:#94A3B8;font-size:12px\">"+esc(CONFIG.tagline||"Les experts de la hauteur")+"</div></div><div style=\"margin-left:auto;color:#94A3B8;font-size:11px;background:rgba(255,255,255,.08);padding:3px 10px;border-radius:20px\">Aperçu</div></div></div>";
   // Nom
   h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-signature\" style=\"color:#6D28D9\"></i> Nom de l'application</div><div style=\"padding:12px 14px\"><input id=\"perso-name\" class=\"ui-in\" style=\"width:100%\" value=\""+esc(CONFIG.appName||"AppROVISIO")+"\" placeholder=\"AppROVISIO\"/><div style=\"margin-top:10px;font-size:12px;color:#64748B;font-weight:600\">Slogan (sous le nom)</div><input id=\"perso-tag\" class=\"ui-in\" style=\"width:100%;margin-top:4px\" value=\""+esc(CONFIG.tagline||"Les experts de la hauteur")+"\" placeholder=\"Les experts de la hauteur\"/></div></div>";
@@ -8253,6 +8351,18 @@ function toggleMailNotifs(on){
     hint.innerHTML="<i class=\"ti "+(on?"ti-circle-check":"ti-bell-off")+"\"></i> "+(on?"Les emails sont activ\u00e9s.":"Les emails sont d\u00e9sactiv\u00e9s \u2014 seule la cloche notifie.");
   }
   saveConfig(function(){toast(on?"Emails de notification activ\u00e9s":"Emails de notification d\u00e9sactiv\u00e9s",on?"ti-mail":"ti-mail-off");});
+}
+function toggleFeature(key,on){
+  if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};
+  if(!CONFIG.features)CONFIG.features={};
+  CONFIG.features[key]=!!on;
+  var meta=FEATURES.filter(function(f){return f.key===key;})[0];
+  saveConfig(function(){
+    toast((meta?meta.label:key)+" : "+(on?"activ\u00e9e":"d\u00e9sactiv\u00e9e"),on?"ti-toggle-right":"ti-toggle-left");
+    /* Le menu (Camions, Annonces, Messages en attente...) doit refl\u00e9ter le
+       changement tout de suite, sans attendre une reconnexion. */
+    try{_syncMenuVisibility();}catch(e){}
+  });
 }
 function savePerso(){
   CONFIG.appName=((document.getElementById("perso-name")||{}).value||"").trim();
@@ -9698,6 +9808,8 @@ var TUTO_MODULES={
       {before:_navDepot,sel:"#btn-biblio",ic:"ti-books",t:"La biblioth\u00e8que",d:"Toutes les appros de l'entreprise, pour retrouver un ancien chantier.",action:"next"},
       {before:_navDepot,sel:"#btn-refresh",ic:"ti-refresh",t:"Mettre \u00e0 jour",d:"Ce bouton recharge les donn\u00e9es du serveur. L'appli le fait d\u00e9j\u00e0 toute seule quand vous y revenez.",action:"next"},
       {before:_navDepot,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous pr\u00e9vient : nouvelle appro \u00e0 pr\u00e9parer, demande du terrain, annonce.",action:"next"},
+      {before:_navDepot,sel:"#btn-notifs",ic:"ti-bell-cog",t:"G\u00e9rer les notifications",d:"Activez-les sur cet appareil, ou coupez-les si besoin. Pratique aussi si vous changez de t\u00e9l\u00e9phone.",action:"next"},
+      {before:_navDepot,sel:"#btn-pending",ic:"ti-message-report",t:"Messages en attente",d:"Un conducteur ou un technicien vous a \u00e9crit sur une appro et attend une r\u00e9ponse ? Elle appara\u00eet ici, avec un compteur rouge. R\u00e9pondez et elle en sort.",action:"next"},
       {before:_navDepot,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
     ]:_tutoHomeVide()?[
       /* Nouvel utilisateur : l'accueil bascule en \u00e9tat vide (ni chiffres, ni actions rapides).
@@ -9709,6 +9821,8 @@ var TUTO_MODULES={
       {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherchez par chantier, client, N\u00b0 d'affaire\u2026 ou m\u00eame par le nom d'un article contenu dans l'appro.",action:"next"},
       {before:_navHome,sel:"#btn-refresh",ic:"ti-refresh",t:"Mettre \u00e0 jour",d:"Ce bouton recharge les donn\u00e9es du serveur. L'appli le fait d\u00e9j\u00e0 toute seule quand vous y revenez.",action:"next"},
       {before:_navHome,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous pr\u00e9vient : appro pr\u00eate, demande trait\u00e9e, annonce de l'\u00e9quipe.",action:"next"},
+      {before:_navHome,sel:"#btn-notifs",ic:"ti-bell-cog",t:"G\u00e9rer les notifications",d:"Activez-les sur cet appareil, ou coupez-les si besoin. Pratique aussi si vous changez de t\u00e9l\u00e9phone.",action:"next"},
+      {before:_navHome,sel:"#btn-pending",ic:"ti-message-report",t:"Messages en attente",d:"Le d\u00e9p\u00f4t vous a \u00e9crit sur une appro et attend une r\u00e9ponse ? Elle appara\u00eet ici, avec un compteur rouge. R\u00e9pondez et elle en sort.",action:"next"},
       {before:_navHome,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
     ]:[
       {before:_navHome,sel:".home-hero",ic:"ti-home",t:"Votre accueil",d:"Le point de d\u00e9part. Vous y voyez l'\u00e9tat de vos appros d'un coup d'\u0153il.",action:"next"},
@@ -9718,13 +9832,13 @@ var TUTO_MODULES={
       {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherchez par chantier, client, N\u00b0 d'affaire\u2026 ou m\u00eame par le nom d'un article contenu dans l'appro.",action:"next"},
       {before:_navHome,sel:"#btn-refresh",ic:"ti-refresh",t:"Mettre \u00e0 jour",d:"Ce bouton recharge les donn\u00e9es du serveur. L'appli le fait d\u00e9j\u00e0 toute seule quand vous y revenez.",action:"next"},
       {before:_navHome,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous pr\u00e9vient : appro pr\u00eate, demande trait\u00e9e, annonce de l'\u00e9quipe.",action:"next"},
+      {before:_navHome,sel:"#btn-notifs",ic:"ti-bell-cog",t:"G\u00e9rer les notifications",d:"Activez-les sur cet appareil, ou coupez-les si besoin. Pratique aussi si vous changez de t\u00e9l\u00e9phone.",action:"next"},
+      {before:_navHome,sel:"#btn-pending",ic:"ti-message-report",t:"Messages en attente",d:"Le d\u00e9p\u00f4t vous a \u00e9crit sur une appro et attend une r\u00e9ponse ? Elle appara\u00eet ici, avec un compteur rouge. R\u00e9pondez et elle en sort.",action:"next"},
       {before:_navHome,sel:"#scan-fab",ic:"ti-qrcode",t:"Scanner une appro",d:"Ce bouton ouvre la cam\u00e9ra pour scanner le QR d'une feuille papier. L'appro s'ouvre aussit\u00f4t dans l'appli \u2014 id\u00e9al au d\u00e9p\u00f4t pour retrouver une appro en un geste, sans repasser par le navigateur.",action:"next"},
       {before:_navHome,sel:"#pwa-install-btn",ic:"ti-download",t:"Installer l'application",d:"Ajoutez AppROVISIO \u00e0 votre \u00e9cran d'accueil : une ic\u00f4ne, un d\u00e9marrage plein \u00e9cran, un acc\u00e8s plus rapide. Parfait sur le t\u00e9l\u00e9phone.",action:"next"},
       {before:_navHome,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
     ];
-    /* Le bouton d\u00e9di\u00e9 « notifications » a \u00e9t\u00e9 retir\u00e9 de la barre du haut (il faisait
-       doublon avec celui d\u00e9j\u00e0 propos\u00e9 dans le panneau de la cloche) : l'\u00e9tape de tuto
-       correspondante n'a donc plus lieu d'\u00eatre. */
+
     return s;
   }},
 
@@ -9740,7 +9854,8 @@ var TUTO_MODULES={
       {before:_tutoNeedAppro,sel:".btn-save",ic:"ti-device-floppy",t:"Enregistrer",d:"À faire régulièrement. Tant que l'appro est un brouillon, le dépôt ne la voit pas.",action:"next"},
       {before:_tutoNeedAppro,sel:".tbi[title*='PDF'],button[onclick=\"doPDF()\"]",ic:"ti-file-type-pdf",t:"Exporter en livret",d:"Génère un livret A3 : imprimez-le puis pliez-le en deux. La couverture porte les infos et le QR de suivi, l'intérieur le détail de l'appro.",action:"next"},
       {before:_tutoNeedAppro,sel:"button[onclick=\"sendToProduction()\"],.next-step",ic:"ti-send",t:"Envoyer en production",d:"C'est le moment clé : le chef dépôt reçoit l'appro et peut la préparer.",action:"next"},
-      {before:_tutoNeedAppro,sel:"#hist-chev,#hist-box",ic:"ti-history",t:"L'historique",d:"Qui a modifié quoi, et quand. Utile quand on est plusieurs sur une affaire.",action:"next"}
+      {before:_tutoNeedAppro,sel:"#hist-chev,#hist-box",ic:"ti-history",t:"L'historique",d:"Qui a modifié quoi, et quand. Utile quand on est plusieurs sur une affaire.",action:"next"},
+      {before:_tutoNeedAppro,sel:".sig-card,.thread-card",ic:"ti-signature",t:"Les signatures",d:"Quand un technicien ajoute du matériel ou prend une appro en charge, il confirme en tapant son nom ici — avec un commentaire s'il manque quelque chose. Ça reste attaché à l'appro.",action:"next"}
     ];
   }},
 
@@ -9781,8 +9896,8 @@ var TUTO_MODULES={
     ];
   }},
 
-  terrain:{titre:"Demander du matériel",ic:"ti-message-report",roles:["team_leader"],etapes:function(){
-    return [
+  terrain:{titre:"Demander du matériel",ic:"ti-message-report",roles:["team_leader"],avail:function(){return featureOn("terrain_requests");},etapes:function(){
+    var s=[
       {sel:"#btn-terrain",ic:"ti-message-report",t:"Vos demandes",d:"C'est ici que vous réclamez du matériel au dépôt depuis le chantier.",action:"click"},
       {before:_navTerrain,sel:"#td-prod",ic:"ti-package",t:"Ce qu'il vous faut",d:"Indiquez l'objet de la demande, et la quantité si besoin.",action:"next"},
       {before:_navTerrain,sel:"#td-note",ic:"ti-note",t:"Expliquez le contexte",d:"Précisez le chantier et pourquoi vous en avez besoin : le dépôt tranchera plus vite.",action:"next"},
@@ -9790,6 +9905,8 @@ var TUTO_MODULES={
       {before:_navTerrain,sel:".td-sec,.home-empty",ic:"ti-clock",t:"Suivre l'avancement",d:"Vos demandes en attente puis traitées s'affichent ici. Un refus est toujours justifié.",action:"next"},
       {before:_navTerrain,sel:".td-card,.home-empty",ic:"ti-truck-delivery",t:"Une demande validée",d:"Quand le dépôt valide, le matériel passe automatiquement en commande.",action:"next"}
     ];
+    if(featureOn("tech_signature"))s.push({sel:null,ic:"ti-signature",t:"Si vous touchez une appro directement",d:"Ajouter un article ou marquer une appro « sur chantier » depuis sa fiche ? En la quittant, on vous demandera de taper votre nom pour confirmer — ça reste attaché à l'appro, avec un commentaire si quelque chose manque.",action:"next"});
+    return s;
   }},
 
   depot:{titre:"Préparer & rendre",ic:"ti-building-warehouse",roles:["depot"],etapes:function(){
@@ -9803,7 +9920,7 @@ var TUTO_MODULES={
     ];
   }},
 
-  commandes:{titre:"Les commandes",ic:"ti-truck-delivery",roles:["conducteur","depot"],etapes:function(){
+  commandes:{titre:"Les commandes",ic:"ti-truck-delivery",roles:["conducteur","depot"],avail:function(){return featureOn("commandes");},etapes:function(){
     return [
       {sel:"#btn-cmd",ic:"ti-truck-delivery",t:"Ouvrez les commandes",d:"Tout ce qui doit être acheté se retrouve ici.",action:"click"},
       {before:_navCmd,sel:".dash-grid",ic:"ti-filter",t:"Filtrer d'un clic",d:"Toutes, en attente, reçues. Le compteur « en attente » pulse tant qu'il reste du travail.",action:"next"},
@@ -9816,7 +9933,7 @@ var TUTO_MODULES={
     ];
   }},
 
-  tickets:{titre:"Les demandes du terrain",ic:"ti-ticket",roles:["depot"],etapes:function(){
+  tickets:{titre:"Les demandes du terrain",ic:"ti-ticket",roles:["depot"],avail:function(){return featureOn("terrain_requests");},etapes:function(){
     return [
       {sel:"#btn-tickets",ic:"ti-ticket",t:"Ouvrez les demandes",d:"Quand un Team Leader réclame du matériel depuis le chantier, sa demande arrive ici.",action:"click"},
       {before:_navTickets,sel:".tk-stats",ic:"ti-clock",t:"Ce qui vous attend",d:"Ces quatre compteurs filtrent la liste. L'écran s'ouvre toujours sur « À traiter ».",action:"next"},
@@ -9827,7 +9944,7 @@ var TUTO_MODULES={
     ];
   }},
 
-  camions:{titre:"Les camions",ic:"ti-truck",roles:["depot"],etapes:function(){
+  camions:{titre:"Les camions",ic:"ti-truck",roles:["depot"],avail:function(){return featureOn("depot_trucks");},etapes:function(){
     return [
       {sel:"#btn-trucks",ic:"ti-truck",t:"Gestion des camions",d:"L'\u00e9tat de la flotte, en un \u00e9cran.",action:"click"},
       {before:_navTrucks,sel:"#truck-search",ic:"ti-search",t:"Retrouver un camion",d:"Par nom, plaque, ou type de v\u00e9hicule.",action:"next"},
@@ -9842,7 +9959,7 @@ var TUTO_MODULES={
     ];
   }},
 
-  annonces:{titre:"Les annonces",ic:"ti-speakerphone",roles:["depot"],etapes:function(){
+  annonces:{titre:"Les annonces",ic:"ti-speakerphone",roles:["depot"],avail:function(){return featureOn("annonces");},etapes:function(){
     return [
       {sel:"#btn-annonce",ic:"ti-speakerphone",t:"Ouvrez les annonces",d:"Un message qui s'affiche en pop-up aux personnes concernées.",action:"click"},
       {before:_navAnnonces,sel:".ann-seg",ic:"ti-users",t:"À qui ?",d:"Générale : conducteurs, dépôt et admins. Team Leaders : uniquement eux. Ou une seule personne.",action:"next"},
@@ -10385,6 +10502,24 @@ function _showSkeleton(){
   var row="<div class=\"skel-row\"><div class=\"skel-box skel-ic\"></div><div class=\"skel-lines\"><div class=\"skel-box skel-l1\"></div><div class=\"skel-box skel-l2\"></div></div></div>";
   m.innerHTML="<div class=\"skel-wrap\">"+row+row+row+row+"</div>";
 }
+/* Visibilité des entrées du menu (rôle + fonctionnalités désactivées par
+   l'admin). Extrait d'enterApp() pour pouvoir la rappeler après un
+   changement de réglage, sans attendre une reconnexion. */
+function _syncMenuVisibility(){
+  if(!currentUser)return;
+  document.getElementById("btn-admin").style.display=(currentUser.role==="admin")?"flex":"none";
+  var bd=document.getElementById("btn-dash");if(bd)bd.style.display=(currentUser.role==="admin")?"flex":"none";
+  var bui=document.getElementById("btn-ui");if(bui)bui.style.display=canManage()?"flex":"none";
+  var balo=document.getElementById("btn-alo");if(balo)balo.style.display=(currentUser.role==="admin")?"flex":"none";
+  var btr=document.getElementById("btn-trucks");if(btr)btr.style.display=(canManage()&&featureOn("depot_trucks"))?"flex":"none";
+  var bcmd=document.getElementById("btn-cmd");if(bcmd)bcmd.style.display=(currentUser.role!=="team_leader"&&currentUser.role!=="technicien"&&featureOn("commandes"))?"flex":"none";
+  var bann=document.getElementById("btn-annonce");if(bann)bann.style.display=(canManage()&&featureOn("annonces"))?"flex":"none";
+  var btk=document.getElementById("btn-tickets");if(btk)btk.style.display=(canManage()&&featureOn("terrain_requests"))?"flex":"none";
+  var bpe=document.getElementById("btn-perso");if(bpe)bpe.style.display=(currentUser.role==="admin")?"flex":"none";
+  var bter=document.getElementById("btn-terrain");if(bter)bter.style.display=(isField()&&featureOn("terrain_requests"))?"flex":"none";
+  var bpen=document.getElementById("btn-pending");if(bpen)bpen.style.display=featureOn("appro_discussion")?"flex":"none";
+  var bbl=document.getElementById("btn-biblio");if(bbl)bbl.style.display=isField()?"none":"flex";
+}
 function enterApp(){
   // Configure sidebar selon le r\u00f4le
   var ri=ROLE_INFO[currentUser.role]||ROLE_INFO.conducteur;
@@ -10407,17 +10542,7 @@ function enterApp(){
   av.style.background=ri.bg;av.style.color=ri.color;av.textContent=initials;
   document.getElementById("sb-user-name").textContent=currentUser.name;
   document.getElementById("sb-user-role").textContent=ri.label;
-  document.getElementById("btn-admin").style.display=(currentUser.role==="admin")?"flex":"none";
-  var bd=document.getElementById("btn-dash");if(bd)bd.style.display=(currentUser.role==="admin")?"flex":"none";
-  var bui=document.getElementById("btn-ui");if(bui)bui.style.display=canManage()?"flex":"none";
-  var balo=document.getElementById("btn-alo");if(balo)balo.style.display=(currentUser.role==="admin")?"flex":"none";
-  var btr=document.getElementById("btn-trucks");if(btr)btr.style.display=canManage()?"flex":"none";
-  var bcmd=document.getElementById("btn-cmd");if(bcmd)bcmd.style.display=(currentUser.role!=="team_leader"&&currentUser.role!=="technicien")?"flex":"none";
-  var bann=document.getElementById("btn-annonce");if(bann)bann.style.display=canManage()?"flex":"none";
-  var btk=document.getElementById("btn-tickets");if(btk)btk.style.display=canManage()?"flex":"none";
-  var bpe=document.getElementById("btn-perso");if(bpe)bpe.style.display=(currentUser.role==="admin")?"flex":"none";
-  var bter=document.getElementById("btn-terrain");if(bter)bter.style.display=(isField())?"flex":"none";
-  var bbl=document.getElementById("btn-biblio");if(bbl)bbl.style.display=isField()?"none":"flex";
+  _syncMenuVisibility();
   // currentRole pilote l'affichage (conducteur/depot)
   currentRole=(currentUser.role==="depot")?"depot":"conducteur";
   document.getElementById("auth-screen").style.display="none";
