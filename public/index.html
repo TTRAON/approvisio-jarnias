@@ -301,29 +301,25 @@ html[data-amb="jarnias"] .tab-btn::after{background:#E4C878!important}
 
 /* ═══ Ecran Bibliotheque (vue grille/liste, filtres) — meme traitement
    que les cartes de la sidebar : vert fonce, liseret blanc epais. ═══ */
-html[data-amb="jarnias"] .lib-card,html[data-amb="jarnias"] .lib-row{background:#123528;border:1.5px solid rgba(255,255,255,.26)}
-html[data-amb="jarnias"] .lib-card:hover,html[data-amb="jarnias"] .lib-row:hover{border-color:rgba(255,255,255,.45)}
-html[data-amb="jarnias"] .lib-card .sc-aff{color:#E4C878}
-html[data-amb="jarnias"] .lib-card-name{color:#fff}
-html[data-amb="jarnias"] .lib-card-cond,html[data-amb="jarnias"] .lib-card-meta{color:rgba(255,255,255,.55)}
-html[data-amb="jarnias"] .lib-card .sc-client{color:rgba(255,255,255,.55)}
-html[data-amb="jarnias"] .lib-card-btn{background:transparent;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.85)}
-html[data-amb="jarnias"] .lib-card-del{background:transparent;border:1.5px solid rgba(248,113,113,.4);color:#FCA5A5}
+/* Cartes de la bibliothèque : Su a comparé aux cartes de « Mes appros »
+   (restées blanches, jamais touchées) et trouvé celles-ci — sombres avec
+   liseret blanc — moins lisibles. Même famille visuelle maintenant : fond
+   blanc, liseré coloré à gauche (déjà la couleur du conducteur, comme
+   « Mes appros »). L'identité JARNIAS reste dans le numéro de référence,
+   qui redevient vert via var(--accent) — plus besoin d'un or de secours
+   puisque le fond n'est plus sombre. */
+html[data-amb="jarnias"] .lib-card,html[data-amb="jarnias"] .lib-row{background:#fff;border:1px solid #E8EDF4}
+html[data-amb="jarnias"] .lib-card:hover,html[data-amb="jarnias"] .lib-row:hover{border-color:#C9A24B}
+html[data-amb="jarnias"] .lib-card-name{color:#0F172A}
+html[data-amb="jarnias"] .lib-card-cond,html[data-amb="jarnias"] .lib-card-meta{color:#64748B}
+html[data-amb="jarnias"] .lib-card .sc-client{color:#64748B}
+html[data-amb="jarnias"] .lib-card-btn{background:#123528;border:none;color:#fff}
+html[data-amb="jarnias"] .lib-card-btn:hover{background:#1F5C42}
 
-html[data-amb="jarnias"] .lib-search{background:transparent!important;border:1.5px solid rgba(255,255,255,.28)!important;color:#fff!important}
-html[data-amb="jarnias"] .lib-search::placeholder{color:rgba(255,255,255,.4)}
-
-html[data-amb="jarnias"] .pill-group{background:rgba(255,255,255,.08)}
-html[data-amb="jarnias"] .pill{color:rgba(255,255,255,.6)}
-html[data-amb="jarnias"] .pill:hover{color:#fff}
-html[data-amb="jarnias"] .pill.on{background:rgba(255,255,255,.14);color:#fff;box-shadow:none;border:1px solid rgba(255,255,255,.3)}
-
-html[data-amb="jarnias"] .pill-sel{background-color:transparent!important;border:1.5px solid rgba(255,255,255,.28)!important;color:rgba(255,255,255,.85)!important}
-html[data-amb="jarnias"] .pill-reset{background:transparent;border:1.5px dashed rgba(255,255,255,.35);color:rgba(255,255,255,.7)}
-
-html[data-amb="jarnias"] .lib-view-tog{background:rgba(255,255,255,.08)}
-html[data-amb="jarnias"] .lib-view-tog button{color:rgba(255,255,255,.55)}
-html[data-amb="jarnias"] .lib-view-tog button.on{background:rgba(255,255,255,.16);color:#fff;box-shadow:none}
+/* Barre de filtres de la bibliothèque (recherche, tri, menus déroulants,
+   bascule grille/liste) : maintenant que les cartes sont redevenues claires,
+   le style de base (déjà clair, déjà pensé pour flotter sur un fond quelconque,
+   comme .ma-chip) convient tel quel — aucune surcharge JARNIAS nécessaire. */
 
 html[data-amb="jarnias"] .lib-empty{background:transparent;border:1.5px dashed rgba(255,255,255,.28)}
 html[data-amb="jarnias"] .lib-empty-t{color:#fff}
@@ -338,6 +334,12 @@ html[data-amb="jarnias"] .help-card p{color:rgba(255,255,255,.6)}
 html[data-amb="jarnias"] .tour-skip-x{color:rgba(255,255,255,.45)}
 html[data-amb="jarnias"] .tour-skip-x:hover{color:#fff}
 html[data-amb="jarnias"] .tour-w-role{color:#E4C878;background:rgba(228,200,120,.15)}
+/* .tour-w-card : carte de bienvenue ET de fin de module (« Les bases, terminé ! »
+   sur la capture de Su) — classe différente de .help-card, jamais reprise. */
+html[data-amb="jarnias"] .tour-w-card{background:#123528;border:1.5px solid rgba(255,255,255,.26)}
+html[data-amb="jarnias"] .tour-w-card h2{color:#fff}
+html[data-amb="jarnias"] .tour-w-card p{color:rgba(255,255,255,.6)}
+html[data-amb="jarnias"] .tour-w-skip{background:transparent;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.85)}
 html[data-amb="jarnias"] .help-prog-bar{background:rgba(255,255,255,.14)}
 html[data-amb="jarnias"] .help-prog-bar span{background:#E4C878!important}
 html[data-amb="jarnias"] .help-prog-t{color:rgba(255,255,255,.5)}
@@ -2396,15 +2398,20 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
             <button class="hdr-btn" id="amb-btn" onclick="event.stopPropagation();toggleAmbPop()" title="Ambiance couleur"><i class="ti ti-palette" style="font-size:15px"></i><span class="hdr-lbl">Ambiance</span></button>
           </div>
           <button class="hdr-btn" id="btn-refresh" onclick="refreshFromServer()" title="Mettre &#224; jour les donn&#233;es"><i class="ti ti-refresh" style="font-size:15px"></i><span class="hdr-lbl">Actualiser</span></button>
-          <button class="hdr-btn" id="pwa-install-btn" onclick="pwaInstall()" style="color:#6D28D9" title="Installer l'application"><i class="ti ti-download" style="font-size:15px"></i><span class="hdr-lbl">Installer l'app</span></button>
-          <button class="hdr-btn" id="theme-btn" onclick="toggleTheme()" title="Th&#232;me clair / sombre"><i class="ti ti-moon" style="font-size:15px"></i><span class="hdr-lbl">Th&#232;me</span></button>
+          <div class="tb-more-wrap" style="position:relative;display:inline-block">
+            <button class="hdr-btn" id="hdr-more-btn" onclick="event.stopPropagation();toggleHdrMore(event)" title="Plus"><i class="ti ti-dots-vertical" style="font-size:15px"></i><span class="hdr-lbl">Plus</span></button>
+            <div class="tb-more-pop" id="hdr-more-pop" style="top:38px">
+              <button class="tb-more-item" id="pwa-install-btn" onclick="pwaInstall();closeHdrMore()" style="color:#6D28D9"><i class="ti ti-download"></i> Installer l'application</button>
+              <button class="tb-more-item" id="theme-btn" onclick="toggleTheme();closeHdrMore()"><i class="ti ti-moon"></i> Th&#232;me clair / sombre</button>
+            </div>
+          </div>
         </div>
         </div>
         <button class="sb-logout" onclick="doLogout()"><i class="ti ti-logout"></i> Se d&#233;connecter</button>
     </div>
     
     <div class="sb-body">
-      <input class="sb-search" type="search" id="srch" placeholder="Chantier, adresse, article..." oninput="renderList()"/>
+      <input class="sb-search" type="search" id="srch" placeholder="Rechercher dans mes appros..." oninput="renderList()"/>
       <button class="btn-admin" id="btn-home" onclick="goHome()" style="--c:#475569"><i class="ti ti-home" style="font-size:15px"></i> Accueil</button>
       <button class="btn-new-sb" onclick="openNew()"><i class="ti ti-plus" style="font-size:16px"></i> Nouvelle appro</button>
       <button class="btn-admin" id="btn-biblio" onclick="switchTab('biblio')" style="--c:#15803D"><i class="ti ti-books" style="font-size:15px"></i> Biblioth&#232;que</button>
@@ -2419,7 +2426,7 @@ try{var _amb=localStorage.getItem("appro_amb");if(_amb&&_amb!=="none")document.d
       <button class="btn-admin" id="btn-tickets" onclick="renderTickets()" style="display:none;--c:#1D4ED8"><i class="ti ti-ticket" style="font-size:15px"></i> <span id="tk-lbl">Demandes dépôt</span></button>
       <button class="btn-admin" id="btn-pending" onclick="renderPending()" style="--c:#B91C1C"><i class="ti ti-message-report" style="font-size:15px"></i> Messages en attente<span class="pending-badge" id="pending-badge" style="display:none">0</span></button>
       <button class="btn-admin" id="btn-notifs" onclick="renderNotifSettings()" style="--c:#6D28D9"><i class="ti ti-bell-cog" style="font-size:15px"></i> Notifications</button>
-      <button class="btn-admin" id="btn-perso" onclick="renderPersonnalisation()" style="display:none;--c:#6D28D9"><i class="ti ti-palette" style="font-size:15px"></i> Personnalisation</button>
+      <button class="btn-admin" id="btn-perso" onclick="renderPersonnalisation()" style="display:none;--c:#6D28D9"><i class="ti ti-settings" style="font-size:15px"></i> Réglages généraux</button>
       <div id="sheets-list"></div>
     </div>
   </aside>
@@ -4789,7 +4796,7 @@ function renderLibrary(){
 
   var h=tabsBarHTML();
   h+="<div class=\"lib-wrap\">";
-  h+="<div class=\"lib-searchbox\"><i class=\"ti ti-search\"></i><input class=\"lib-search\" type=\"search\" placeholder=\"Rechercher : chantier, conducteur, client, N\u00b0 affaire, ou un article...\" value=\""+esc(libSearch)+"\" oninput=\"libSearchUpd(this.value)\"/></div>";
+  h+="<div class=\"lib-searchbox\"><i class=\"ti ti-search\"></i><input class=\"lib-search\" type=\"search\" placeholder=\"Rechercher dans toute la biblioth\u00e8que : chantier, conducteur, client, N\u00b0 affaire, article...\" value=\""+esc(libSearch)+"\" oninput=\"libSearchUpd(this.value)\"/></div>";
   h+=_libFilterBar();
 
   if(!vis.length){
@@ -5022,7 +5029,7 @@ function renderList(){
   if(!(currentUser&&(currentUser.role==="depot"||isField()))){
     toggle="<div style=\"display:flex;gap:5px;padding:2px 0 9px\"><button class=\"seg-btn"+(_dv?"":" on")+"\" onclick=\"setDraftView(false)\" style=\"flex:1;border:1px solid "+(_dv?"#E2E8F0":"#1D4ED8")+";background:"+(_dv?"#fff":"#EFF6FF")+";color:"+(_dv?"#64748B":"#1D4ED8")+";border-radius:7px;padding:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\">Appros</button><button class=\"seg-btn"+(_dv?" on":"")+"\" onclick=\"setDraftView(true)\" style=\"flex:1;border:1px solid "+(_dv?"#A16207":"#E2E8F0")+";background:"+(_dv?"#FEF9C3":"#fff")+";color:"+(_dv?"#854D0E":"#64748B")+";border-radius:7px;padding:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit\"><i class=\"ti ti-pencil\" style=\"font-size:12px\"></i> Brouillons"+(_dc?" ("+_dc+")":"")+"</button></div>";
   }
-  var srchBar="<div style=\"position:relative;margin-bottom:8px\"><i class=\"ti ti-search\" style=\"position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:15px\"></i><input id=\"srch-lib\" value=\""+esc(q)+"\" oninput=\"onLibSearch(this.value)\" placeholder=\"Rechercher : chantier, adresse, N\u00b0 affaire, article...\" style=\"width:100%;box-sizing:border-box;padding:9px 12px 9px 33px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;font-family:inherit;background:#fff\"/></div>";
+  var srchBar="<div style=\"position:relative;margin-bottom:8px\"><i class=\"ti ti-search\" style=\"position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:15px\"></i><input id=\"srch-lib\" value=\""+esc(q)+"\" oninput=\"onLibSearch(this.value)\" placeholder=\"Rechercher dans mes appros...\" style=\"width:100%;box-sizing:border-box;padding:9px 12px 9px 33px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;font-family:inherit;background:#fff\"/></div>";
   document.getElementById("sheets-list").innerHTML=srchBar+toggle+html;
 }
 function togC(cid,key){
@@ -5788,6 +5795,8 @@ function delR(sec,i){
   var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
   var tr=document.getElementById("tr_"+sec+"_"+i);
   var rid=cur[sec][i]&&cur[sec][i].id;
+  var delDesignation=(cur[sec][i]&&cur[sec][i].designation)||"";
+  var snap=_snapshotSections(["consommables","fournitures","outillage"]);
   function commit(){
     /* On retrouve la ligne par SON id, pas par l'index capturé au clic : si deux
        suppressions sont lancées coup sur coup, le tableau a déjà bougé entre les
@@ -5797,6 +5806,11 @@ function delR(sec,i){
     cur[sec].splice(idx,1);
     if(!cur[sec].length)cur[sec].push(mkR());
     renderForm();
+    /* Même filet de sécurité que pour un ajout depuis le catalogue : une ligne
+       supprimée par erreur (clic malencontreux sur une longue appro) doit
+       pouvoir revenir sans tout retaper. */
+    var msg=delDesignation?("« "+delDesignation+" » supprimé"):"Ligne supprimée";
+    toastUndo(msg,function(){_restoreSections(snap);});
   }
   if(tr&&!reduce){
     tr.classList.add("row-out");
@@ -6312,7 +6326,7 @@ var NEWS=[
     {t:"nouveau",z:"Appros",txt:"Un fil de discussion en bas de chaque appro : posez une question au d\u00e9p\u00f4t ou au conducteur, la r\u00e9ponse reste attach\u00e9e au chantier au lieu de partir par t\u00e9l\u00e9phone."},
     {t:"nouveau",z:"Appros",txt:"Les articles ajout\u00e9s par un technicien depuis le chantier ressortent en cyan, avec leur propre l\u00e9gende \u2014 comme les ajouts du d\u00e9p\u00f4t."},
     {t:"nouveau",z:"Appros",txt:"Un technicien qui ajoute du mat\u00e9riel ou prend une appro en charge doit d\u00e9sormais taper son nom pour confirmer en la quittant, avec un commentaire s'il manque quelque chose. Visible ensuite \u00e0 c\u00f4t\u00e9 de la discussion."},
-    {t:"nouveau",z:"Personnalisation",txt:"Un nouveau th\u00e8me « JARNIAS », vert et or aux couleurs de l'entreprise, disponible dans le s\u00e9lecteur d'ambiance \u00e0 c\u00f4t\u00e9 de votre nom."},
+    {t:"nouveau",z:"R\u00e9glages g\u00e9n\u00e9raux",txt:"Un nouveau th\u00e8me « JARNIAS », vert et or aux couleurs de l'entreprise, disponible dans le s\u00e9lecteur d'ambiance \u00e0 c\u00f4t\u00e9 de votre nom."},
     {t:"ameliore",z:"Connexion",txt:"L'\u00e9cran de connexion a \u00e9t\u00e9 repens\u00e9 : plus sobre, aux couleurs JARNIAS."},
     {t:"ameliore",z:"Interface",txt:"Les \u00e9crans s'affichent d\u00e9sormais en douceur, section par section, au lieu d'un chargement brut."},
     {t:"corrige",z:"Appros",txt:"Une case vide apparaissait parfois \u00e0 c\u00f4t\u00e9 de la 3e carte du formulaire (Planning & camion). Corrig\u00e9."}
@@ -8077,7 +8091,7 @@ function tlTicketSection(){
 
 // ═══ MENU DE GAUCHE — ordre personnalisable ═══
 var MENU_KEYS=["btn-new-sb","btn-pending","btn-terrain","btn-admin","btn-dash","btn-ui","btn-alo","btn-trucks","btn-cmd","btn-annonce","btn-tickets","btn-notifs","btn-perso"];
-var MENU_LABELS={"btn-new-sb":"Nouvelle appro","btn-terrain":"Demande du terrain","btn-admin":"Administration","btn-dash":"Tableau de bord","btn-ui":"Param\u00e9trage interface","btn-alo":"Lien Alobees","btn-trucks":"Gestion des camions","btn-cmd":"Commandes","btn-annonce":"Annonces","btn-pending":"Messages en attente","btn-notifs":"Notifications","btn-tickets":"Demandes d\u00e9p\u00f4t","btn-perso":"Personnalisation"};
+var MENU_LABELS={"btn-new-sb":"Nouvelle appro","btn-terrain":"Demande du terrain","btn-admin":"Administration","btn-dash":"Tableau de bord","btn-ui":"Param\u00e9trage interface","btn-alo":"Lien Alobees","btn-trucks":"Gestion des camions","btn-cmd":"Commandes","btn-annonce":"Annonces","btn-pending":"Messages en attente","btn-notifs":"Notifications","btn-tickets":"Demandes d\u00e9p\u00f4t","btn-perso":"Réglages généraux"};
 function _menuOrder(){var mo=(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.menuOrder)?CONFIG.menuOrder.slice():[];MENU_KEYS.forEach(function(k){if(mo.indexOf(k)<0)mo.push(k);});return mo;}
 function applyMenuOrder(){try{var body=document.querySelector(".sb-body");var anchor=document.getElementById("sheets-list");if(!body||!anchor)return;_menuOrder().forEach(function(k){var el=document.getElementById(k);if(el)body.insertBefore(el,anchor);});}catch(e){}}
 function moveMenu(i,dir){var mo=_menuOrder();var j=i+dir;if(j<0||j>=mo.length)return;var t=mo[i];mo[i]=mo[j];mo[j]=t;if(typeof CONFIG==="undefined"||!CONFIG)CONFIG={};CONFIG.menuOrder=mo;applyMenuOrder();saveConfig(function(){});renderPersonnalisation();}
@@ -8261,7 +8275,7 @@ function renderPersonnalisation(){try{setActiveNav('btn-perso');}catch(e){}
   var m=document.getElementById("main-area");
   var SL=CONFIG.statutLabels||{};
   var h="<div class=\"settings-page\" style=\"max-width:680px;margin:0 auto;padding:22px 18px\">";
-  h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-palette\" style=\"font-size:24px;color:#6D28D9\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Personnalisation</h2></div>";
+  h+="<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:6px\"><i class=\"ti ti-settings\" style=\"font-size:24px;color:#6D28D9\"></i><h2 style=\"margin:0;font-size:21px;color:#0F172A\">Réglages généraux</h2></div>";
   h+="<p style=\"color:#64748B;font-size:13px;margin:0 0 20px\">Adapte l'appli à ton entreprise. Ces réglages sont partagés par toute l'équipe.</p>";
   // Fonctionnalités désactivables — en tête, c'est le seul réglage qui change
   // vraiment ce que l'équipe peut faire, pas juste l'apparence.
@@ -8370,7 +8384,7 @@ function savePerso(){
   CONFIG.tagline=((document.getElementById("perso-tag")||{}).value||"").trim();if(!CONFIG.tagline)delete CONFIG.tagline;
   CONFIG.statutLabels=CONFIG.statutLabels||{};
   ["en_attente","prete","sur_chantier","rendu","sortie"].forEach(function(k){var v=((document.getElementById("perso-st-"+k)||{}).value||"").trim();if(v)CONFIG.statutLabels[k]=v;else delete CONFIG.statutLabels[k];});
-  saveConfig(function(){toast("Personnalisation enregistr\u00e9e","ti-check");renderPersonnalisation();});
+  saveConfig(function(){toast("R\u00e9glages enregistr\u00e9s","ti-check");renderPersonnalisation();});
 }
 
 // ═══ GESTION LIEN ALOBEES (admin) ═══
@@ -8461,6 +8475,31 @@ function closeTbMore(){
 function _tbMoreOutside(e){
   var pop=document.getElementById("tb-more-pop");
   if(pop&&!pop.contains(e.target))closeTbMore();
+}
+/* Menu « Plus » de la sidebar (Installer l'app / Thème) : réglages qu'on
+   touche une fois puis qu'on oublie, sortis de la rangée d'icônes du haut
+   pour la désencombrer. Volontairement isolé de toggleTbMore ci-dessus
+   (le menu « Plus d'actions » de la fiche d'appro) : deux popovers distincts,
+   pas de risque de casser l'existant en généralisant à tort. */
+function toggleHdrMore(e){
+  if(e)e.stopPropagation();
+  var pop=document.getElementById("hdr-more-pop");
+  if(!pop)return;
+  var willOpen=!pop.classList.contains("show");
+  closeHdrMore();
+  if(willOpen){
+    pop.classList.add("show");
+    setTimeout(function(){document.addEventListener("click",_hdrMoreOutside);},0);
+  }
+}
+function closeHdrMore(){
+  var pop=document.getElementById("hdr-more-pop");
+  if(pop)pop.classList.remove("show");
+  document.removeEventListener("click",_hdrMoreOutside);
+}
+function _hdrMoreOutside(e){
+  var pop=document.getElementById("hdr-more-pop");
+  if(pop&&!pop.contains(e.target))closeHdrMore();
 }
 function toggleAmbPop(){
   var ex=document.getElementById("amb-pop");
@@ -9793,6 +9832,13 @@ function _navTruckOpen(){
     if(first&&!first.classList.contains("open"))tvTog(parseInt(first.getAttribute("data-i"),10));
   }catch(e){}
 }
+/* « Installer l'app » vit maintenant dans le menu « Plus » de la sidebar (repli
+   pour désencombrer la rangée d'icônes) : sans l'ouvrir, l'étape surlignerait
+   un bouton masqué, comme pour un camion replié ci-dessus. */
+function _navHomeMoreOpen(){
+  _navHome();
+  try{if(typeof toggleHdrMore==="function"){var pop=document.getElementById("hdr-more-pop");if(pop&&!pop.classList.contains("show"))toggleHdrMore();}}catch(e){}
+}
 function _navAnnonces(){_tutoEnsure(".ann-wrap",function(){renderAnnonces();});}
 function _navTerrain(){_tutoEnsure(".td-wrap",function(){renderTerrainDemande();});}
 function _navReglages(){_tutoEnsure("#cat-grid",function(){renderUISettings();});}
@@ -9818,7 +9864,7 @@ var TUTO_MODULES={
       {before:_navHome,sel:".home-empty",ic:"ti-clipboard-plus",t:"Aucune appro pour l'instant",d:"C'est normal : vous n'en avez pas encore cr\u00e9\u00e9. D\u00e8s la premi\u00e8re, vos chiffres s'afficheront ici.",action:"next"},
       {before:_navHome,sel:".home-empty .btn-cta",ic:"ti-plus",t:"Cr\u00e9er la premi\u00e8re",d:"Ce bouton ouvre une feuille de chantier vierge. C'est le point de d\u00e9part de tout le reste.",action:"next"},
       {before:_navHome,sel:".tabs-bar",ic:"ti-layout-navbar",t:"Deux onglets",d:"\u00ab Mes appros \u00bb listera vos chantiers en cours. \u00ab Biblioth\u00e8que \u00bb sert \u00e0 r\u00e9utiliser une ancienne appro.",action:"next"},
-      {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherchez par chantier, client, N\u00b0 d'affaire\u2026 ou m\u00eame par le nom d'un article contenu dans l'appro.",action:"next"},
+      {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherche parmi VOS appros : par chantier, client, N\u00b0 d'affaire\u2026 ou m\u00eame par le nom d'un article contenu dedans.",action:"next"},
       {before:_navHome,sel:"#btn-refresh",ic:"ti-refresh",t:"Mettre \u00e0 jour",d:"Ce bouton recharge les donn\u00e9es du serveur. L'appli le fait d\u00e9j\u00e0 toute seule quand vous y revenez.",action:"next"},
       {before:_navHome,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous pr\u00e9vient : appro pr\u00eate, demande trait\u00e9e, annonce de l'\u00e9quipe.",action:"next"},
       {before:_navHome,sel:"#btn-notifs",ic:"ti-bell-cog",t:"G\u00e9rer les notifications",d:"Activez-les sur cet appareil, ou coupez-les si besoin. Pratique aussi si vous changez de t\u00e9l\u00e9phone.",action:"next"},
@@ -9829,13 +9875,13 @@ var TUTO_MODULES={
       {before:_navHome,sel:".home-stats",ic:"ti-chart-bar",t:"Vos chiffres",d:"En préparation, prêtes, sur chantier, brouillons. Chaque carte est cliquable : elle ouvre la liste filtrée sur cet état.",action:"next"},
       {before:_navHome,sel:".tabs-bar",ic:"ti-layout-navbar",t:"Deux onglets",d:"\u00ab Mes appros \u00bb liste vos chantiers en cours. \u00ab Biblioth\u00e8que \u00bb sert \u00e0 r\u00e9utiliser une ancienne appro.",action:"next"},
       {before:_navHome,sel:".qa-primary",ic:"ti-plus",t:"Nouvelle appro",d:"Le bouton principal : il cr\u00e9e une feuille de chantier vierge.",action:"next"},
-      {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherchez par chantier, client, N\u00b0 d'affaire\u2026 ou m\u00eame par le nom d'un article contenu dans l'appro.",action:"next"},
+      {before:_navHome,sel:"#srch",ic:"ti-search",t:"La recherche",d:"Cherche parmi VOS appros : par chantier, client, N\u00b0 d'affaire\u2026 ou m\u00eame par le nom d'un article contenu dedans.",action:"next"},
       {before:_navHome,sel:"#btn-refresh",ic:"ti-refresh",t:"Mettre \u00e0 jour",d:"Ce bouton recharge les donn\u00e9es du serveur. L'appli le fait d\u00e9j\u00e0 toute seule quand vous y revenez.",action:"next"},
       {before:_navHome,sel:".notif-bell",ic:"ti-bell",t:"Les notifications",d:"La cloche vous pr\u00e9vient : appro pr\u00eate, demande trait\u00e9e, annonce de l'\u00e9quipe.",action:"next"},
       {before:_navHome,sel:"#btn-notifs",ic:"ti-bell-cog",t:"G\u00e9rer les notifications",d:"Activez-les sur cet appareil, ou coupez-les si besoin. Pratique aussi si vous changez de t\u00e9l\u00e9phone.",action:"next"},
       {before:_navHome,sel:"#btn-pending",ic:"ti-message-report",t:"Messages en attente",d:"Le d\u00e9p\u00f4t vous a \u00e9crit sur une appro et attend une r\u00e9ponse ? Elle appara\u00eet ici, avec un compteur rouge. R\u00e9pondez et elle en sort.",action:"next"},
       {before:_navHome,sel:"#scan-fab",ic:"ti-qrcode",t:"Scanner une appro",d:"Ce bouton ouvre la cam\u00e9ra pour scanner le QR d'une feuille papier. L'appro s'ouvre aussit\u00f4t dans l'appli \u2014 id\u00e9al au d\u00e9p\u00f4t pour retrouver une appro en un geste, sans repasser par le navigateur.",action:"next"},
-      {before:_navHome,sel:"#pwa-install-btn",ic:"ti-download",t:"Installer l'application",d:"Ajoutez AppROVISIO \u00e0 votre \u00e9cran d'accueil : une ic\u00f4ne, un d\u00e9marrage plein \u00e9cran, un acc\u00e8s plus rapide. Parfait sur le t\u00e9l\u00e9phone.",action:"next"},
+      {before:_navHomeMoreOpen,sel:"#pwa-install-btn",ic:"ti-download",t:"Installer l'application",d:"Ajoutez AppROVISIO \u00e0 votre \u00e9cran d'accueil : une ic\u00f4ne, un d\u00e9marrage plein \u00e9cran, un acc\u00e8s plus rapide. Parfait sur le t\u00e9l\u00e9phone. (D\u00e9sormais dans le menu \u00ab Plus \u00bb.)",action:"next"},
       {before:_navHome,sel:"#help-btn",ic:"ti-help-circle",t:"Ce bouton d'aide",d:"Vous pouvez relancer n'importe quel module quand vous voulez. Rien ne se perd.",action:"next"}
     ];
 
@@ -9888,7 +9934,7 @@ var TUTO_MODULES={
   biblio:{titre:"La bibliothèque",ic:"ti-books",roles:["conducteur","depot"],etapes:function(){
     return [
       {sel:"#btn-biblio",ic:"ti-books",t:"Ouvrez la bibliothèque",d:"Toutes les appros déjà créées, y compris les anciennes.",action:"click"},
-      {before:_navBiblio,sel:".lib-search",ic:"ti-search",t:"Chercher",d:"Par chantier, client, N° d'affaire… ou par un article contenu dans l'appro.",action:"next"},
+      {before:_navBiblio,sel:".lib-search",ic:"ti-search",t:"Chercher dans toute la bibliothèque",d:"Contrairement à la recherche de la sidebar (limitée à vos appros), celle-ci porte sur toute l'équipe : par chantier, client, conducteur, N° d'affaire… ou un article.",action:"next"},
       {before:_navBiblio,sel:".pill-group",ic:"ti-filter",t:"Trier et filtrer",d:"Par conducteur, par date, par épinglées. Le tri change juste l'ordre d'affichage.",action:"next"},
       {before:_navBiblio,sel:".lib-view-tog",ic:"ti-layout-grid",t:"Grille ou liste",d:"Deux façons de voir : cartes en grille, ou liste compacte.",action:"next"},
       {before:_navBiblio,sel:".lib-pin",ic:"ti-pin",t:"Épingler un modèle",d:"Une appro type que vous refaites souvent ? Épinglez-la : elle remonte toujours en tête.",action:"next"},
@@ -9970,7 +10016,7 @@ var TUTO_MODULES={
     ];
   }},
 
-  reglages:{titre:"Personnaliser",ic:"ti-adjustments",roles:["conducteur","depot"],etapes:function(){
+  reglages:{titre:"Réglages généraux",ic:"ti-settings",roles:["conducteur","depot"],etapes:function(){
     var s=[
       {before:_navHome,sel:"#amb-btn",ic:"ti-palette",t:"Les ambiances",d:"Changez les couleurs de l'application selon votre goût. C'est propre à vous.",action:"next"}
     ];
@@ -9985,7 +10031,7 @@ var TUTO_MODULES={
         {before:_navReglages,sel:"#ui-client-new",ic:"ti-building",t:"Vos clients",d:"La liste proposée automatiquement quand vous remplissez une appro.",action:"next"}
       ]);
     }
-    if((currentUser&&currentUser.role)==="admin")s.push({before:_navReglages,sel:"#btn-perso",ic:"ti-user-cog",t:"Personnalisation",d:"Libellés, notifications par email, ordre du menu : les réglages de l'équipe.",action:"next"});
+    if((currentUser&&currentUser.role)==="admin")s.push({before:_navReglages,sel:"#btn-perso",ic:"ti-settings",t:"Réglages généraux",d:"La gestion de l'appli pour toute l'équipe : fonctionnalités activées, libellés, notifications, ordre du menu.",action:"next"});
     return s;
   }}
 };
