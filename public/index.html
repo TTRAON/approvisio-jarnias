@@ -3300,7 +3300,7 @@ function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36
 function mkR(n,q){return{id:uid(),designation:n||"",quantite:q||"",disponibilite:"",commentaire:"",addBatch:null,returned:false,depotAdded:false,techAdded:false};}
 function mkS(){
   return{id:uid(),
-    reference:(function(){var n=new Date();return"REFJA"+n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0");})(),
+    reference:(function(){var n=new Date();var pfx=(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.refPrefix)?CONFIG.refPrefix:"REFJA";return pfx+n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0");})(),
     noAffaire:"",nomChantier:"",chargeAffaires:"",conducteur:"",coordClient:"",clientSite:"",adresseChantier:"",dateAppro:"",dateChantier:"",
     typeChantiers:[],typeConfirmed:false,priorite:"normale",notes:[],statut:"en_attente",draft:true,preparedAt:null,modifPrep:false,addToPrepare:false,tlName:"",tlCamion:"",truckApplied:false,additionDates:[],
     consommables:[mkR(),mkR(),mkR()],fournitures:[mkR(),mkR(),mkR()],outillage:[mkR(),mkR(),mkR()],
@@ -4921,6 +4921,10 @@ function takeBaseFromLib(id){
   ns.fournitures=s.fournitures.map(function(r){return Object.assign({},r,{id:uid(),addBatch:null,returned:false,depotAdded:false,techAdded:false});});
   ns.outillage=s.outillage.map(function(r){return Object.assign({},r,{id:uid(),addBatch:null,returned:false,depotAdded:false,techAdded:false});});
   ns.typeChantiers=getTypes(s).slice();ns.typeConfirmed=s.typeConfirmed;
+  /* Le conducteur par d\u00e9faut, c'est TOUJOURS celui qui \u00e9crit la fiche, jamais
+     celui de l'appro copi\u00e9e \u2014 modifiable ensuite si besoin (ex. il la r\u00e9dige
+     pour le compte d'un coll\u00e8gue). */
+  if(currentUser&&(currentUser.role==="conducteur"||currentUser.role==="admin")&&currentUser.name)ns.conducteur=currentUser.name;
   tpl=s.nomChantier||"appro pr\u00e9c\u00e9dente";
   currentTab="mes";
   cur=ns;saved=false;aiSug=null;window._err=null;addMode=false;addDate=null;
@@ -5907,6 +5911,9 @@ function takeBase(id){
   ns.fournitures=s.fournitures.map(function(r){return Object.assign({},r,{id:uid(),addBatch:null,returned:false});});
   ns.outillage=s.outillage.map(function(r){return Object.assign({},r,{id:uid(),addBatch:null,returned:false});});
   ns.typeChantiers=getTypes(s).slice();ns.typeConfirmed=s.typeConfirmed;
+  /* Le conducteur par d&#233;faut, c'est TOUJOURS celui qui &#233;crit la fiche, jamais
+     celui de l'appro copi&#233;e. */
+  if(currentUser&&(currentUser.role==="conducteur"||currentUser.role==="admin")&&currentUser.name)ns.conducteur=currentUser.name;
   tpl=s.nomChantier||"appro pr&#233;c&#233;dente";cur=ns;saved=false;aiSug=null;window._err=null;addMode=false;addDate=null;
   renderForm();toast("Nouvelle appro cr&#233;&#233;e &#8212; l&#39;original est intact","ti-copy");
 }
@@ -8318,6 +8325,15 @@ function renderPersonnalisation(){try{setActiveNav('btn-perso');}catch(e){}
     h+="<div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:12px;color:#94A3B8;width:130px;flex-shrink:0\">"+p[1]+"</span><input id=\"perso-st-"+p[0]+"\" class=\"ui-in\" style=\"flex:1\" value=\""+esc(SL[p[0]]||"")+"\" placeholder=\""+p[1]+"\"/></div>";
   });
   h+="</div></div>";
+  // Références & délais
+  h+="<div class=\"ui-sec\" style=\"margin-bottom:16px\"><div class=\"ui-sec-hd\"><i class=\"ti ti-hash\" style=\"color:#6D28D9\"></i> Références & délais</div><div style=\"padding:12px 14px;display:flex;flex-direction:column;gap:14px\">";
+  h+="<div><label style=\"display:block;font-size:10.5px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px\">Préfixe des références</label>";
+  h+="<input id=\"perso-refprefix\" class=\"ui-in\" style=\"max-width:200px\" value=\""+esc(CONFIG.refPrefix||"REFJA")+"\" placeholder=\"REFJA\" maxlength=\"12\"/>";
+  h+="<div style=\"font-size:11.5px;color:#94A3B8;margin-top:5px\">L'année et le mois se rajoutent automatiquement — ex. « "+esc(CONFIG.refPrefix||"REFJA")+new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0")+" ».</div></div>";
+  h+="<div><label style=\"display:block;font-size:10.5px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px\">Alerte « Échéance proche »</label>";
+  h+="<div style=\"display:flex;align-items:center;gap:8px\"><input id=\"perso-deadline\" type=\"number\" min=\"1\" max=\"30\" class=\"ui-in\" style=\"width:80px\" value=\""+esc(String(CONFIG.deadlineDays||3))+"\"/><span style=\"font-size:12.5px;color:#64748B\">jour(s) avant l'échéance</span></div>";
+  h+="<div style=\"font-size:11.5px;color:#94A3B8;margin-top:5px\">Détermine quand le bandeau « Échéance proche — à préparer » apparaît sur le tableau de bord, pour toute l'équipe.</div></div>";
+  h+="</div></div>";
   // Apparence — ambiances & thèmes (choix personnel, par appareil)
   var _curAmb=(function(){try{return localStorage.getItem("appro_amb")||"none";}catch(e){return "none";}})();
   var _ambNames={none:"Aucune (sobre)",jarnias:"JARNIAS",aurore:"Aurore",halo:"Halo",maille:"Maille",teinte:"Teinte",frais:"Frais",synthwave:"Synthwave",neon:"N\u00e9on",memphis:"Memphis",chrome:"Chrome",hybride:"Hybride",foret:"For\u00eat",botanique:"Botanique",terre:"Terre",ocean:"Oc\u00e9an",zen:"Zen",verre:"Verre"};
@@ -8393,6 +8409,10 @@ function savePerso(){
   CONFIG.tagline=((document.getElementById("perso-tag")||{}).value||"").trim();if(!CONFIG.tagline)delete CONFIG.tagline;
   CONFIG.statutLabels=CONFIG.statutLabels||{};
   ["en_attente","prete","sur_chantier","rendu","sortie"].forEach(function(k){var v=((document.getElementById("perso-st-"+k)||{}).value||"").trim();if(v)CONFIG.statutLabels[k]=v;else delete CONFIG.statutLabels[k];});
+  var refPfx=((document.getElementById("perso-refprefix")||{}).value||"").trim();
+  if(refPfx)CONFIG.refPrefix=refPfx;else delete CONFIG.refPrefix;
+  var dl=parseInt((document.getElementById("perso-deadline")||{}).value,10);
+  if(dl&&dl>0&&dl<=30)CONFIG.deadlineDays=dl;else delete CONFIG.deadlineDays;
   saveConfig(function(){toast("R\u00e9glages enregistr\u00e9s","ti-check");renderPersonnalisation();});
 }
 
@@ -9149,7 +9169,8 @@ function renderDeadlineBanner(){
   var urgent=(sheets||[]).filter(function(s){
     if(s.statut==="prete"||s.statut==="sortie")return false;
     var du=daysUntil(s.dateAppro);
-    return du!==null&&du<=3;
+    var seuil=(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.deadlineDays)?parseInt(CONFIG.deadlineDays,10)||3:3;
+    return du!==null&&du<=seuil;
   });
   if(!urgent.length){el.style.display="none";el.innerHTML="";return;}
   urgent.sort(function(a,b){return daysUntil(a.dateAppro)-daysUntil(b.dateAppro);});
@@ -10607,6 +10628,17 @@ function _syncMenuVisibility(){
   var bbl=document.getElementById("btn-biblio");if(bbl)bbl.style.display=isField()?"none":"flex";
 }
 function enterApp(){
+  /* Filet de sécurité pour un appareil partagé : si quelqu'un se connecte
+     juste après quelqu'un d'autre sans recharger la page, aucune trace de
+     la session précédente ne doit rester visible — c'est exactement ce qui
+     est arrivé à Su : une appro encore ouverte en mémoire, avec le nom du
+     PRÉCÉDENT conducteur pré-rempli, s'est retrouvée affichée au nouveau
+     compte qui venait de se connecter. */
+  cur=null;tpl=null;saved=false;aiSug=null;addMode=false;addDate=null;
+  _threadMsgs=[];_threadLectures=[];_threadMaLecture=null;
+  _sigList=[];
+  PENDING=[];
+  _techDirty=false;_techDirtySnap=null;
   // Configure sidebar selon le r\u00f4le
   var ri=ROLE_INFO[currentUser.role]||ROLE_INFO.conducteur;
   try{_syncInstallBtn();}catch(e){}
