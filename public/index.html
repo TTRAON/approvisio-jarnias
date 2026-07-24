@@ -247,7 +247,7 @@ html[data-amb="jarnias"] .btn-admin:hover i,html[data-amb="jarnias"] .btn-admin.
 html[data-amb="jarnias"] .btn-admin.active::before{background:#E4C878!important}
 
 /* Regroupement par conducteur ("TANGUY TRAON · 2") */
-html[data-amb="jarnias"] .cat-lbl{color:rgba(255,255,255,.55)}
+html[data-amb="jarnias"] .cat-lbl{color:#E4C878;font-weight:700}
 html[data-amb="jarnias"] .cat-cnt{background:rgba(255,255,255,.1);color:rgba(255,255,255,.65)}
 
 /* Cartes d'appro (liste + bibliothèque) */
@@ -527,6 +527,8 @@ input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{o
 
 /* boutons de statut vivants */
 .stbtn{position:relative;overflow:hidden;transition:transform .12s var(--ease),box-shadow .18s var(--ease),filter .16s var(--ease)}
+.stat-jump{border:1px dashed #CBD5E1;border-radius:7px;padding:6px 9px;font-size:11.5px;font-weight:600;color:#64748B;background:#fff;cursor:pointer;font-family:inherit}
+.stat-jump:hover{border-color:#94A3B8;color:#475569}
 .stbtn:hover{transform:translateY(-1px);filter:brightness(.98);box-shadow:0 4px 12px rgba(15,23,42,.1)}
 .stbtn:active{transform:scale(.96)}
 
@@ -5609,7 +5611,7 @@ h+="";
   h+=truckSelectorHTML();
   h+="</div></div>";
   h+="</div>"; /* fin .info-grid (2 colonnes sur ordinateur) */
-  h+="<div class=\"card\" style=\"border-left:4px solid \"+((STATUT[cur.statut]||STATUT.en_attente).color)+\"\"><div style=\"padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap\"><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:12px;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.5px\">Statut :</span>"+statutBadge(cur.statut)+(cur.preparedAt?"<span style=\"font-size:11px;color:#94A3B8\">pr\u00e9par\u00e9e le "+cur.preparedAt+"</span>":"")+"</div><div style=\"display:flex;gap:6px\">"+statutButtons()+"</div></div></div>";
+  h+="<div class=\"card\" style=\"border-left:4px solid \"+((STATUT[cur.statut]||STATUT.en_attente).color)+\"\"><div style=\"padding:13px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap\"><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-size:12px;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.5px\">Statut :</span>"+statutBadge(cur.statut)+(cur.preparedAt?"<span style=\"font-size:11px;color:#94A3B8\">pr\u00e9par\u00e9e le "+cur.preparedAt+"</span>":"")+"</div><div style=\"display:flex;align-items:center;gap:8px\">"+statutButtons()+_statutJumpHTML()+"</div></div></div>";
   h+=catDatalistHTML();
   h+=aiBanner+aiErr+legH()+secH;
 h+="<div class=\"card\"><div class=\"card-hd\"><div class=\"card-hd-t\"><i class=\"ti ti-star\" style=\"font-size:16px;color:#F59E0B\"></i> Qualit\u00e9 de l'appro</div>"+(avgNote(cur)>0?"<span class=\"card-hd-n\">"+avgNote(cur).toFixed(1)+"/5 \u00b7 "+cur.notes.length+" avis</span>":"")+"</div><div style=\"padding:16px 18px;display:flex;align-items:center;gap:14px\"><div style=\"display:flex;gap:3px\">"+starsHTML(avgNote(cur),true,cur.id)+"</div><span style=\"font-size:12px;color:#94A3B8\">"+(avgNote(cur)>0?"Note moyenne : "+avgNote(cur).toFixed(1)+"/5":"Cliquez sur les \u00e9toiles pour noter")+"</span></div></div>";
@@ -6002,6 +6004,32 @@ function statutButtons(){
     else btns+="<span style=\"font-size:11px;color:#065F46;background:#D1FAE5;padding:6px 12px;border-radius:20px;font-weight:600;display:inline-flex;align-items:center;gap:5px\"><i class=\"ti ti-package-import\"></i> Pr\u00eate au d\u00e9p\u00f4t</span>";
   }
   return btns;
+}
+/* Bascule de statut libre, \u00e0 tout moment (Su) : contrairement \u00e0 statutButtons()
+   ci-dessus (qui ne propose QUE la prochaine \u00e9tape logique), celle-ci laisse
+   sauter directement \u00e0 n'importe quel statut. R\u00e9serv\u00e9e \u00e0 l'admin, au d\u00e9p\u00f4t,
+   ET au conducteur RESPONSABLE de CETTE appro pr\u00e9cise (m\u00eame r\u00e8gle que partout
+   ailleurs : _isMyAppro, pas juste \u00eatre conducteur en g\u00e9n\u00e9ral). */
+function _statutJumpHTML(){
+  if(!cur)return"";
+  var eligible=canManage()||(currentUser&&currentUser.role==="conducteur"&&_isMyAppro(cur));
+  if(!eligible)return"";
+  var order=["en_attente","prete","sur_chantier","rendu","sortie"];
+  var opts=order.map(function(k){
+    var lbl=(STATUT[k]||{}).label||k;
+    return "<option value=\""+k+"\""+(cur.statut===k?" selected":"")+">"+esc(lbl)+"</option>";
+  }).join("");
+  return "<select class=\"stat-jump\" onchange=\"_statutJump(this)\" title=\"Changer le statut directement, \u00e0 tout moment\">"+opts+"</select>";
+}
+function _statutJump(sel){
+  var v=sel.value;
+  if(!cur||v===cur.statut)return;
+  var lbl=((STATUT[v]||{}).label)||v;
+  if(!confirm("Passer cette appro au statut \u00ab "+lbl+" \u00bb ?")){
+    sel.value=cur.statut; // annul\u00e9 : on remet le menu sur le statut actuel
+    return;
+  }
+  setStatut(v);
 }
 function setStatut(st){
   if(!cur)return;
