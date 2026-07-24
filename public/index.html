@@ -9237,7 +9237,14 @@ function _isMyAppro(s){
     var names=[s.conducteur,s.chargeAffaires,s.tlName];
     if(names.some(function(n){return _stripAccents((n||"").toLowerCase())===me;}))return true;
   }
-  if(s._createdBy&&s._createdBy===currentUser.id)return true;
+  /* Pas de secours sur _createdBy : une appro que vous avez créée puis
+     réassignée à quelqu'un d'autre ne doit plus vous suivre nulle part —
+     ni dans les échéances, ni dans les droits de suppression, ni ailleurs.
+     C'est la même règle que « Mes appros » (_maMine ci-dessous) : le nom sur
+     la fiche fait foi, pas qui l'a créée à l'origine. Avant ce correctif, une
+     appro réassignée continuait d'apparaître dans les échéances de l'ancien
+     conducteur alors qu'elle avait disparu de sa liste « Mes appros » — la
+     source exacte du signalement de Su (« Pose de filet »). */
   return false;
 }
 function _sheetsMine(){
