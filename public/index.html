@@ -9168,6 +9168,7 @@ function renderDeadlineBanner(){
   if(!el)return;
   var urgent=(sheets||[]).filter(function(s){
     if(s.statut==="prete"||s.statut==="sortie")return false;
+    if(!_isMyAppro(s))return false; // un conducteur ne voit QUE ses propres échéances, pas toute la bibliothèque
     var du=daysUntil(s.dateAppro);
     var seuil=(typeof CONFIG!=="undefined"&&CONFIG&&CONFIG.deadlineDays)?parseInt(CONFIG.deadlineDays,10)||3:3;
     return du!==null&&du<=seuil;
